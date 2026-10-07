@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Issues a Meridian Pro licence key.
+// Issues a Meridian licence key.
 //
-//   node sign.mjs --ref ORDER-1234 [--key keys/private.pem] [--sku pro]
+//   node sign.mjs --ref ORDER-1234 [--key keys/private.pem] [--sku pro|premium]
 //
 // Output format (what the customer pastes into the app):
 //   MERIDIAN-<base64url payload>.<base64url signature>
-// payload = {"sku":"pro","iat":<unix seconds>,"ref":"ORDER-1234"}
+// payload = {"sku":"pro"|"premium","iat":<unix seconds>,"ref":"ORDER-1234"}
 // signature = SHA256withECDSA over the raw payload bytes, DER encoded
 // (matches java.security.Signature "SHA256withECDSA" in MainActivity.activate).
 import { createSign, createPrivateKey } from "node:crypto";
@@ -21,11 +21,15 @@ const args = Object.fromEntries(
 
 const ref = args.ref;
 if (!ref) {
-  console.error("Usage: node sign.mjs --ref <order id> [--key keys/private.pem] [--sku pro]");
+  console.error("Usage: node sign.mjs --ref <order id> [--key keys/private.pem] [--sku pro|premium]");
   process.exit(1);
 }
 const keyPath = args.key || join(import.meta.dirname, "keys", "private.pem");
 const sku = args.sku || "pro";
+if (sku !== "pro" && sku !== "premium") {
+  console.error("sku must be pro or premium");
+  process.exit(1);
+}
 
 const payload = Buffer.from(JSON.stringify({ sku, iat: Math.floor(Date.now() / 1000), ref }), "utf8");
 const signer = createSign("SHA256");

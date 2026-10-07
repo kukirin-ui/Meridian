@@ -516,6 +516,10 @@ public class MainActivity extends Activity {
                 if (shown.length() == 0) shown = "This phone";
                 String brand = props.optString("brand", "");
                 o.put("model", shown);
+                // Build.MODEL and brand stay language-neutral. shown/marketname can be a
+                // locale string from the ROM (for example a Croatian marketing name).
+                o.put("product", model);
+                o.put("brand", brand);
                 o.put("rawModel", (brand.length() > 0 ? brand + " " : "") + model);
                 o.put("release", Build.VERSION.RELEASE == null ? "" : Build.VERSION.RELEASE);
                 o.put("abi", Build.SUPPORTED_ABIS != null && Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : "");
@@ -846,8 +850,9 @@ public class MainActivity extends Activity {
 
         /**
          * Activates a licence key of the form MERIDIAN-<payload>.<signature> where payload is
-         * base64url JSON {"sku":"pro","iat":...,"ref":"..."} and signature is a P-256 ECDSA (SHA-256)
-         * signature over the raw payload bytes. Verified offline against LICENSE_PUBKEY.
+         * base64url JSON {"sku":"pro"|"premium","iat":...,"ref":"..."} and signature is a P-256
+         * ECDSA (SHA-256) signature over the raw payload bytes. Verified offline against LICENSE_PUBKEY.
+         * The words paid, full, and unlocked are not keys and do not unlock.
          */
         @JavascriptInterface
         public String activate(String key) {
@@ -856,12 +861,6 @@ public class MainActivity extends Activity {
                 String k = key == null ? "" : key.trim();
                 if (k.length() > 0 && k.charAt(0) == '\uFEFF') k = k.substring(1).trim();
                 k = k.replace("\r", "").replace("\n", "").replace(" ", "");
-                // 1.8.6 stored unlock as the four bytes "paid" in files/full.key. People who
-                // extracted that file and paste it here are restoring a purchase, not spoofing a new one.
-                if (k.equals("paid") || k.equalsIgnoreCase("full") || k.equalsIgnoreCase("unlocked")) {
-                    markPaid();
-                    return "{\"ok\":true}";
-                }
                 if (k.startsWith("MERIDIAN-")) k = k.substring(9);
                 int dot = k.indexOf('.');
                 if (dot <= 0) return "{\"ok\":false,\"error\":\"That is not a Meridian key. It should start with MERIDIAN-\"}";
@@ -874,9 +873,10 @@ public class MainActivity extends Activity {
                 verifier.update(payload);
                 if (!verifier.verify(sig)) return "{\"ok\":false,\"error\":\"The key did not verify.\"}";
                 JSONObject claims = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8));
-                if (!"pro".equals(claims.optString("sku", ""))) return "{\"ok\":false,\"error\":\"That key is for a different product.\"}";
-                markPaid();
-                return "{\"ok\":true}";
+                String sku = claims.optString("sku", "");
+                if (!"pro".equals(sku) && !"premium".equals(sku)) return "{\"ok\":false,\"error\":\"That key is for a different product.\"}";
+                markPaid(sku);
+                return "{\"ok\":true,\"sku\":" + JSONObject.quote(sku) + "}";
             } catch (Exception ex) {
                 return "{\"ok\":false,\"error\":\"The key could not be read.\"}";
             }
@@ -912,8 +912,21 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String unlocked() {
-            if (OPEN) { markPaid(); return "yes"; }
-            return new File(getFilesDir(), "full.key").isFile() ? "yes" : "no";
+            File licence = new File(getFilesDir(), "full.key");
+            if (OPEN) {
+                if (!licence.isFile() || licence.length() == 0) markPaid("pro");
+                return "yes";
+            }
+            return licence.isFile() && licence.length() > 0 ? "yes" : "no";
+        }
+
+        /** free, pro, or premium. An existing full.key from this install stays pro unless it says premium. */
+        @JavascriptInterface
+        public String tier() {
+            File licence = new File(getFilesDir(), "full.key");
+            if (!licence.isFile() || licence.length() == 0) return "free";
+            if ("premium".equals(readSmallText(licence, 32))) return "premium";
+            return "pro";
         }
 
         @JavascriptInterface
@@ -1407,19 +1420,40 @@ public class MainActivity extends Activity {
         return line.matches("(?i)^(?:(?:pkg|apt|apt-get|dpkg|curl|wget|getprop|termux-[a-z0-9-]+|python3?|pip3?|npm|npx|node|git|clang|gcc|cmake|make|ninja|ls|cat|free|df|du|uname|ping|ssh|ssh-keygen|sshd|vim|nvim|nano|cd|mkdir|echo|printf|export|chmod|chown|cp|mv|rm|tar|unzip|zip|sed|awk|grep|rg|find|which|source|bash|sh|proot-distro|cargo|rustc|go|java|javac|ruby|php|lua|perl|ffmpeg|sqlite3|rsync|tmux|nproc|env|test|llama-cli|llama-server)\\b|clang\\+\\+|g\\+\\+|\\[ |\\./).*");
     }
 
-    private void markPaid() {
+    /** Writes pro or premium into files/full.key. Never writes the four letters paid. Does not downgrade premium. */
+    private void markPaid(String sku) {
         try {
             java.io.File out = new java.io.File(getFilesDir(), "full.key");
+            String current = readSmallText(out, 32);
+            String next = ("premium".equals(sku) || "premium".equals(current)) ? "premium" : "pro";
             java.io.FileOutputStream stream = new java.io.FileOutputStream(out);
-            stream.write("paid".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            stream.write(next.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             stream.close();
         } catch (Exception ignored) {}
     }
 
+    private String readSmallText(File file, int max) {
+        if (file == null || !file.isFile()) return "";
+        try {
+            int n = (int) Math.min(file.length(), max);
+            if (n <= 0) return "";
+            byte[] buf = new byte[n];
+            java.io.FileInputStream in = new java.io.FileInputStream(file);
+            int got = in.read(buf);
+            in.close();
+            if (got <= 0) return "";
+            String text = new String(buf, 0, got, java.nio.charset.StandardCharsets.UTF_8).trim();
+            if (text.startsWith("\uFEFF")) text = text.substring(1).trim();
+            return text;
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
     /**
-     * 1.8.6 wrote files/full.key after Revolut. A sideloaded debug APK is a different
-     * signing cert, so Android treats it as a new app and that file is gone — unless the
-     * user kept the same debug cert, or copied the file. Also look next to the APK / Downloads.
+     * Keeps files/full.key when this install already unlocked. Does not copy a Downloads
+     * file whose body is the four letters paid, full, or unlocked. A MERIDIAN- file in
+     * Downloads is adopted only after the same signature check as activate().
      */
     private void adoptLegacyUnlock() {
         File local = new File(getFilesDir(), "full.key");
@@ -1432,18 +1466,11 @@ public class MainActivity extends Activity {
         };
         for (File guess : guesses) {
             if (guess == null || !guess.isFile()) continue;
-            try {
-                byte[] buf = new byte[(int) Math.min(guess.length(), 32)];
-                java.io.FileInputStream in = new java.io.FileInputStream(guess);
-                int n = in.read(buf);
-                in.close();
-                String text = new String(buf, 0, Math.max(n, 0), java.nio.charset.StandardCharsets.UTF_8).trim();
-                if (text.startsWith("\uFEFF")) text = text.substring(1).trim();
-                if ("paid".equals(text) || text.startsWith("MERIDIAN-")) {
-                    markPaid();
-                    return;
-                }
-            } catch (Exception ignored) {}
+            String text = readSmallText(guess, 8192);
+            if (text.equals("paid") || text.equalsIgnoreCase("full") || text.equalsIgnoreCase("unlocked")) continue;
+            if (!text.startsWith("MERIDIAN-")) continue;
+            new Deck().activate(text);
+            if (local.isFile() && local.length() > 0) return;
         }
     }
 

@@ -102,8 +102,8 @@
   .osx.mini b { inset: 2px; animation: none; }
   .osx.mini b::after { width: 1px; height: 8px; animation: none; }
   .osx.bar { width: 28px; height: 28px; min-height: 28px; margin: 0; padding: 0; border: 0; border-radius: 8px; z-index: 1; flex: none; }
-  .osx.bar b { inset: 5px; animation: none; }
-  .osx.bar b::after { height: 10px; }
+  .osx.bar b { inset: 5px; animation: none !important; }
+  .osx.bar b::after { height: 10px; animation: none !important; }
   .osxtile { display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .healthrow { display: flex; justify-content: center; }
   .healthrow .tile { width: 168px; }
@@ -142,41 +142,40 @@
   .system-core { position: relative; }
   .stage { width: 190px; height: 190px; margin: 0 auto; perspective: 900px; display: block; }
   .stage.compact { width: 96px; height: 96px; margin: 0; flex: none; }
-  .globe {
-    width: 100%; height: 100%; position: relative; border-radius: 50%; overflow: hidden; contain: paint;
+  .termorb {
+    width: 100%; height: 100%; border-radius: 50%; position: relative;
+    display: flex; align-items: center; justify-content: center; gap: 3px;
+    color: var(--accent);
     background:
-      radial-gradient(circle at 32% 28%, rgba(255,255,255,.55) 0 4%, transparent 18%),
-      radial-gradient(circle at 40% 42%, #1d4e89 0 28%, #0c3a66 46%, #071e36 68%, #02060c 100%);
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.42), transparent 18%),
+      radial-gradient(circle at 48% 46%, #3a3228 0%, #1a1612 46%, #070605 100%);
     box-shadow:
-      inset -18px -16px 28px rgba(0,0,0,.82),
-      inset 8px 6px 14px rgba(255,255,255,.18),
-      0 0 0 1px rgba(255,255,255,.12),
-      0 0 32px var(--accent-glow);
+      inset -14px -16px 22px rgba(0,0,0,.78),
+      inset 6px 5px 10px rgba(255,255,255,.12),
+      0 0 0 1px var(--accent-border),
+      0 0 28px var(--accent-glow);
+    font: 700 28px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: -0.04em;
   }
-  .globe-drift {
-    position: absolute; top: 0; left: 0; width: 200%; height: 100%;
-    animation: globe-drift 22s linear infinite;
+  .stage.compact .termorb { font-size: 20px; gap: 2px; }
+  .termorb-prompt { text-shadow: 0 0 12px var(--accent-glow); }
+  .termorb-caret {
+    width: 2px; height: 0.85em; border-radius: 1px; background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: blink 1.1s steps(1) infinite;
   }
-  .globe-map { width: 100%; height: 100%; display: block; }
-  .globe-map .land { fill: #c4a46a; }
-  .globe-map .graticule { fill: none; stroke: rgba(255,255,255,.28); stroke-width: 0.6; }
-  .globe-shine {
-    position: absolute; left: 14%; top: 8%; width: 46%; height: 28%; border-radius: 50%;
-    background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
-    pointer-events: none; animation: globe-gleam 5.2s ease-in-out infinite;
+  .logo-slot, #headmark, .logo-mark { color: var(--accent); line-height: 0; }
+  .logo-slot {
+    width: 28px; height: 28px; min-width: 28px; min-height: 28px; padding: 0; margin: 0;
+    border: 0; border-radius: 8px; background: transparent; display: grid; place-items: center; flex: none;
   }
-  .globe-night {
-    position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-    background: linear-gradient(100deg, transparent 36%, rgba(0,0,0,.22) 58%, rgba(0,0,0,.72) 100%);
-  }
-  .globe-ring {
-    position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; text-decoration: none;
-    border: 1px solid var(--accent-border);
-    box-shadow: 0 0 18px var(--accent-glow), inset 0 0 12px rgba(120,180,255,.25);
-    opacity: .85;
-  }
-  @keyframes globe-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
-  @keyframes globe-gleam { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }
+  .logo-slot.pressed { filter: brightness(1.45); }
+  #headmark { width: 22px; height: 22px; flex: none; display: grid; place-items: center; }
+  .logo-mark { display: block; }
+  .logo-mark.md { width: 52px; height: 52px; flex: none; }
+  .logo-mark.lg { width: 74px; height: 74px; margin: 4px auto 0; }
+  .marklogo, .marklogo * { animation: none !important; transition: none !important; }
+  .marklogo { width: 100%; height: 100%; display: block; }
   .orb { display: none; }
   .status-text { margin-top: 16px; text-align: center; font-weight: 700; font-size: 0.8125rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); transition: color 0.4s ease; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -191,7 +190,7 @@
   .desk .sec { padding: 10px 12px 0; }
   .sec.mach { color: var(--accent); }
   .sec.lib { color: var(--muted); }
-  .bend { height: 16px; margin: 0 20px; border-bottom: 1px solid var(--line); border-left: 1px solid var(--accent-border); border-radius: 0 0 0 22px; }
+  .bend { height: 22px; margin: 6px 14px 8px 18px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); border-radius: 0 0 0 28px; box-shadow: 0 0 12px var(--accent-glow); opacity: 1; }
   .page { display: flex; flex-direction: column; min-height: 0; }
   .brandfill { flex: 1; min-height: 140px; display: flex; align-items: center; justify-content: center; padding: 36px 0 48px; }
   .logo { width: 104px; height: 104px; position: relative; }
@@ -244,7 +243,8 @@
   .runbar .ghost { width: auto; min-height: 36px; padding: 0 12px; }
   .runbar .muted { flex: 1; font-size: 0.8125rem; }
   textarea.cmd { display: block; padding: 10px 12px; line-height: 1.45; font: 0.8125rem/1.45 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; resize: vertical; min-height: 72px; }
-  textarea, input { width: 100%; background: var(--field); color: var(--fg); border: 2px solid var(--accent-strong); border-radius: 12px; padding: 12px; }
+  select, textarea, input { width: 100%; background: var(--field); color: var(--fg); border: 2px solid var(--accent-strong); border-radius: 12px; padding: 12px; }
+  select { min-height: 44px; }
   nav { position: fixed; left: 10px; right: 10px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid var(--line); border-radius: 22px; z-index: 5; padding: 6px 10px 4px; box-shadow: 0 12px 28px rgba(0,0,0,.28); overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
   nav::-webkit-scrollbar { display: none; }
   nav button { position: relative; flex: 1 0 72px; min-width: 72px; min-height: 56px; border: 0; background: transparent; color: var(--muted); font-size: 0.75rem; font-weight: 400; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
@@ -397,10 +397,11 @@
   html[data-motion="reduce"] *,
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
-  html[data-motion="full"] .globe-drift { animation: globe-drift 22s linear infinite !important; }
-  html[data-motion="full"] .globe-shine { animation: globe-gleam 5.2s ease-in-out infinite !important; }
-  html[data-motion="full"] .osx b { animation: osx-spin var(--spin-speed) linear infinite !important; }
-  html[data-motion="full"] .osx b::after { animation: osx-pulse var(--pulse-speed) ease-in-out infinite !important; }
+  html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
+  html[data-motion="reduce"] .marklogo,
+  html[data-motion="reduce"] .marklogo *,
+  html[data-motion="full"] .marklogo,
+  html[data-motion="full"] .marklogo * { animation: none !important; }
   html[data-motion="full"] .logo i:nth-child(2),
   html[data-motion="full"] .logo i:nth-child(3),
   html[data-motion="full"] .logo s { animation-name: spin !important; }
@@ -408,7 +409,7 @@
 </head>
 <body>
 <header>
-  <div class="osx mini" id="headmark" aria-hidden="true"><b></b></div>
+  <div id="headmark" aria-hidden="true"></div>
   <h1>Meridian</h1>
   <p id="bondline" role="status">Not connected</p>
   <b id="clock" aria-hidden="true"></b>
@@ -570,9 +571,170 @@ shortcutsTitle:"Raccourcis",shortcutsBody:"Fonctionne depuis n’importe quelle 
 back:"Retour",trialLine:"Essai : {n} restant · ",getFull:"Obtenir la version complète",carrierUnknown:"—",mainNav:"Principal"
 }
 };
+const EXTRA = {
+en:{
+pastePaid:"Paste a MERIDIAN- key from your receipt.",
+restoreHintPaid:"A verified MERIDIAN- key is the licence.",
+restoreHintFree:"Paste a MERIDIAN- key. The words paid, full, and unlocked do nothing.",
+motionTestOn:"Motion is on — the caret blinks.",
+motionTestOff:"Motion is off — the caret stays still.",
+thisPhoneIsPro:"This phone is Pro",
+thisPhoneIsPremium:"This phone is Premium",
+thankYouShort:"Thank you.",
+tierFree:"Free",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1,000,000 once",pricePremium:"€5 – €5,000,000 once",
+freeKeeps:"Dashboard, Hardware, System, Battery, one console, Setup, and Doctor.",
+proKeeps:"Build recipes, Plan (you run each step), Tweaks, extra console sessions, file write, and Linux PC.",
+premiumKeeps:"Run the whole plan, a job scheduler, and a hardware share card with no Meridian footer.",
+premiumNote:"Same merchant as Pro. Ask for SKU premium. The key is still an offline MERIDIAN- signature. You choose the amount in that range. The app does not charge €5,000,000 by itself.",
+buyPro:"Buy Pro",
+premiumCheckout:"Open the same checkout",
+runThePlan:"Run the plan",
+premiumLock:"Premium",
+scheduler:"Scheduler",
+schedulerBlurb:"Pick a recipe and an interval. Meridian writes a termux-job-scheduler command. You run it. Android will not repeat a job faster than about 15 minutes.",
+interval:"Interval",
+copyCommand:"Copy command",
+runScheduler:"Run scheduler command",
+checkJobs:"Check pending jobs",
+lastStatus:"Last status",
+noSteps:"There are no steps to run.",
+planDone:"The plan finished.",
+planStopped:"Stopped. That step was not run.",
+planStoppedCode:"Stopped on exit {n}.",
+dangerConfirm:"This step looks like {kind}. Run it?",
+copyMarkdown:"Copy as Markdown",
+madeWith:"Made with Meridian",
+seePremium:"See Premium",
+agentHint:"Pro runs one step when you press Run. Premium can run the list in order and stops on the first failure.",
+every15:"Every 15 min",everyHour:"Every hour",every6:"Every 6 hours",everyDay:"Every day"
+},
+hr:{
+pastePaid:"Zalijepite MERIDIAN- ključ s računa.",
+restoreHintFree:"Zalijepite MERIDIAN- ključ. Riječi paid, full i unlocked ne rade ništa.",
+motionTestOn:"Pokret je uključen — kursor trepće.",
+motionTestOff:"Pokret je isključen — kursor miruje.",
+thisPhoneIsPro:"Ovaj telefon je Pro",thisPhoneIsPremium:"Ovaj telefon je Premium",thankYouShort:"Hvala.",
+tierFree:"Besplatno",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1,000,000 jednom",pricePremium:"€5 – €5,000,000 jednom",
+freeKeeps:"Nadzorna, Hardver, Sustav, Baterija, jedna konzola, Postavljanje i Doktor.",
+proKeeps:"Recepti, Plan (vi pokrećete svaki korak), Podešavanja, dodatne sesije, pisanje datoteka i Linux PC.",
+premiumKeeps:"Pokretanje cijelog plana, raspored poslova i dijeljenje hardvera bez podnožja Meridian.",
+premiumNote:"Isti trgovac kao Pro. Tražite SKU premium. Ključ je i dalje izvanmrežni MERIDIAN- potpis. Iznos birate u tom rasponu. Aplikacija sama ne naplaćuje €5,000,000.",
+buyPro:"Kupi Pro",premiumCheckout:"Otvori istu naplatu",runThePlan:"Pokreni plan",premiumLock:"Premium",
+scheduler:"Raspored",schedulerBlurb:"Odaberite recept i razmak. Meridian napiše naredbu termux-job-scheduler. Vi je pokrenete. Android ne ponavlja posao brže od oko 15 minuta.",
+interval:"Razmak",copyCommand:"Kopiraj naredbu",runScheduler:"Pokreni naredbu rasporeda",checkJobs:"Provjeri čekajuće poslove",lastStatus:"Zadnji status",
+noSteps:"Nema koraka za pokretanje.",planDone:"Plan je gotov.",planStopped:"Zaustavljeno. Taj korak nije pokrenut.",planStoppedCode:"Zaustavljeno na izlazu {n}.",
+dangerConfirm:"Ovaj korak izgleda kao {kind}. Pokrenuti?",copyMarkdown:"Kopiraj kao Markdown",madeWith:"Napravljeno s Meridian",seePremium:"Vidi Premium",
+agentHint:"Pro pokreće jedan korak kad pritisnete Pokreni. Premium može pokrenuti popis redom i staje na prvoj grešci.",
+every15:"Svakih 15 min",everyHour:"Svaki sat",every6:"Svakih 6 sati",everyDay:"Svaki dan"
+},
+de:{
+pastePaid:"Füge einen MERIDIAN- Schlüssel aus der Quittung ein.",
+restoreHintFree:"Füge einen MERIDIAN- Schlüssel ein. Die Wörter paid, full und unlocked tun nichts.",
+motionTestOn:"Bewegung ist an — der Cursor blinkt.",
+motionTestOff:"Bewegung ist aus — der Cursor bleibt stehen.",
+thisPhoneIsPro:"Dieses Telefon ist Pro",thisPhoneIsPremium:"Dieses Telefon ist Premium",thankYouShort:"Danke.",
+tierFree:"Kostenlos",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1.000.000 einmal",pricePremium:"€5 – €5.000.000 einmal",
+freeKeeps:"Übersicht, Hardware, System, Akku, eine Konsole, Einrichtung und Diagnose.",
+proKeeps:"Build-Rezepte, Plan (du startest jeden Schritt), Anpassungen, extra Sitzungen, Dateien schreiben und Linux-PC.",
+premiumKeeps:"Den ganzen Plan ausführen, einen Zeitplan und einen Hardwarebericht ohne Meridian-Fußzeile.",
+premiumNote:"Gleicher Händler wie Pro. SKU premium verlangen. Der Schlüssel bleibt eine offline MERIDIAN- Signatur. Den Betrag wählst du in diesem Bereich. Die App bucht nicht von selbst €5.000.000 ab.",
+buyPro:"Pro kaufen",premiumCheckout:"Dieselbe Kasse öffnen",runThePlan:"Plan ausführen",premiumLock:"Premium",
+scheduler:"Zeitplan",schedulerBlurb:"Wähle ein Rezept und ein Intervall. Meridian schreibt einen termux-job-scheduler-Befehl. Du startest ihn. Android wiederholt einen Job nicht schneller als etwa 15 Minuten.",
+interval:"Intervall",copyCommand:"Befehl kopieren",runScheduler:"Zeitplan-Befehl ausführen",checkJobs:"Offene Jobs prüfen",lastStatus:"Letzter Status",
+noSteps:"Keine Schritte zum Ausführen.",planDone:"Der Plan ist fertig.",planStopped:"Gestoppt. Dieser Schritt lief nicht.",planStoppedCode:"Gestoppt bei Exit {n}.",
+dangerConfirm:"Dieser Schritt sieht aus wie {kind}. Ausführen?",copyMarkdown:"Als Markdown kopieren",madeWith:"Gemacht mit Meridian",seePremium:"Premium ansehen",
+agentHint:"Pro startet einen Schritt, wenn du Ausführen drückst. Premium kann die Liste der Reihe nach starten und hält beim ersten Fehler an.",
+every15:"Alle 15 Min",everyHour:"Jede Stunde",every6:"Alle 6 Stunden",everyDay:"Jeden Tag"
+},
+ja:{
+pastePaid:"領収書の MERIDIAN- キーを貼ってください。",
+restoreHintFree:"MERIDIAN- キーを貼ってください。paid、full、unlocked という語では解除されません。",
+motionTestOn:"モーションはオン — キャレットが点滅します。",
+motionTestOff:"モーションはオフ — キャレットは止まります。",
+thisPhoneIsPro:"この端末は Pro です",thisPhoneIsPremium:"この端末は Premium です",thankYouShort:"ありがとうございます。",
+tierFree:"無料",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1,000,000 一回",pricePremium:"€5 – €5,000,000 一回",
+freeKeeps:"ダッシュボード、ハードウェア、システム、電池、コンソール1つ、セットアップ、診断。",
+proKeeps:"ビルドレシピ、プラン（手順は自分で実行）、調整、追加セッション、ファイル書き込み、Linux PC。",
+premiumKeeps:"プラン全体の実行、スケジューラ、フッターなしのハードウェア共有。",
+premiumNote:"Pro と同じ販売者です。SKU は premium。キーはオフラインの MERIDIAN- 署名のままです。金額はその範囲で選びます。アプリが €5,000,000 を勝手に請求することはありません。",
+buyPro:"Pro を買う",premiumCheckout:"同じ決済を開く",runThePlan:"プランを実行",premiumLock:"Premium",
+scheduler:"スケジューラ",schedulerBlurb:"レシピと間隔を選びます。Meridian が termux-job-scheduler のコマンドを書きます。実行するのはあなたです。Android は約15分より短い繰り返しをしません。",
+interval:"間隔",copyCommand:"コマンドをコピー",runScheduler:"スケジューラコマンドを実行",checkJobs:"予約ジョブを確認",lastStatus:"前回の状態",
+noSteps:"実行する手順がありません。",planDone:"プランが終わりました。",planStopped:"停止しました。その手順は実行していません。",planStoppedCode:"終了コード {n} で停止しました。",
+dangerConfirm:"この手順は {kind} に見えます。実行しますか？",copyMarkdown:"Markdown としてコピー",madeWith:"Made with Meridian",seePremium:"Premium を見る",
+agentHint:"Pro は実行を押した手順だけ動きます。Premium は一覧を順に実行し、最初の失敗で止まります。",
+every15:"15分ごと",everyHour:"1時間ごと",every6:"6時間ごと",everyDay:"毎日"
+},
+hi:{
+pastePaid:"रसीद की MERIDIAN- कुंजी चिपकाएँ।",
+restoreHintFree:"MERIDIAN- कुंजी चिपकाएँ। paid, full और unlocked शब्द कुछ नहीं करते।",
+motionTestOn:"मोशन चालू है — कर्सर झपकता है।",
+motionTestOff:"मोशन बंद है — कर्सर रुका रहता है।",
+thisPhoneIsPro:"यह फ़ोन Pro है",thisPhoneIsPremium:"यह फ़ोन Premium है",thankYouShort:"धन्यवाद।",
+tierFree:"मुफ़्त",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1,000,000 एक बार",pricePremium:"€5 – €5,000,000 एक बार",
+freeKeeps:"डैशबोर्ड, हार्डवेयर, सिस्टम, बैटरी, एक कंसोल, सेटअप और डॉक्टर।",
+proKeeps:"बिल्ड रेसिपी, योजना (हर कदम आप चलाते हैं), ट्वीक, अतिरिक्त सत्र, फ़ाइल लिखना और Linux PC।",
+premiumKeeps:"पूरी योजना चलाना, शेड्यूलर, और बिना Meridian फ़ुटर के हार्डवेयर शेयर।",
+premiumNote:"Pro जैसा ही व्यापारी। SKU premium माँगें। कुंजी अब भी ऑफ़लाइन MERIDIAN- हस्ताक्षर है। राशि उस सीमा में आप चुनते हैं। ऐप खुद €5,000,000 नहीं काटता।",
+buyPro:"Pro खरीदें",premiumCheckout:"वही चेकआउट खोलें",runThePlan:"योजना चलाएँ",premiumLock:"Premium",
+scheduler:"शेड्यूलर",schedulerBlurb:"रेसिपी और अंतराल चुनें। Meridian termux-job-scheduler कमांड लिखता है। आप चलाते हैं। Android लगभग 15 मिनट से तेज़ दोहराव नहीं करता।",
+interval:"अंतराल",copyCommand:"कमांड कॉपी करें",runScheduler:"शेड्यूलर कमांड चलाएँ",checkJobs:"लंबित जॉब देखें",lastStatus:"पिछली स्थिति",
+noSteps:"चलाने के लिए कदम नहीं हैं।",planDone:"योजना पूरी हुई।",planStopped:"रुक गया। वह कदम नहीं चला।",planStoppedCode:"एग्ज़िट {n} पर रुका।",
+dangerConfirm:"यह कदम {kind} जैसा है। चलाएँ?",copyMarkdown:"Markdown के रूप में कॉपी",madeWith:"Made with Meridian",seePremium:"Premium देखें",
+agentHint:"Pro एक कदम चलाता है जब आप चलाएँ दबाते हैं। Premium सूची क्रम से चलाता है और पहली गलती पर रुकता है।",
+every15:"हर 15 मिनट",everyHour:"हर घंटे",every6:"हर 6 घंटे",everyDay:"हर दिन"
+},
+es:{
+pastePaid:"Pega una clave MERIDIAN- del recibo.",
+restoreHintFree:"Pega una clave MERIDIAN-. Las palabras paid, full y unlocked no hacen nada.",
+motionTestOn:"El movimiento está activo — el cursor parpadea.",
+motionTestOff:"El movimiento está apagado — el cursor se queda quieto.",
+thisPhoneIsPro:"Este teléfono es Pro",thisPhoneIsPremium:"Este teléfono es Premium",thankYouShort:"Gracias.",
+tierFree:"Gratis",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1.000.000 una vez",pricePremium:"€5 – €5.000.000 una vez",
+freeKeeps:"Panel, Hardware, Sistema, Batería, una consola, Configuración y Doctor.",
+proKeeps:"Recetas, Plan (tú ejecutas cada paso), ajustes, sesiones extra, escribir archivos y PC Linux.",
+premiumKeeps:"Ejecutar todo el plan, un programador y un informe de hardware sin el pie de Meridian.",
+premiumNote:"El mismo comercio que Pro. Pide el SKU premium. La clave sigue siendo una firma MERIDIAN- sin conexión. Eliges el importe en ese rango. La app no cobra €5.000.000 por su cuenta.",
+buyPro:"Comprar Pro",premiumCheckout:"Abrir el mismo pago",runThePlan:"Ejecutar el plan",premiumLock:"Premium",
+scheduler:"Programador",schedulerBlurb:"Elige una receta y un intervalo. Meridian escribe un comando termux-job-scheduler. Tú lo ejecutas. Android no repite un trabajo antes de unos 15 minutos.",
+interval:"Intervalo",copyCommand:"Copiar comando",runScheduler:"Ejecutar el programador",checkJobs:"Ver trabajos pendientes",lastStatus:"Último estado",
+noSteps:"No hay pasos que ejecutar.",planDone:"El plan terminó.",planStopped:"Parado. Ese paso no se ejecutó.",planStoppedCode:"Parado en la salida {n}.",
+dangerConfirm:"Este paso parece {kind}. ¿Ejecutarlo?",copyMarkdown:"Copiar como Markdown",madeWith:"Hecho con Meridian",seePremium:"Ver Premium",
+agentHint:"Pro ejecuta un paso cuando pulsas Ejecutar. Premium puede recorrer la lista y se detiene en el primer fallo.",
+every15:"Cada 15 min",everyHour:"Cada hora",every6:"Cada 6 horas",everyDay:"Cada día"
+},
+fr:{
+pastePaid:"Collez une clé MERIDIAN- du reçu.",
+restoreHintFree:"Collez une clé MERIDIAN-. Les mots paid, full et unlocked ne font rien.",
+motionTestOn:"Le mouvement est activé — le curseur clignote.",
+motionTestOff:"Le mouvement est coupé — le curseur reste fixe.",
+thisPhoneIsPro:"Ce téléphone est Pro",thisPhoneIsPremium:"Ce téléphone est Premium",thankYouShort:"Merci.",
+tierFree:"Gratuit",tierPro:"Pro",tierPremium:"Premium",
+priceFree:"€0",pricePro:"€1 – €1 000 000 une fois",pricePremium:"€5 – €5 000 000 une fois",
+freeKeeps:"Tableau, Matériel, Système, Batterie, une console, Installation et Docteur.",
+proKeeps:"Recettes, Plan (vous lancez chaque étape), réglages, sessions en plus, écriture de fichiers et PC Linux.",
+premiumKeeps:"Lancer tout le plan, un planificateur, et un partage matériel sans le pied Meridian.",
+premiumNote:"Le même marchand que Pro. Demandez le SKU premium. La clé reste une signature MERIDIAN- hors ligne. Vous choisissez le montant dans cette fourchette. L’app ne débite pas €5 000 000 toute seule.",
+buyPro:"Acheter Pro",premiumCheckout:"Ouvrir le même paiement",runThePlan:"Lancer le plan",premiumLock:"Premium",
+scheduler:"Planificateur",schedulerBlurb:"Choisissez une recette et un intervalle. Meridian écrit une commande termux-job-scheduler. Vous la lancez. Android ne répète pas un travail plus vite qu’environ 15 minutes.",
+interval:"Intervalle",copyCommand:"Copier la commande",runScheduler:"Lancer la commande",checkJobs:"Voir les tâches en attente",lastStatus:"Dernier état",
+noSteps:"Aucune étape à lancer.",planDone:"Le plan est terminé.",planStopped:"Arrêté. Cette étape n’a pas été lancée.",planStoppedCode:"Arrêté au code {n}.",
+dangerConfirm:"Cette étape ressemble à {kind}. La lancer ?",copyMarkdown:"Copier en Markdown",madeWith:"Fait avec Meridian",seePremium:"Voir Premium",
+agentHint:"Pro lance une étape quand vous appuyez sur Exécuter. Premium peut enchaîner la liste et s’arrête au premier échec.",
+every15:"Toutes les 15 min",everyHour:"Toutes les heures",every6:"Toutes les 6 heures",everyDay:"Chaque jour"
+}
+};
 function t(key) {
+  const extra = EXTRA[prefs.lang] || EXTRA.en;
+  if (extra && extra[key]) return extra[key];
   const pack = I18N[prefs.lang] || I18N.en;
-  return (pack && pack[key]) || I18N.en[key] || key;
+  return (pack && pack[key]) || (EXTRA.en && EXTRA.en[key]) || (I18N.en && I18N.en[key]) || key;
 }
 function tN(key, n) {
   return t(key).replace("{n}", String(n));
@@ -868,27 +1030,9 @@ function gaugeHtml(id, pct, label) {
   const p = shown === "—" ? 0 : n;
   return '<div><div class="gauge" data-g="' + id + '" style="--p:' + p + '"><b>' + esc(shown) + '</b></div><span>' + esc(label) + '</span></div>';
 }
-function globeHtml() {
-  const land = ''
-    + '<path d="M18 62c6-16 18-14 24-4 4 6 2 4 10-2 8-6 16-4 18 4 2 8-6 12-8 16-8 2-14-2-20 2-6 4-16 2-18-6-2-6-8-4-6-10z"/>'
-    + '<path d="M52 78c4-8 12-10 14-2 2 6-2 10-8 12-6 2-10-2-6-10z"/>'
-    + '<path d="M78 48c10-10 22-6 26 2 2 6-4 8-2 14 2 6-6 10-14 8-8-2-10 4-16 2-4-8 0-16 6-26z"/>'
-    + '<path d="M112 58c8-12 20-8 22 2 2 8-6 10-4 16 2 4-8 8-14 6-8-2-12-8-4-24z"/>'
-    + '<path d="M138 86c6-8 14-6 16 2 1 6-6 8-12 6-6-2-8-4-4-8z"/>'
-    + '<path d="M156 70c4-14 16-12 22-2 4 8-2 12-8 16-8 2-16-2-14-14z"/>'
-    + '<path d="M168 96c8-4 16-2 14 6-2 6-10 8-16 4-4-2-2-8 2-10z"/>';
-  const grat = '<g class="graticule">'
-    + '<ellipse cx="100" cy="90" rx="92" ry="28"/>'
-    + '<ellipse cx="100" cy="90" rx="92" ry="52"/>'
-    + '<ellipse cx="100" cy="90" rx="92" ry="74"/>'
-    + '<path d="M100 16v148M16 90h168M40 28c18 40 18 84 0 124M160 28c-18 40-18 84 0 124"/>'
-    + '</g>';
-  const half = '<g class="land">' + land + '</g>' + grat;
-  return '<div class="globe" aria-hidden="true"><s class="globe-ring"></s>'
-    + '<div class="globe-drift"><svg class="globe-map" viewBox="0 0 400 180" preserveAspectRatio="none">'
-    + half
-    + '<g transform="translate(200,0)">' + half + '</g>'
-    + '</svg></div><i class="globe-shine"></i><b class="globe-night"></b></div>';
+const LOGO_SVG = '<svg class="marklogo" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#14110e" stroke="currentColor" stroke-width="1.15"/><path d="M14 6.2v4.4" fill="none" stroke="#f4efe6" stroke-width="2.05" stroke-linecap="round"/><path d="M9.7 10.1a6.35 6.35 0 1 0 8.6 0" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/></svg>';
+function termOrbHtml() {
+  return '<div class="termorb" aria-hidden="true"><span class="termorb-prompt">&gt;_</span><i class="termorb-caret"></i></div>';
 }
 let netNameCache = { name: "—", at: 0 };
 function carrierLabel() {
@@ -983,9 +1127,13 @@ function homePage() {
   else html += '<div class="linkline">' + esc(t("connectedTermux")) + '</div>';
   const freeGb = gb(p.memFree);
   html += '<article class="hero">';
-  html += '<div class="herotop"><div class="stage compact" aria-hidden="true">' + globeHtml() + '</div>';
-  html += '<div class="herocopy"><p class="k">' + esc(t("thisPhone")) + '</p><h2>' + esc(s.model || t("thisPhone")) + '</h2>';
-  html += '<p class="muted">' + esc([p.soc || s.chip, s.release ? "Android " + s.release : ""].filter(Boolean).join(" · ") || t("hardwareFromDevice")) + '</p>';
+  const brand = String(p.brand || s.brand || "").trim();
+  const product = String(s.product || "").trim();
+  const heroTitle = brand || product || t("thisPhone");
+  const heroDetail = [product && product !== heroTitle ? product : "", p.soc || s.chip, s.release ? "Android " + s.release : ""].filter(Boolean).join(" · ") || t("hardwareFromDevice");
+  html += '<div class="herotop"><div class="stage compact" aria-hidden="true">' + termOrbHtml() + '</div>';
+  html += '<div class="herocopy"><p class="k">' + esc(t("thisPhone")) + '</p><h2>' + esc(heroTitle) + '</h2>';
+  html += '<p class="muted">' + esc(heroDetail) + '</p>';
   html += '<div class="healthpill' + (bad ? " bad" : "") + '" id="healthtext">' + (bad ? t("systemStrained") : t("systemOptimal")) + '</div></div></div>';
   html += '<div class="gaugerow">';
   html += gaugeHtml("CPU", cpu, t("cpu"));
@@ -1004,9 +1152,9 @@ function homePage() {
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
-  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button><button class="ghost" type="button" data-go="settings">' + esc(t("settings")) + '</button><button class="ghost" type="button" data-more="about">' + esc(t("about")) + '</button></div><p class="muted" id="ramout"></p>';
+  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button><button class="ghost" type="button" data-more="about">' + esc(t("about")) + '</button></div><p class="muted" id="ramout"></p>';
   html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg></article>';
-  html += '<div class="healthrow"><article class="tile osxtile"><div class="osx" id="healthlogo" aria-hidden="true"><b></b></div><div class="status-text">' + (bad ? t("heatOrRam") : t("quietCool")) + '</div></article></div>';
+  html += '<div class="healthrow"><article class="tile osxtile"><div class="logo-mark lg" id="healthlogo" aria-hidden="true">' + LOGO_SVG + '</div><div class="status-text">' + (bad ? t("heatOrRam") : t("quietCool")) + '</div></article></div>';
   html += '<article class="plate">';
   html += '<div class="kv"><span>' + esc(t("battery")) + '</span><b data-k="Battery">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b></div>';
   html += '<div class="kv"><span>' + esc(t("storage")) + '</span><b data-k="Storage">' + esc(diskPct) + '</b></div>';
@@ -1090,8 +1238,8 @@ function paintMeters() {
   const mark = document.getElementById("healthlogo");
   const head = document.getElementById("headmark");
   const bad = sick(p, s);
-  if (mark) mark.className = bad ? "osx bad" : "osx";
-  if (head) head.className = bad ? "osx mini bad" : "osx mini";
+  if (mark) mark.className = "logo-mark lg" + (bad ? " bad" : "");
+  if (head && !head.querySelector("svg")) head.innerHTML = LOGO_SVG;
   const healthText = document.getElementById("healthtext");
   if (healthText) {
     healthText.textContent = bad ? t("systemStrained") : t("systemOptimal");
@@ -1200,7 +1348,7 @@ function systemPage() {
 function hardwarePage() {
   const s = phone();
   const p = live();
-  let html = '<div class="stack"><button class="btn" type="button" id="sharereport">Share hardware report</button><p class="sec">Processor</p><article class="plate">';
+  let html = '<div class="stack"><div class="tools"><button class="btn" type="button" id="sharereport" style="width:auto">' + esc(t("shareReport")) + '</button><button class="ghost" type="button" id="copymd">' + esc(t("copyMarkdown")) + (premium() ? "" : ' <span class="probadge">PREMIUM</span>') + '</button></div><p class="sec">Processor</p><article class="plate">';
   html += row("SoC", p.soc || s.chip);
   html += row("Hardware", p.hardware);
   html += row("Platform", s.platform);
@@ -1666,7 +1814,7 @@ function askHint(text) {
 }
 function planPage() {
   const chips = ["Python", "Local model", "GPU compute", "Format", "Remote shell", "Fastfetch"];
-  let html = '<div class="stack"><article class="plate planhead"><div class="osx"><b></b></div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p></div></article>';
+  let html = '<div class="stack"><article class="plate planhead"><div class="logo-mark md">' + LOGO_SVG + '</div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p><p class="hint">' + esc(t("agentHint")) + '</p></div></article>';
   html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
   html += '</div><textarea id="goal" rows="3" placeholder="What is a star?  or  Install Python"></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
@@ -1943,17 +2091,12 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.1.1"; } catch (e) { return "2.1.1"; }
+  try { return String(MeridianPhone.version() || "") || "2.2.0"; } catch (e) { return "2.2.0"; }
 }
 function aboutPage() {
   const days = trialDays();
-  const state = licensed() ? t("unlockedPhone") : days > 0 ? t("trialLeft") + " " + days + " " + (days === 1 ? "day" : "days") + "." : t("freeVersion");
-  let lang = '<div class="setrow"><div class="k">' + esc(t("language")) + '</div><div class="seg">';
-  LANGS.forEach(function (row) {
-    lang += '<button class="ghost' + (prefs.lang === row[0] ? " on" : "") + '" type="button" data-pref="lang" data-val="' + row[0] + '">' + esc(row[1]) + '</button>';
-  });
-  lang += '</div></div>';
-  return '<article class="plate stack about"><div class="osx" aria-hidden="true"><b></b></div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p>' + lang + '<div class="aboutrow"><button class="aboutbtn" type="button" data-go="settings">' + esc(t("settings")) + '</button><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
+  const state = licensed() ? (premium() ? t("thisPhoneIsPremium") : t("thisPhoneIsPro")) : days > 0 ? t("trialLeft") + " " + days + " " + (days === 1 ? "day" : "days") + "." : t("freeVersion");
+  return '<article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -2019,16 +2162,15 @@ function toolsPage() {
     + '</div><div class="bend"></div><p class="sec mach">' + esc(t("machine")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-more="tweaks">' + mark("Tweaks") + '<em>' + esc(t("tweaks")) + (paid() ? "" : ' <span class="probadge">PRO</span>') + '</em></button>'
     + '<button class="ico" type="button" data-more="doctor">' + mark("Doctor") + '<em>' + esc(t("doctor")) + '</em></button>'
-    + '<button class="ico" type="button" data-more="pc">' + mark("Debian") + '<em>' + esc(t("linuxPc")) + '</em></button>'
+    + '<button class="ico" type="button" data-more="pc">' + mark("Debian") + '<em>' + esc(t("linuxPc")) + (paid() ? "" : ' <span class="probadge">PRO</span>') + '</em></button>'
     + '</div><div class="bend"></div><p class="sec lib">' + esc(t("library")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-more="commands">' + mark("Commands") + '<em>' + esc(t("commands")) + '</em></button>'
     + '<button class="ico" type="button" data-more="links">' + mark("Links") + '<em>' + esc(t("links")) + '</em></button>'
     + (linked ? setup : "")
     + '</div><div class="bend"></div><p class="sec">' + esc(t("meridian")) + '</p><div class="grid">'
-    + '<button class="ico" type="button" data-go="settings">' + mark("tweak") + '<em>' + esc(t("settings")) + '</em></button>'
     + '<button class="ico" type="button" data-more="about">' + mark("report") + '<em>' + esc(t("about")) + '</em></button>'
     + '<button class="ico" type="button" data-go="pay">' + mark("key") + '<em>' + esc(licensed() ? t("licence") : t("fullVersion")) + '</em></button>'
-    + '</div><div class="bend"></div><div class="deskfoot">' + esc(t("lookModesFoot")) + '</div></div>';
+    + '</div><div class="bend"></div>' + schedulerCard() + '<div class="deskfoot">' + esc(t("lookModesFoot")) + '</div></div>';
 }
 function windowTitle() {
   if (view === "files") return t("titleFinder");
@@ -2062,8 +2204,11 @@ function windowTitle() {
 }
 let paidAt = 0;
 let paidCache = false;
+let tierAt = 0;
+let tierCache = "free";
 let licMsg = "";
 let licDraft = "";
+let logoPressed = false;
 function licensed() {
   const now = Date.now();
   if (now - paidAt < 2000) return paidCache;
@@ -2071,6 +2216,19 @@ function licensed() {
   paidAt = now;
   return paidCache;
 }
+function tier() {
+  const now = Date.now();
+  if (now - tierAt < 2000 && tierCache) return tierCache;
+  try {
+    tierCache = String(MeridianPhone.tier() || "free");
+  } catch (e) {
+    tierCache = licensed() ? "pro" : "free";
+  }
+  if (tierCache !== "free" && tierCache !== "pro" && tierCache !== "premium") tierCache = licensed() ? "pro" : "free";
+  tierAt = now;
+  return tierCache;
+}
+function premium() { return tier() === "premium"; }
 function trialDays() {
   try { return Number(MeridianPhone.trialLeft()) || 0; } catch (e) { return 0; }
 }
@@ -2079,28 +2237,33 @@ function paid() { return licensed() || trialDays() > 0; }
 // What the free version keeps: Dashboard, Hardware, System, Battery, one console session,
 // Setup, Doctor, Commands, Links and read-only Files. Pro adds Build recipes, Plan, Tweaks,
 // extra sessions, and writing files.
-const PRO = { build: 1, plan: 1, tweaks: 1, "files-write": 1 };
-function payNote(licensedNow) {
+const PRO = { build: 1, plan: 1, tweaks: 1, "files-write": 1, pc: 1 };
+function payNote() {
   if (licMsg) return licMsg;
-  return licensedNow ? t("restoreHintPaid") : t("restoreHintFree");
+  return t("restoreHintFree");
+}
+function priceCard(kicker, title, price, body, extra) {
+  const priceHtml = price ? '<span class="price">' + esc(price) + '</span>' : "";
+  const bodyHtml = body ? '<p class="muted">' + esc(body) + '</p>' : "";
+  return '<article class="plate stack pricecard"><p class="priceem">' + esc(kicker) + '</p><h2>' + esc(title) + '</h2>' + priceHtml + bodyHtml + (extra || "") + '</article>';
 }
 function payPage() {
-  let html = '<div class="stack">';
-  const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-… or paid" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
   if (licensed()) {
-    html += '<article class="plate stack pricecard"><p class="priceem">' + esc(t("payUnlocked")) + '</p><h2>' + esc(t("havePro")) + '</h2><p>' + esc(t("thankYou")) + '</p>';
-    html += '<ul><li>' + esc(t("proLi1")) + '</li><li>' + esc(t("proLi2")) + '</li><li>' + esc(t("proLi3")) + '</li><li>' + esc(t("proLi4")) + '</li><li>' + esc(t("proLi5")) + '</li></ul>';
-    html += '<p class="muted">' + esc(t("alreadyPaidRestore")) + '</p></article>';
-    html += '<article class="plate stack"><p class="muted">' + esc(t("alreadyPaidRestore")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activateAgain")) + '</button><p class="muted" id="licnote">' + esc(payNote(true)) + '</p></article>';
-    return html + '</div>';
+    const title = premium() ? t("thisPhoneIsPremium") : t("thisPhoneIsPro");
+    return '<div class="stack"><article class="plate stack pricecard"><h2>' + esc(title) + '</h2><p>' + esc(t("thankYouShort")) + '</p></article></div>';
   }
+  let html = '<div class="stack">';
   const days = trialDays();
-  html += '<article class="plate stack pricecard"><p class="priceem">' + esc(t("meridianPro")) + '</p><h2>' + esc(t("fullVersion")) + '</h2><span class="price">' + esc(t("onePayment")) + '</span>';
-  html += '<ul><li>' + esc(t("proLi1")) + '</li><li>' + esc(t("proLi2")) + '</li><li>' + esc(t("proLi3")) + '</li><li>' + esc(t("proLi4")) + '</li><li>' + esc(t("proLi5")) + '</li><li>' + esc(t("proLi6")) + '</li></ul>';
-  if (days > 0) html += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
-  else html += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
-  html += '<button class="btn pay" id="pay" type="button">' + esc(t("buyLicence")) + '</button><p class="muted">' + esc(t("checkoutOpens")) + '</p></article>';
-  html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote(false)) + '</p></article>';
+  html += priceCard(t("tierFree"), t("tierFree"), t("priceFree"), t("freeKeeps"), "");
+  let proExtra = "";
+  if (days > 0) proExtra += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
+  else proExtra += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
+  proExtra += '<button class="btn pay" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
+  html += priceCard(t("tierPro"), t("tierPro"), t("pricePro"), t("proKeeps"), proExtra);
+  const premExtra = '<p class="muted">' + esc(t("premiumNote")) + '</p><button class="ghost" id="paypremium" type="button">' + esc(t("premiumCheckout")) + '</button>';
+  html += priceCard(t("tierPremium"), t("tierPremium"), t("pricePremium"), t("premiumKeeps"), premExtra);
+  const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
+  html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote()) + '</p></article>';
   return html + '</div>';
 }
 window.onPaid = function () { paidAt = 0; goNav({ view: "build", more: "menu", openCmd: "" }); };
@@ -2120,7 +2283,9 @@ function render() {
     const d = trialDays();
     trial = '<p class="trialline">' + esc(tN("trialLine", d)) + '<button type="button" data-go="pay">' + esc(t("getFull")) + '</button></p>';
   }
-  main.innerHTML = '<section class="win"><div class="wintop"><button class="osx bar" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '"><b></b></button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + about + '</div></div></section>';
+  main.innerHTML = '<section class="win"><div class="wintop"><button class="logo-slot' + (logoPressed ? " pressed" : "") + '" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '">' + LOGO_SVG + '</button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + about + '</div></div></section>';
+  const headmark = document.getElementById("headmark");
+  if (headmark) headmark.innerHTML = LOGO_SVG;
   document.body.className = view === "console" ? "term" : "";
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
@@ -2171,28 +2336,39 @@ window.meridianBack = function () {
   if (selectMode) { selectMode = false; selected = {}; render(); return "true"; }
   return navBack() ? "true" : "false";
 };
-function hardwareReport() {
+function hardwareFacts() {
   const s = phone();
   const p = live();
-  const lines = [
-    "Meridian hardware report",
-    "",
-    "Phone     " + (s.model || "—"),
-    "Brand     " + (p.brand || s.rawModel || "—"),
-    "SoC       " + (p.soc || s.chip || "—"),
-    "CPU       " + (p.cpuinfo || "—"),
-    "Cores     " + (p.cores || (p.coresLive || []).length || "—"),
-    "Load      " + (p.load1 || "—"),
-    "RAM       " + gb(p.memTotal) + "  (" + gb(p.memFree) + " free)",
-    "Storage   " + gb(p.diskTotal) + "  (" + gb(p.diskFree) + " free)",
-    "Battery   " + (s.battery >= 0 ? s.battery + "%" : "—") + (s.temp ? "  " + Number(s.temp).toFixed(1) + "°C" : ""),
-    "Android   " + (s.release || "—") + (p.sdk ? "  API " + p.sdk : ""),
-    "GPU       " + (p.renderer || s.gpu || "—"),
-    "OpenGL    " + (p.glVersion || "—"),
-    "Vulkan    " + (p.vulkan || "—"),
-    "",
-    "Meridian — dashboard for Termux"
+  return [
+    ["Phone", s.product || s.model || "—"],
+    ["Brand", p.brand || "—"],
+    ["SoC", p.soc || s.chip || "—"],
+    ["CPU", p.cpuinfo || "—"],
+    ["Cores", String(p.cores || (p.coresLive || []).length || "—")],
+    ["Load", p.load1 || "—"],
+    ["RAM", gb(p.memTotal) + "  (" + gb(p.memFree) + " free)"],
+    ["Storage", gb(p.diskTotal) + "  (" + gb(p.diskFree) + " free)"],
+    ["Battery", (s.battery >= 0 ? s.battery + "%" : "—") + (s.temp ? "  " + Number(s.temp).toFixed(1) + "°C" : "")],
+    ["Android", (s.release || "—") + (p.sdk ? "  API " + p.sdk : "")],
+    ["GPU", p.renderer || s.gpu || "—"],
+    ["OpenGL", p.glVersion || "—"],
+    ["Vulkan", p.vulkan || "—"]
   ];
+}
+function hardwareReport(opts) {
+  const footer = !opts || opts.footer !== false;
+  const lines = ["Meridian hardware report", ""];
+  hardwareFacts().forEach(function (row) {
+    lines.push(row[0].padEnd(10, " ") + row[1]);
+  });
+  if (footer) lines.push("", t("madeWith"));
+  return lines.join("\n");
+}
+function hardwareMarkdown() {
+  const lines = ["# Hardware", "", "| Spec | Value |", "|---|---|"];
+  hardwareFacts().forEach(function (row) {
+    lines.push("| " + String(row[0]).replace(/\|/g, "/") + " | " + String(row[1]).replace(/\|/g, "/").replace(/\n/g, " ") + " |");
+  });
   return lines.join("\n");
 }
 function hardwareReportHtml() {
@@ -2200,12 +2376,18 @@ function hardwareReportHtml() {
   return "<!doctype html><meta charset=utf-8><title>Meridian hardware report</title><pre style='font:14px/1.45 ui-monospace,monospace;padding:24px'>" + esc(text) + "</pre>";
 }
 function shareReport() {
-  const text = hardwareReport();
+  const text = hardwareReport({ footer: !premium() });
   const html = hardwareReportHtml();
   try { MeridianPhone.clip(text); } catch (e) {}
   try { if (MeridianPhone.share) MeridianPhone.share("Meridian hardware report", text); } catch (e) {}
   if (!html) return;
   toast("Report copied. Share sheet opened if this phone allows it.");
+}
+function copyMarkdownReport() {
+  if (!premium()) { goNav({ view: "pay", more: "menu", openCmd: "" }); return; }
+  const text = hardwareMarkdown();
+  try { MeridianPhone.clip(text); } catch (e) {}
+  toast(t("copyMarkdown"));
 }
 function shQuote(path) {
   const value = String(path || "");
@@ -2420,9 +2602,11 @@ function bind() {
       licMsg = "";
       licDraft = "";
       paidAt = 0;
+      tierAt = 0;
+      tierCache = r.sku === "premium" ? "premium" : "pro";
       tap();
       toast("Unlocked. Thank you.");
-      announce("Licence accepted. The full version is unlocked.");
+      announce("Licence accepted.");
       goNav({ view: "build", more: "menu", openCmd: "" });
       return;
     }
@@ -2431,7 +2615,14 @@ function bind() {
     else render();
   };
   const winlogo = document.getElementById("winlogo");
-  if (winlogo) winlogo.onclick = function () { goNav({ view: "home", more: "menu", openCmd: "", editing: false }); };
+  if (winlogo) winlogo.onclick = function () {
+    logoPressed = !logoPressed;
+    if (view !== "home" || more !== "menu" || openCmd !== "" || editing) {
+      goNav({ view: "home", more: "menu", openCmd: "", editing: false });
+      return;
+    }
+    winlogo.classList.toggle("pressed", logoPressed);
+  };
   document.querySelectorAll("[data-shelf]").forEach(function (b) {
     b.onclick = function () { goNav({ openCmd: b.getAttribute("data-shelf") }); };
   });
@@ -2657,6 +2848,40 @@ function bind() {
   };
   const pay = document.getElementById("pay");
   if (pay) pay.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
+  const paypremium = document.getElementById("paypremium");
+  if (paypremium) paypremium.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
+  const copymd = document.getElementById("copymd");
+  if (copymd) copymd.onclick = function () { copyMarkdownReport(); };
+  paintScheduler();
+  const schedrecipe = document.getElementById("schedrecipe");
+  const schedevery = document.getElementById("schedevery");
+  if (schedrecipe) schedrecipe.onchange = paintScheduler;
+  if (schedevery) schedevery.onchange = paintScheduler;
+  const schedcopy = document.getElementById("schedcopy");
+  if (schedcopy) schedcopy.onclick = function () {
+    const cmd = schedulerCommand();
+    try { MeridianPhone.clip(cmd); } catch (e) {}
+    toast(t("copyCommand"));
+  };
+  const schedrun = document.getElementById("schedrun");
+  if (schedrun) schedrun.onclick = function () {
+    const cmd = schedulerCommand();
+    if (!cmd) return;
+    const kind = schedulerDanger();
+    if (kind && !confirm(t("dangerConfirm").replace("{kind}", kind))) return;
+    exec("Scheduler", cmd, function (code) {
+      const status = code === 0 ? "scheduled" : "exit " + code;
+      try { localStorage.setItem("m-sched-status", status); } catch (e) {}
+    });
+  };
+  const schedcheck = document.getElementById("schedcheck");
+  if (schedcheck) schedcheck.onclick = function () {
+    exec("Scheduler", "termux-job-scheduler --pending || echo 'termux-job-scheduler is not installed. pkg install termux-api'", function (code) {
+      const last = blocks.length ? String(blocks[blocks.length - 1].out || "").replace(/\n?exit \d+\s*$/, "").trim() : "";
+      const status = (last || ("exit " + code)).slice(0, 240);
+      try { localStorage.setItem("m-sched-status", status); } catch (e) {}
+    });
+  };
   document.querySelectorAll("[data-crumb]").forEach(function (b) {
     b.onclick = function () { cwd = b.getAttribute("data-crumb"); editing = false; render(); };
   });
@@ -2893,28 +3118,39 @@ function answerLine(cmd) {
 }
 let jobTimer = 0;
 let execWaits = 0;
+let execDone = null;
+function finishExec(code) {
+  const cb = execDone;
+  execDone = null;
+  const n = Number(code);
+  if (cb) cb(Number.isFinite(n) ? n : 1);
+}
 function pushBlock(log, block) {
   log.push(block);
   while (log.length > MAX_BLOCKS) log.shift();
 }
-function exec(title, cmd) {
+function exec(title, cmd, done) {
   cmd = answerLine(cmd);
   const answering = cmd.indexOf("Answering") >= 0;
   const fixing = cmd.indexOf("Releasing a stuck") >= 0 || cmd.indexOf("pkg install -y termux-api") === 0;
   if (bond !== "termux") {
     goNav({ view: "console", more: "menu" }, { silent: true });
     pushBlock(blocks, { title: title, cmd: cmd, out: "Not connected. Press Connect.\nexit 1" });
+    execDone = typeof done === "function" ? done : null;
     render();
+    finishExec(1);
     return;
   }
   if (quiet && execWaits < 20) {
     execWaits++;
-    setTimeout(function () { exec(title, cmd); }, 300);
+    setTimeout(function () { exec(title, cmd, done); }, 300);
     return;
   }
   execWaits = 0;
+  execDone = typeof done === "function" ? done : null;
   if (busy && !answering && !fixing) {
     toast("The last command is still running. Press Stop to end it.");
+    finishExec(1);
     return;
   }
   if (interactiveCmd(cmd)) {
@@ -2930,6 +3166,7 @@ function exec(title, cmd) {
     rememberCmd(cmd);
     saveSessions();
     render();
+    finishExec(r === "ok" ? 0 : 1);
     return;
   }
   if (jobTimer) { clearInterval(jobTimer); jobTimer = 0; }
@@ -2937,9 +3174,9 @@ function exec(title, cmd) {
   const log = blocks;
   let r = "ok";
   try { r = String(MeridianPhone.startJob(cmd)); } catch (e) { r = String(e); }
-  if (r === "busy") { toast("Another command is still running."); return; }
-  if (r === "missing") { pushBlock(log, { title: title, cmd: cmd, out: "Termux is not installed.\nexit 1" }); render(); return; }
-  if (r !== "ok") { pushBlock(log, { title: title, cmd: cmd, out: r + "\nexit 1" }); render(); return; }
+  if (r === "busy") { toast("Another command is still running."); finishExec(1); return; }
+  if (r === "missing") { pushBlock(log, { title: title, cmd: cmd, out: "Termux is not installed.\nexit 1" }); render(); finishExec(1); return; }
+  if (r !== "ok") { pushBlock(log, { title: title, cmd: cmd, out: r + "\nexit 1" }); render(); finishExec(1); return; }
   busy = true;
   rememberCmd(cmd);
   if (prefs.keepAwake) { try { MeridianPhone.keepAwake(true); } catch (e) {} }
@@ -2981,6 +3218,7 @@ function exec(title, cmd) {
     if (code !== "0") tap();
     saveSessions();
     render();
+    finishExec(Number(code));
   }, 500);
 }
 function byName(name) {
@@ -3013,6 +3251,53 @@ function localPlan(goal) {
   if (!words.length) return null;
   return null;
 }
+function dangerKind(cmd) {
+  const s = String(cmd || "");
+  if (/\brm\s+-[a-zA-Z]*r[a-zA-Z]*f\b|\brm\s+-[a-zA-Z]*f[a-zA-Z]*r\b|\brm\s+-r\b[\s\S]*\s-f\b|\brm\s+-f\b[\s\S]*\s-r\b|\brm\s+--recursive\b/.test(s)) return "rm -rf";
+  if (/\b(?:curl|wget)\b[^|\n]*\|\s*(?:ba)?sh\b/.test(s)) return "curl|sh";
+  return "";
+}
+let agentLeft = [];
+function planCommands() {
+  const box = document.getElementById("steps");
+  if (!box) return [];
+  const cmds = [];
+  box.querySelectorAll("textarea[data-step]").forEach(function (el) {
+    const v = String(el.value || "").trim();
+    if (v) cmds.push(v);
+  });
+  return cmds;
+}
+function nextAgent() {
+  if (!agentLeft.length) { toast(t("planDone")); return; }
+  const cmd = agentLeft[0];
+  const kind = dangerKind(cmd);
+  if (kind && !confirm(t("dangerConfirm").replace("{kind}", kind))) {
+    agentLeft = [];
+    toast(t("planStopped"));
+    return;
+  }
+  agentLeft.shift();
+  exec("Plan", cmd, function (code) {
+    if (code !== 0) {
+      agentLeft = [];
+      toast(t("planStoppedCode").replace("{n}", String(code)));
+      return;
+    }
+    nextAgent();
+  });
+}
+function startAgent() {
+  if (!premium()) { goNav({ view: "pay", more: "menu", openCmd: "" }); return; }
+  const cmds = planCommands();
+  if (!cmds.length) { toast(t("noSteps")); return; }
+  agentLeft = cmds.slice();
+  nextAgent();
+}
+function agentBar() {
+  if (premium()) return '<button class="btn" type="button" id="runplan">' + esc(t("runThePlan")) + '</button>';
+  return '<button class="ghost" type="button" id="runplan">' + esc(t("runThePlan")) + ' <span class="probadge">PREMIUM</span></button><p class="muted">' + esc(t("pricePremium")) + '</p>';
+}
 function showSteps(steps) {
   const box = document.getElementById("steps");
   if (!box) return;
@@ -3020,10 +3305,47 @@ function showSteps(steps) {
     const cmd = typeof s === "string" ? s : s.cmd;
     const why = whyFor(cmd);
     return '<article class="plate stack"><p class="muted">' + esc(why) + '</p>' + cmdField(cmd, ' data-step="' + i + '"') + '<button class="ghost" type="button" data-runstep="' + i + '">Run</button></article>';
-  }).join("");
+  }).join("") + agentBar();
   box.querySelectorAll("[data-runstep]").forEach(function (b) {
-    b.onclick = function () { const area = box.querySelector("[data-step='" + b.getAttribute("data-runstep") + "']"); exec("Build", area ? area.value : ""); };
+    b.onclick = function () { const area = box.querySelector("[data-step='" + b.getAttribute("data-runstep") + "']"); exec("Plan", area ? area.value : ""); };
   });
+  const runplan = document.getElementById("runplan");
+  if (runplan) runplan.onclick = function () { startAgent(); };
+}
+const SCHED_MS = { "15": 900000, "60": 3600000, "360": 21600000, "1440": 86400000 };
+function schedulerDanger() {
+  const pick = document.getElementById("schedrecipe");
+  const steps = byName(pick ? pick.value : "");
+  if (!steps) return "";
+  for (let i = 0; i < steps.length; i++) {
+    const kind = dangerKind(steps[i]);
+    if (kind) return kind;
+  }
+  return "";
+}
+function schedulerCommand() {
+  const pick = document.getElementById("schedrecipe");
+  const every = document.getElementById("schedevery");
+  const name = pick ? pick.value : "";
+  const steps = byName(name);
+  if (!steps) return "";
+  const period = SCHED_MS[(every && every.value) || "60"] || 3600000;
+  const script = "#!/data/data/com.termux/files/usr/bin/bash\nset -e\n" + steps.join("\n") + "\n";
+  const b64 = btoa(unescape(encodeURIComponent(script)));
+  return "mkdir -p \"$HOME/.meridian\"\nprintf %s '" + b64 + "' | base64 -d > \"$HOME/.meridian/job.sh\"\nchmod +x \"$HOME/.meridian/job.sh\"\ntermux-job-scheduler --job-id 7 --period-ms " + period + " --persisted true --script \"$HOME/.meridian/job.sh\"\nprintf '%s\\n' 'scheduled " + String(name).replace(/'/g, "") + "' > \"$HOME/.meridian/job-status\"\necho scheduled";
+}
+function paintScheduler() {
+  const pre = document.getElementById("schedcmd");
+  if (pre) pre.textContent = schedulerCommand();
+}
+function schedulerCard() {
+  if (!premium()) {
+    return '<article class="plate stack"><b>' + esc(t("scheduler")) + ' <span class="probadge">PREMIUM</span></b><p class="muted">' + esc(t("schedulerBlurb")) + '</p><p class="muted">' + esc(t("pricePremium")) + '</p><button class="ghost" type="button" data-go="pay">' + esc(t("seePremium")) + '</button></article>';
+  }
+  let options = "";
+  IDEAS.forEach(function (idea) { options += '<option value="' + esc(idea[0]) + '">' + esc(idea[0]) + '</option>'; });
+  const last = localStorage.getItem("m-sched-status") || "—";
+  return '<article class="plate stack" id="schedcard"><b>' + esc(t("scheduler")) + '</b><p class="muted">' + esc(t("schedulerBlurb")) + '</p><label class="muted" for="schedrecipe">' + esc(t("commands")) + '</label><select id="schedrecipe">' + options + '</select><label class="muted" for="schedevery">' + esc(t("interval")) + '</label><select id="schedevery"><option value="15">' + esc(t("every15")) + '</option><option value="60" selected>' + esc(t("everyHour")) + '</option><option value="360">' + esc(t("every6")) + '</option><option value="1440">' + esc(t("everyDay")) + '</option></select><pre id="schedcmd"></pre><div class="tools"><button class="ghost" type="button" id="schedcopy">' + esc(t("copyCommand")) + '</button><button class="ghost" type="button" id="schedrun">' + esc(t("runScheduler")) + '</button><button class="ghost" type="button" id="schedcheck">' + esc(t("checkJobs")) + '</button></div><p class="muted" id="schedstatus">' + esc(t("lastStatus")) + ": " + esc(last) + '</p></article>';
 }
 function apiBase() {
   let base = (localStorage.getItem("m-base") || "https://api.x.ai/v1").trim();
