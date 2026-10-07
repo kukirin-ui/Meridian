@@ -749,6 +749,27 @@ public class MainActivity extends Activity {
             cm.setPrimaryClip(ClipData.newPlainText("meridian", text));
         }
 
+        /** Opens the system share sheet with a plain-text payload. Used for the hardware report. */
+        @JavascriptInterface
+        public void share(String title, String body) {
+            if (title == null || body == null) return;
+            final String subject = title.trim();
+            final String text = body;
+            if (subject.length() == 0 || text.length() == 0) return;
+            if (subject.length() > 200 || text.length() > 100000) return;
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("text/plain");
+                        i.putExtra(Intent.EXTRA_SUBJECT, subject);
+                        i.putExtra(Intent.EXTRA_TEXT, text);
+                        startActivity(Intent.createChooser(i, subject));
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+
         @JavascriptInterface
         public String run(String cmd) {
             if (!termuxInstalled()) return "Termux is not installed\nexit 1";
