@@ -42,6 +42,8 @@ public class MainActivity extends Activity {
      * Generate your own pair with clone/tools/license/keygen.mjs and paste the public half here.
      */
     private static final String LICENSE_PUBKEY = "";
+    /** Length of the free trial that unlocks Pro pages before a licence key is entered. */
+    private static final int TRIAL_DAYS = 7;
     private WebView web;
     static final Object GATE = new Object();
     static volatile String pendingOut = "";
@@ -1047,6 +1049,47 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 String msg = ex.getMessage() == null ? "blocked" : ex.getMessage();
                 return "{\"error\":" + JSONObject.quote(msg) + "}";
+            }
+        }
+
+        /**
+         * Non-blocking variant of askNet. The synchronous call froze the WebView for up to 50 s
+         * while the model answered; this one returns at once and later calls
+         * window.onAskDone(ticket, resultJson) on the page.
+         */
+        @JavascriptInterface
+        public void askNetStart(final String ticket, final String base, final String key, final String model, final String goal) {
+            new Thread(new Runnable() {
+                public void run() {
+                    final String result = askNet(base, key, model, goal);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (web == null) return;
+                            web.evaluateJavascript("window.onAskDone && window.onAskDone(" + JSONObject.quote(ticket == null ? "" : ticket) + "," + JSONObject.quote(result) + ")", null);
+                        }
+                    });
+                }
+            }, "meridian-ask").start();
+        }
+
+        /** Days left in the 7-day trial, 0 when over. The first-run stamp lives in filesDir so clearing WebView storage does not restart it. */
+        @JavascriptInterface
+        public int trialLeft() {
+            try {
+                File stamp = new File(getFilesDir(), "first.run");
+                long first;
+                if (stamp.isFile()) {
+                    first = stamp.lastModified();
+                } else {
+                    new java.io.FileOutputStream(stamp).close();
+                    first = System.currentTimeMillis();
+                    stamp.setLastModified(first);
+                }
+                long elapsedDays = (System.currentTimeMillis() - first) / 86400000L;
+                long left = TRIAL_DAYS - elapsedDays;
+                return left < 0 ? 0 : (int) left;
+            } catch (Exception ex) {
+                return 0;
             }
         }
 
