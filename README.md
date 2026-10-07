@@ -64,18 +64,22 @@ signingConfigs {
 buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
 ```
 
-## Free, Pro, and Premium
+## Free and Pro
 
-| Free | Pro (choose €1 – €1,000,000 once) | Premium (choose €5 – €5,000,000 once) |
-|---|---|---|
-| Dashboard, Hardware, System, Battery | Build recipes, including Linux PC install/open | Everything in Pro |
-| One console session, Setup, Doctor | Plan: your API key, you press Run on each step | **Run the plan** walks the steps and stops on the first failure |
-| Files (read-only browse and view) | Tweaks, extra console sessions | Scheduler: a `termux-job-scheduler` command for a recipe |
-| Hardware report with a small “Made with Meridian” footer | File create / edit / rename / delete / zip | The same report with no footer, plus copy as Markdown |
+The price is **Pro €15 once**. An earlier draft used a pay-what-you-want span of €1–€1,000,000. That is not the price.
 
-Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). Premium is not part of the trial. After the trial, Pro tabs show a `PRO` badge and route to the purchase page. Premium cards show a lock and the price range until a Premium key is on the phone.
+| Free | Pro (€15 once) |
+|---|---|
+| Dashboard, Hardware, System, Battery | Build recipes, including Linux PC install/open |
+| One console session, Setup, Doctor, Commands, Links | Plan (your API key or a local model). You press Run on each step |
+| Files (read-only browse and view) | Tweaks, extra console sessions, file create / edit / rename / delete / zip |
+| Hardware report with a small “Made with Meridian” footer | |
 
-A phone that already has Pro or Premium sees a short thank-you on the Full version page. The paste field is only there when the phone is not unlocked.
+Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). After that the Pro tabs show a `PRO` badge and route to the purchase page.
+
+A phone that already has Pro sees a short thank-you on the Full version page. The paste field is only there when the phone is not unlocked.
+
+Premium is designed and **not for sale**. The app has no Premium buy button. See [PRICES.md](PRICES.md).
 
 ## Turning on payments
 
@@ -88,15 +92,16 @@ A phone that already has Pro or Premium sees a short thank-you on the Full versi
 
    Paste the printed line into `MainActivity.java` as `LICENSE_PUBKEY`. The private key is git-ignored; back it up offline.
 
-2. Point `PAY_URL` at your checkout. The app opens it in the system browser for Pro and for Premium. Premium is the same merchant with SKU `premium`. The label is the price range. The app does not charge €5,000,000 by itself.
+2. Point `PAY_URL` at your checkout. The app opens it in the system browser. The button says **Buy Pro · €15**.
 
-3. Issue keys after each sale:
+3. Issue a Pro key after each sale:
 
    ```bash
    node tools/license/sign.mjs --sku pro --ref ORDER
-   node tools/license/sign.mjs --sku premium --ref ORDER
    node tools/license/verify.mjs MERIDIAN-xxxx.yyyy
    ```
+
+   `sign.mjs` still accepts `--sku premium` for a later release. Do not sell that SKU yet.
 
 4. The customer pastes the `MERIDIAN-` key on **Full version** while the phone is still locked.
 
