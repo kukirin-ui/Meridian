@@ -1,7 +1,0 @@
-.gradle/
-build/
-local.properties
-*.keystore
-*.jks
-tools/license/private.pem
-tools/license/keys/

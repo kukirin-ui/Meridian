@@ -1,8 +1,8 @@
 # Meridian — A-to-Z audit, enhancement roadmap and monetization plan
 
 Scope: the shipped 1.8.6 source (`original/`), evaluated as product manager, UX designer and QA lead.
-Every finding below is paired with the exact fix. Findings marked **[fixed in clone]** are already
-implemented in `clone/`; the rest are specified so they can be built next.
+Every finding below is paired with the exact fix. Findings marked **[fixed in 2.0]** are already
+implemented at the repo root (`app/`); the rest are specified so they can be built next.
 
 ---
 
@@ -30,15 +30,15 @@ That positioning is good and rare. The direction kept throughout this plan:
 
 | # | Finding (original) | Severity | Status |
 |---|---|---|---|
-| C1 | `safePath()` returns `$HOME` for any invalid path, so `removePath("../x")` runs `rm -rf "$HOME"` | Critical — deletes the user's whole Termux home | **[fixed in clone]** |
-| C2 | `TermuxResult` receiver is `android:exported="true"` with an intent-filter; any app can inject fake command output or trigger the "paid" path | Critical — spoofing | **[fixed in clone]** |
-| C3 | Paywall = Revolut checkout rendered *inside the WebView* and a text scrape for "thank you"; any page containing those words writes `files/full.key` | Critical — bypassable in 10 s, no VAT handling, no invoice, no refund trail | **[fixed in clone]** |
-| C4 | Gemini API key sent as `?key=` in the URL (logged by proxies/CDNs) | High | **[fixed in clone]** |
-| C5 | API key stored in `localStorage`, which `allowBackup` copies to Google backup | High | **[fixed in clone]** |
-| C6 | Heredoc with fixed delimiter when writing `cmd.sh` → a command containing the delimiter line escapes the heredoc | High — command injection | **[fixed in clone]** |
-| C7 | `setAllowFileAccess(true)` + `usesCleartextTraffic="true"` for an app that loads only `file:///android_asset` | Medium | **[fixed in clone]** |
+| C1 | `safePath()` returns `$HOME` for any invalid path, so `removePath("../x")` runs `rm -rf "$HOME"` | Critical — deletes the user's whole Termux home | **[fixed in 2.0]** |
+| C2 | `TermuxResult` receiver is `android:exported="true"` with an intent-filter; any app can inject fake command output or trigger the "paid" path | Critical — spoofing | **[fixed in 2.0]** |
+| C3 | Paywall = Revolut checkout rendered *inside the WebView* and a text scrape for "thank you"; any page containing those words writes `files/full.key` | Critical — bypassable in 10 s, no VAT handling, no invoice, no refund trail | **[fixed in 2.0]** |
+| C4 | Gemini API key sent as `?key=` in the URL (logged by proxies/CDNs) | High | **[fixed in 2.0]** |
+| C5 | API key stored in `localStorage`, which `allowBackup` copies to Google backup | High | **[fixed in 2.0]** |
+| C6 | Heredoc with fixed delimiter when writing `cmd.sh` → a command containing the delimiter line escapes the heredoc | High — command injection | **[fixed in 2.0]** |
+| C7 | `setAllowFileAccess(true)` + `usesCleartextTraffic="true"` for an app that loads only `file:///android_asset` | Medium | **[fixed in 2.0]** |
 
-**C1 fix** (`clone/.../MainActivity.java`): `safePath` returns `null` on any doubt and every caller
+**C1 fix** (`app/src/main/java/com/meridian/shell/MainActivity.java`): `safePath` returns `null` on any doubt and every caller
 refuses to run.
 
 ```java
@@ -89,18 +89,18 @@ the command happens to contain it. **C7 fix**: `setAllowFileAccess(false)`,
 
 | # | Finding | Status |
 |---|---|---|
-| H1 | `MeridianPhone.run()` and `askNet()` are **synchronous** `@JavascriptInterface` calls. `run` blocks the JS thread for up to 20 s (startup `uname` probe), `askNet` for up to 60 s while the model answers. The dashboard stops repainting; Android may show ANR. | **[fixed in clone]** — `askNetStart(ticket,…)` → `window.onAskDone(ticket, json)`; startup probe moved to a background job |
-| H2 | New file / new folder use `prompt()`, but no `WebChromeClient` is installed → `prompt()` returns `null` and the buttons do nothing | **[fixed in clone]** — inline name field + `goodName()` |
-| H3 | `loadFiles` filters out any entry containing a space → "My Project/" never shows up | **[fixed in clone]** |
-| H4 | No way to cancel a running job; the console just spins. `cancelJob` existed in Java but had no UI | **[fixed in clone]** — `Stop` button in the run bar, Ctrl+C in the dock |
-| H5 | Interactive commands (`vim`, `htop`, `python`, `ssh host`) start under `script | nc`, never get a TTY, and hang forever | **[fixed in clone]** — `interactiveCmd()` guard → `openInTermux(cmd)` hands the command to Termux's own terminal |
-| H6 | `openTermux` is called from JS but not defined in the bridge → `TypeError` on the Doctor page | **[fixed in clone]** |
-| H7 | `powerMode()` writes `Settings.Global.low_power`; that needs `WRITE_SECURE_SETTINGS`, which a sideloaded app can never hold → every tap throws and falls through to `openPower()` while the UI says "set" | **[fixed in clone]** — buttons honestly open the system power screen and the note says so |
-| H8 | `killBackgroundProcesses()` is a no-op since Android 8 for apps you do not own; "Free RAM" reports success | **[fixed in clone]** — `dropCache` left as a Termux-side action with honest copy; the fake success is gone |
-| H9 | `sick()` paints **SYSTEM FAULT** whenever any console block ever contained `exit 1` (e.g. `grep` with no match), or when Termux is not bonded | **[fixed in clone]** — health is memory ≥ 94 % or SoC ≥ 46 °C only |
-| H10 | `kill -9` on `dpkg`/`apt` during cancel and before every package job leaves the package database locked/half-written | **[fixed in clone]** — cancel sends TERM to the job tree, waits 1 s, KILLs only the wrapper; a live `dpkg`/`apt` is never killed and stale locks are cleared only when no such process exists, followed by `dpkg --configure -a` |
-| H11 | Termux truncates oversized results: `stdout` arrives empty with `stdout_original_length` set, and the block shows nothing | **[fixed in clone]** — `TermuxResult` detects the truncation marker and falls back to the live-stream buffer (`pendingOut`), which is capped per block |
-| H12 | `isCommand()` regex recognises ~30 binaries; `cargo build`, `./run.sh`, `pnpm i` are treated as prose | **[fixed in clone]** — the dock always executes; prose detection is only a hint |
+| H1 | `MeridianPhone.run()` and `askNet()` are **synchronous** `@JavascriptInterface` calls. `run` blocks the JS thread for up to 20 s (startup `uname` probe), `askNet` for up to 60 s while the model answers. The dashboard stops repainting; Android may show ANR. | **[fixed in 2.0]** — `askNetStart(ticket,…)` → `window.onAskDone(ticket, json)`; startup probe moved to a background job |
+| H2 | New file / new folder use `prompt()`, but no `WebChromeClient` is installed → `prompt()` returns `null` and the buttons do nothing | **[fixed in 2.0]** — inline name field + `goodName()` |
+| H3 | `loadFiles` filters out any entry containing a space → "My Project/" never shows up | **[fixed in 2.0]** |
+| H4 | No way to cancel a running job; the console just spins. `cancelJob` existed in Java but had no UI | **[fixed in 2.0]** — `Stop` button in the run bar, Ctrl+C in the dock |
+| H5 | Interactive commands (`vim`, `htop`, `python`, `ssh host`) start under `script | nc`, never get a TTY, and hang forever | **[fixed in 2.0]** — `interactiveCmd()` guard → `openInTermux(cmd)` hands the command to Termux's own terminal |
+| H6 | `openTermux` is called from JS but not defined in the bridge → `TypeError` on the Doctor page | **[fixed in 2.0]** |
+| H7 | `powerMode()` writes `Settings.Global.low_power`; that needs `WRITE_SECURE_SETTINGS`, which a sideloaded app can never hold → every tap throws and falls through to `openPower()` while the UI says "set" | **[fixed in 2.0]** — buttons honestly open the system power screen and the note says so |
+| H8 | `killBackgroundProcesses()` is a no-op since Android 8 for apps you do not own; "Free RAM" reports success | **[fixed in 2.0]** — `dropCache` left as a Termux-side action with honest copy; the fake success is gone |
+| H9 | `sick()` paints **SYSTEM FAULT** whenever any console block ever contained `exit 1` (e.g. `grep` with no match), or when Termux is not bonded | **[fixed in 2.0]** — health is memory ≥ 94 % or SoC ≥ 46 °C only |
+| H10 | `kill -9` on `dpkg`/`apt` during cancel and before every package job leaves the package database locked/half-written | **[fixed in 2.0]** — cancel sends TERM to the job tree, waits 1 s, KILLs only the wrapper; a live `dpkg`/`apt` is never killed and stale locks are cleared only when no such process exists, followed by `dpkg --configure -a` |
+| H11 | Termux truncates oversized results: `stdout` arrives empty with `stdout_original_length` set, and the block shows nothing | **[fixed in 2.0]** — `TermuxResult` detects the truncation marker and falls back to the live-stream buffer (`pendingOut`), which is capped per block |
+| H12 | `isCommand()` regex recognises ~30 binaries; `cargo build`, `./run.sh`, `pnpm i` are treated as prose | **[fixed in 2.0]** — the dock always executes; prose detection is only a hint |
 
 **H1 pattern** (reusable for every slow bridge call):
 
@@ -140,18 +140,18 @@ function interactiveCmd(cmd) {
 
 | # | Finding | Status |
 |---|---|---|
-| M1 | Four `setInterval`s at 500/500/80 ms → **12.5 Hz** graph repaint + two 2 Hz full `innerHTML` rebuilds; each tick crosses the JS bridge and reads `/proc` | **[fixed in clone]** — 1000/1000/250 ms, `live()` cache window 240 ms, skip when `document.hidden`, memory bar mutates `style.width` instead of `outerHTML` |
-| M2 | `props()` forks `getprop` ~25× per status call | **[fixed in clone]** — `SystemProperties` via reflection first, results cached for the process lifetime |
-| M3 | Light theme has hard-coded dark colours in 14 selectors (gauges, terminal, dock, glyphs) → unreadable | **[fixed in clone]** — every colour is a token (`--ink --termbg --termfg --track --paper --bad --accent2`) |
-| M4 | Console history is lost on every process death | **[fixed in clone]** — `m-sessions` in `localStorage`, capped at 40 blocks / 24 kB each |
-| M5 | Hardware back exits the app from any sub-page | **[fixed in clone]** — `window.meridianBack()` pops editor → folder → home before finishing |
-| M6 | Dead handlers (`rundoctor`, `data-runtweak`, `data-copycmd`, `ramclean`, `data-idea`) and a drag-and-drop promise in the Files guide that was never implemented | **[fixed in clone]** |
-| M7 | Speed-test result lived in a DOM node that `render()` replaced → result vanished if anything repainted mid-test | **[fixed in clone]** — result is state (`speedText`), rendered by `homePage()` |
-| M8 | Stale "Connecting to Termux…" blocks survive restarts | **[fixed in clone]** — marked as interrupted on boot |
+| M1 | Four `setInterval`s at 500/500/80 ms → **12.5 Hz** graph repaint + two 2 Hz full `innerHTML` rebuilds; each tick crosses the JS bridge and reads `/proc` | **[fixed in 2.0]** — 1000/1000/250 ms, `live()` cache window 240 ms, skip when `document.hidden`, memory bar mutates `style.width` instead of `outerHTML` |
+| M2 | `props()` forks `getprop` ~25× per status call | **[fixed in 2.0]** — `SystemProperties` via reflection first, results cached for the process lifetime |
+| M3 | Light theme has hard-coded dark colours in 14 selectors (gauges, terminal, dock, glyphs) → unreadable | **[fixed in 2.0]** — every colour is a token (`--ink --termbg --termfg --track --paper --bad --accent2`) |
+| M4 | Console history is lost on every process death | **[fixed in 2.0]** — `m-sessions` in `localStorage`, capped at 40 blocks / 24 kB each |
+| M5 | Hardware back exits the app from any sub-page | **[fixed in 2.0]** — `window.meridianBack()` pops editor → folder → home before finishing |
+| M6 | Dead handlers (`rundoctor`, `data-runtweak`, `data-copycmd`, `ramclean`, `data-idea`) and a drag-and-drop promise in the Files guide that was never implemented | **[fixed in 2.0]** |
+| M7 | Speed-test result lived in a DOM node that `render()` replaced → result vanished if anything repainted mid-test | **[fixed in 2.0]** — result is state (`speedText`), rendered by `homePage()` |
+| M8 | Stale "Connecting to Termux…" blocks survive restarts | **[fixed in 2.0]** — marked as interrupted on boot |
 
 ### 1.4 Stress matrix (what was exercised)
 
-Executed against the clone via a jsdom harness with a stubbed bridge (`/tmp/smoke`, outside the repo):
+Executed against 2.0 via a jsdom harness with a stubbed bridge (`/tmp/smoke`, outside the repo):
 
 * every page renders with empty / partial / malformed bridge JSON;
 * Pro gating when trial = 0, bad key, good key, key without public key compiled in;
@@ -163,14 +163,14 @@ Executed against the clone via a jsdom harness with a stubbed bridge (`/tmp/smok
 * `node --check` on the extracted script.
 
 Java is review-only here (no Android SDK on the build host). First thing to do on a workstation:
-`cd clone && gradle wrapper --gradle-version 8.9 && ./gradlew assembleDebug` and install on a device
+`gradle wrapper --gradle-version 8.9 && ./gradlew assembleDebug` and install on a device
 with Termux + `allow-external-apps=true`.
 
 ---
 
 ## 2. Phase 2 — Appearance & UI/UX overhaul
 
-### 2.1 Design language (implemented in the clone)
+### 2.1 Design language (implemented in 2.0)
 
 * **Tokens, not colours.** Two full palettes (dark default, light) defined once; the UI never
   references a hex value directly. Adding a third theme (OLED black, Solarized) is a 12-line change.
@@ -298,7 +298,7 @@ Keep `index.html` free of Android-isms: every `MeridianPhone.*` call already goe
 Uptime here means **the app never hangs and never loses state**:
 
 * No synchronous bridge call may take > 50 ms — enforce with a debug assertion that logs any
-  `MeridianPhone.*` call over budget. Remaining sync offenders in the clone: `probe()`, `speedStatus()`
+  `MeridianPhone.*` call over budget. Remaining sync offenders in 2.0: `probe()`, `speedStatus()`
   (both fast) — migrate anyway for consistency using the `askNetStart` ticket pattern.
 * Live stream backpressure: `live.log` is read from the end; cap at 24 kB per block (done).
 * `StrictMode` in debug builds to catch disk I/O on the main thread.
@@ -312,12 +312,12 @@ Uptime here means **the app never hangs and never loses state**:
 
 | Requirement | Status |
 |---|---|
-| All controls reachable and operable by keyboard, visible focus | **[fixed in clone]** |
-| `aria-label` on icon-only buttons, `role="tablist"/"tab"` on nav, `aria-current` | **[fixed in clone]** |
-| Live regions: `#srstatus role="status" aria-live="polite"` announces job start / exit code | **[fixed in clone]** |
+| All controls reachable and operable by keyboard, visible focus | **[fixed in 2.0]** |
+| `aria-label` on icon-only buttons, `role="tablist"/"tab"` on nav, `aria-current` | **[fixed in 2.0]** |
+| Live regions: `#srstatus role="status" aria-live="polite"` announces job start / exit code | **[fixed in 2.0]** |
 | Minimum 44 × 44 px touch targets (header buttons 36 px → raise to 44 in the next pass) | partial |
 | Contrast ≥ 4.5:1 in both themes — tokens chosen for it; verify muted text (`--muted`) on light | partial |
-| `prefers-reduced-motion` disables all transitions and the pulse | **[fixed in clone]** |
+| `prefers-reduced-motion` disables all transitions and the pulse | **[fixed in 2.0]** |
 | Text scales with system font size (use `rem`, not `px`, for body copy) | todo — mechanical |
 | Terminal output readable by TalkBack: add "Output, N lines" summary before each block | todo |
 
@@ -333,7 +333,7 @@ Uptime here means **the app never hangs and never loses state**:
   chargebacks and refunds are their problem.
 * **Trial, not crippleware.** 7 days of everything, then a clear, polite gate.
 
-### 5.2 Model (implemented in the clone)
+### 5.2 Model (implemented in 2.0)
 
 | | Free | Pro — €9.99 one-time (launch at €6.99 for the first 500) |
 |---|---|---|
@@ -347,7 +347,7 @@ Uptime here means **the app never hangs and never loses state**:
 
 Flow: **Buy** → system browser → Lemon Squeezy / Paddle / Gumroad checkout → key e-mailed →
 paste in **Support → Enter licence key** → verified offline (P-256). Keys are issued with
-`clone/tools/license/sign.mjs`; wire it to the store's "order created" webhook so delivery is
+`tools/license/sign.mjs`; wire it to the store's "order created" webhook so delivery is
 instant. Google Play distribution: swap `activate()/unlocked()` for Play Billing — the UI does not
 change.
 
@@ -378,9 +378,11 @@ attach on the paid base adds a slow but recurring floor. The real upside is the 
 
 ---
 
-## 6. Choosing between `original/` and `clone/`
+## 6. Choosing between `original/` (1.8.6) and the root app (2.0)
 
-| | `original/` 1.8.6 | `clone/` 2.0.0 |
+The 2.0 app **is** the repository root (`app/`). `original/` is the 1.8.6 archive.
+
+| | `original/` 1.8.6 | root `app/` 2.0.0 |
 |---|---|---|
 | Builds | needs your own project files | `./gradlew assembleDebug` |
 | Data safety | `rm -rf $HOME` reachable | path validation fails closed |
@@ -392,14 +394,17 @@ attach on the paid base adds a slow but recurring floor. The real upside is the 
 | Tablet | phone layout only | side rail ≥ 720 px |
 | A11y | none | focus, labels, live regions, reduced motion |
 
-Recommendation: ship the clone. Keep `original/` as the reference for behaviour questions and
+Recommendation: ship 2.0 from the root. Keep `original/` as the reference for behaviour questions and
 delete it once 2.0 has been in users' hands for a release cycle.
+
+The download page at [meridian0.grok.me](https://meridian0.grok.me) still serves 1.8.6 until you
+upload a 2.0 APK and checksum. This repo does not host that site.
 
 ---
 
 ## 7. Execution order (prioritised backlog)
 
-1. Build the clone on a workstation, install, run the Doctor page on a real device. Fix any
+1. Build 2.0 on a workstation (`./gradlew assembleDebug`), install, run the Doctor page on a real device. Fix any
    bridge mismatch the jsdom harness could not see (Java is review-only here).
 2. Generate the licence keypair, set `LICENSE_PUBKEY`, set `PAY_URL` to a Lemon Squeezy product.
 3. Raise header buttons to 44 px, convert body `px` → `rem`, run an axe scan in Chrome remote debugging.
