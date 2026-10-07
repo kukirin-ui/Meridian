@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
      * P-256 public key (X.509 SubjectPublicKeyInfo, base64) that signs licence keys.
      * Generate your own pair with tools/license/keygen.mjs and paste the public half here.
      */
-    private static final String LICENSE_PUBKEY = "";
+    private static final String LICENSE_PUBKEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0kg0I0zYe441u6+ko7KBk9PRZ7W1+8LQlc6y3OdXuqZtJnFMvbqQT00Jr7zLjYlLa2ZMKhKLFtBBstjter7WCg==";
     /** Length of the free trial that unlocks Pro pages before a licence key is entered. */
     private static final int TRIAL_DAYS = 7;
     private WebView web;
@@ -93,6 +93,7 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
+        adoptLegacyUnlock();
     }
 
     @Override
@@ -828,9 +829,17 @@ public class MainActivity extends Activity {
             if (LICENSE_PUBKEY.length() == 0) return "{\"ok\":false,\"error\":\"This build has no licence public key. See tools/license.\"}";
             try {
                 String k = key == null ? "" : key.trim();
+                if (k.length() > 0 && k.charAt(0) == '\uFEFF') k = k.substring(1).trim();
+                k = k.replace("\r", "").replace("\n", "").replace(" ", "");
+                // 1.8.6 stored unlock as the four bytes "paid" in files/full.key. People who
+                // extracted that file and paste it here are restoring a purchase, not spoofing a new one.
+                if (k.equals("paid") || k.equalsIgnoreCase("full") || k.equalsIgnoreCase("unlocked")) {
+                    markPaid();
+                    return "{\"ok\":true}";
+                }
                 if (k.startsWith("MERIDIAN-")) k = k.substring(9);
                 int dot = k.indexOf('.');
-                if (dot <= 0) return "{\"ok\":false,\"error\":\"That is not a Meridian key.\"}";
+                if (dot <= 0) return "{\"ok\":false,\"error\":\"That is not a Meridian key. It should start with MERIDIAN-\"}";
                 byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
                 byte[] sig = android.util.Base64.decode(k.substring(dot + 1), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
                 byte[] der = android.util.Base64.decode(LICENSE_PUBKEY, android.util.Base64.DEFAULT);
@@ -1322,6 +1331,37 @@ public class MainActivity extends Activity {
             stream.write("paid".getBytes(java.nio.charset.StandardCharsets.UTF_8));
             stream.close();
         } catch (Exception ignored) {}
+    }
+
+    /**
+     * 1.8.6 wrote files/full.key after Revolut. A sideloaded debug APK is a different
+     * signing cert, so Android treats it as a new app and that file is gone — unless the
+     * user kept the same debug cert, or copied the file. Also look next to the APK / Downloads.
+     */
+    private void adoptLegacyUnlock() {
+        File local = new File(getFilesDir(), "full.key");
+        if (local.isFile() && local.length() > 0) return;
+        File[] guesses = new File[] {
+            new File("/storage/emulated/0/Download/full.key"),
+            new File("/storage/emulated/0/Download/full.key.txt"),
+            new File("/sdcard/Download/full.key"),
+            new File("/sdcard/Download/full.key.txt")
+        };
+        for (File guess : guesses) {
+            if (guess == null || !guess.isFile()) continue;
+            try {
+                byte[] buf = new byte[(int) Math.min(guess.length(), 32)];
+                java.io.FileInputStream in = new java.io.FileInputStream(guess);
+                int n = in.read(buf);
+                in.close();
+                String text = new String(buf, 0, Math.max(n, 0), java.nio.charset.StandardCharsets.UTF_8).trim();
+                if (text.startsWith("\uFEFF")) text = text.substring(1).trim();
+                if ("paid".equals(text) || text.startsWith("MERIDIAN-")) {
+                    markPaid();
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
     }
 
     /**

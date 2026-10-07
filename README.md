@@ -85,6 +85,8 @@ Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). A
 
 4. The customer pastes the key in **Support → Enter licence key**.
 
+If you already paid in **1.8.6**, there was never a pasteable key. Unlock was a hidden file `full.key` on the phone containing the word `paid` (written after Revolut). A new APK with a different signing cert looks like a different app, so that file is gone. In 2.0: paste `paid` on the licence screen, or paste a `MERIDIAN-…` key issued with `tools/license/sign.mjs`. Put `full.key` in `Download/` and 2.0 will pick it up on launch.
+
 Then rebuild, upload the APK (and its SHA-256) to [meridian0.grok.me](https://meridian0.grok.me) so the download page matches this repo.
 
 MIT licence; see `LICENSE`. The signing key is not included.

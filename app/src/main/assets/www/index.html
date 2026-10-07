@@ -1547,7 +1547,7 @@ function payPage() {
   if (days > 0) html += '<p class="trialline">Trial: ' + days + ' day' + (days === 1 ? "" : "s") + ' left. Everything is open until then.</p>';
   else html += '<p class="trialline">The trial is over. Dashboard, Hardware, System, Battery, the console, Setup and Doctor stay free.</p>';
   html += '<button class="btn" id="pay" type="button">Buy a licence</button><p class="muted">The checkout opens in your browser and emails a key that starts with MERIDIAN-. Paste it below. Nothing about this phone is sent anywhere.</p></article>';
-  html += '<article class="plate stack"><label class="muted" for="lickey">Licence key</label><div class="keyrow"><input id="lickey" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">Paste</button></div><button class="btn" type="button" id="activate">Activate</button><p class="muted" id="licnote"></p></article>';
+  html += '<article class="plate stack"><label class="muted" for="lickey">Licence key</label><div class="keyrow"><input id="lickey" placeholder="MERIDIAN-… or paid" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">Paste</button></div><button class="btn" type="button" id="activate">Activate</button><p class="muted" id="licnote">If you already paid in 1.8.6, paste the word paid (the contents of full.key), or a key that starts with MERIDIAN-.</p></article>';
   return html + '</div>';
 }
 window.onPaid = function () { paidAt = 0; view = "build"; render(); };
