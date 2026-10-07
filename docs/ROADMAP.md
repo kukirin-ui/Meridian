@@ -1,6 +1,6 @@
 # Meridian 1.8.6 — audit and roadmap
 
-Cloned from the app behind [meridian0.grok.me](https://meridian0.grok.me) (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`). The UI is one WebView page, `assets/www/index.html` (about 1,940 lines). The phone bridge is `src/com/meridian/shell/MainActivity.java` (about 1,770 lines) plus `TermuxResult.java`.
+Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by `AUDIT.md` and the 2.0 app at the repo root.** The 1.8.6 UI was one WebView page, `original/assets/www/index.html`. The 1.8.6 phone bridge was `original/src/com/meridian/shell/MainActivity.java` plus `TermuxResult.java`. 2.0 lives in `app/`.
 
 This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account. A Revolut WebView is the only checkout.
 
@@ -407,7 +407,7 @@ Implement with one `keydown` listener on `document`, ignore it when the target i
 - `configChanges` includes orientation, so the WebView is not recreated. Good. Persist `view`, `cwd`, and `sessions` anyway, because the process still dies.
 - `onRequestPermissionsResult` is missing. After the user answers `RUN_COMMAND`, nothing calls `bond()` again until they press Connect. Override it and `render()` from JS via `web.evaluateJavascript`.
 - Notification permission is not required for a low channel on 26+, but a foreground service is the right way to keep a long `pkg upgrade` alive. Termux already runs the command; Meridian only needs the ongoing notification so Android does not freeze the WebView timer.
-- Ship per-ABI or a universal APK plus a SHA-256 on meridian0.grok.me. The site currently has three steps and no version, no checksum, and no price. Put `1.8.6`, the hash, and “dashboard free, Pro €6.99” on that page before any redesign.
+- Ship per-ABI or a universal APK plus a SHA-256 on meridian0.grok.me. The site currently has three steps and no version, no checksum, and no price. Put `2.0.0`, the hash, and “dashboard free, Pro €6.99” on that page before any redesign. The page is not in this repo; upload the APK there after `./gradlew assembleRelease`.
 - `cpuCores()` stops at 16. Read `/sys/devices/system/cpu/present` instead of `for (i < 16)`.
 
 ### Not a desktop app, not an iOS app
@@ -416,7 +416,7 @@ The bridge is `com.termux.permission.RUN_COMMAND` and `/data/data/com.termux/fil
 
 Do this instead:
 
-- **Web:** keep meridian0.grok.me as the download page. Add the price, the checksum, and a short “free vs Pro” list. No account portal.
+- **Web:** keep meridian0.grok.me as the download page (it is not in this repo). After 2.0 ships, replace the APK, add the price, the checksum, and a short “free vs Pro” list. No account portal.
 - **Laptop:** the LAN snapshot in P2 item 5, plus the Remote shell recipe that already installs `sshd`. Document the port and that `sshd` with no password is a hole; the recipe should print “set a password or a key before you leave this screen” and refuse to start `sshd` until `passwd` has been run or an authorized key exists.
 - **iOS:** do not promise it. If you ever do a cousin app, it is a different shell (a-Shell or libssh to the Android phone), not a port of this Activity.
 
@@ -461,4 +461,4 @@ and set `healthtext.textContent` in `paintMeters`.
 4. **Receipts, reattach, Test key.** Then Relay if own-key usage shows people actually press Plan.
 5. **LAN snapshot and the sshd warning.** Not an iOS port.
 
-The clone in this repository is 1.8.6 as shipped, plus this document. Pick from the list. Do not start with a new theme.
+1.8.6 as shipped lives in `original/`. The 2.0 app is at the repo root. This document is the older 1.8.6-only list; prefer `AUDIT.md`. Do not start with a new theme.

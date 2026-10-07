@@ -24,6 +24,6 @@ writeFileSync(join(outDir, "public.b64"), spki + "\n");
 
 console.log(`Private key: ${privPath}  (back it up offline — losing it means re-issuing every key)`);
 console.log("");
-console.log("Paste this into clone/app/src/main/java/com/meridian/shell/MainActivity.java:");
+console.log("Paste this into app/src/main/java/com/meridian/shell/MainActivity.java:");
 console.log("");
 console.log(`    private static final String LICENSE_PUBKEY = "${spki}";`);

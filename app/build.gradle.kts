@@ -11,7 +11,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 37
-        versionName = "2.0.0-clone"
+        versionName = "2.0.0"
     }
 
     buildTypes {

@@ -35,7 +35,15 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
     static final boolean OPEN = false;
+    /** Where "Buy" sends people. Use a merchant-of-record that emails a licence key (Lemon Squeezy, Paddle, Gumroad). */
     private static final String PAY_URL = "https://checkout.revolut.com/pay/044a268e-4869-4708-9b0f-8e302cc28c37";
+    /**
+     * P-256 public key (X.509 SubjectPublicKeyInfo, base64) that signs licence keys.
+     * Generate your own pair with tools/license/keygen.mjs and paste the public half here.
+     */
+    private static final String LICENSE_PUBKEY = "";
+    /** Length of the free trial that unlocks Pro pages before a licence key is entered. */
+    private static final int TRIAL_DAYS = 7;
     private WebView web;
     static final Object GATE = new Object();
     static volatile String pendingOut = "";
@@ -45,8 +53,10 @@ public class MainActivity extends Activity {
     static volatile boolean ready = false;
     static volatile boolean jobLive = false;
     static volatile java.net.ServerSocket liveSock;
+    /** Random per-job secret: a local socket client must send it as its first line or be ignored. */
+    static volatile String liveToken = "";
 
-    private String cachedProps = "";
+    private JSONObject cachedProps;
     private String cachedProbe = "";
     private long probeAt = 0;
     private long prevIdle = -1;
@@ -67,10 +77,43 @@ public class MainActivity extends Activity {
         WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setAllowFileAccess(true);
+        // file:///android_asset still loads with these off; they only block reading arbitrary files from the page.
+        settings.setAllowFileAccess(false);
+        settings.setAllowContentAccess(false);
+        // Without a WebChromeClient, WebView silently cancels prompt()/confirm()/alert() and the
+        // "New file" / "New folder" buttons do nothing.
+        web.setWebChromeClient(new android.webkit.WebChromeClient());
+        web.setWebViewClient(new android.webkit.WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+                // Keep the shell inside its own page; external links go through Deck.open() and its allow-list.
+                return true;
+            }
+        });
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (web == null) { super.onBackPressed(); return; }
+        // Let the page unwind its own navigation first; only leave the app when it says there is nothing to go back to.
+        web.evaluateJavascript("(function(){ try { return window.meridianBack ? String(window.meridianBack()) : 'false'; } catch (e) { return 'false'; } })()",
+            new android.webkit.ValueCallback<String>() {
+                public void onReceiveValue(String value) {
+                    if (value == null || !value.contains("true")) moveTaskToBack(true);
+                }
+            });
+    }
+
+    private void keepAwake(final boolean on) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (on) getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                else getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
     }
 
     private String readCap(InputStream stream, int cap) throws Exception {
@@ -197,6 +240,61 @@ public class MainActivity extends Activity {
         }
     }
 
+    private static String randomToken() {
+        byte[] raw = new byte[12];
+        new java.security.SecureRandom().nextBytes(raw);
+        StringBuilder sb = new StringBuilder();
+        for (byte b : raw) sb.append(String.format(Locale.US, "%02x", b & 0xff));
+        return sb.toString();
+    }
+
+    private Intent termuxIntent(String script, boolean background) {
+        Intent intent = new Intent();
+        intent.setClassName("com.termux", "com.termux.app.RunCommandService");
+        intent.setAction("com.termux.RUN_COMMAND");
+        intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/bash");
+        intent.putExtra("com.termux.RUN_COMMAND_ARGUMENTS", new String[] { "-lc", script });
+        intent.putExtra("com.termux.RUN_COMMAND_WORKDIR", "/data/data/com.termux/files/home");
+        intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", background);
+        intent.putExtra("com.termux.RUN_COMMAND_SESSION_ACTION", "0");
+        return intent;
+    }
+
+    /** Opens a visible Termux session running the command. Used for interactive programs (vim, btop, proot login) that cannot run headless. */
+    private boolean openInTermux(String cmd) {
+        if (cmd == null) cmd = "";
+        String tag = "MERIDIAN_" + randomToken();
+        String script = "cat > \"$HOME/.meridian/open.sh\" << '" + tag + "'\n" + cmd + "\n" + tag + "\n"
+            + "mkdir -p \"$HOME/.meridian\"; bash \"$HOME/.meridian/open.sh\"; echo; echo '[Meridian] Command finished. Press Enter to close.'; read -r _";
+        boolean sent = sendToTermux(termuxIntent(script, false));
+        wakeTermux();
+        return sent;
+    }
+
+    /** Signals the running job to stop. The runner records its PID in ~/.meridian/pid; children are killed first so bash does not sit on a frozen child. */
+    private boolean cancelJob() {
+        int gen;
+        synchronized (GATE) {
+            if (ready) return false;
+            gen = jobGen;
+        }
+        String script = "p=$(cat \"$HOME/.meridian/pid\" 2>/dev/null) || exit 0; [ -n \"$p\" ] || exit 0; "
+            + "for d in /proc/[0-9]*; do pp=$(awk '/^PPid:/{print $2}' \"$d/status\" 2>/dev/null) || continue; [ \"$pp\" = \"$p\" ] && kill -TERM \"$(basename \"$d\")\" 2>/dev/null; done; "
+            + "kill -TERM \"$p\" 2>/dev/null; sleep 1; kill -KILL \"$p\" 2>/dev/null; exit 0";
+        boolean sent = sendToTermux(termuxIntent(script, true));
+        synchronized (GATE) {
+            if (gen == jobGen && !ready) {
+                pendingOut = pendingOut + "\n[stopped by you]";
+                pendingCode = 130;
+                ready = true;
+                jobGen++; // a late result from the killed job is ignored by TermuxResult
+                GATE.notifyAll();
+            }
+            try { if (liveSock != null) liveSock.close(); } catch (Exception ignored) {}
+        }
+        return sent;
+    }
+
     private void launch(String cmd) {
         synchronized (GATE) {
             jobGen++;
@@ -205,15 +303,9 @@ public class MainActivity extends Activity {
             pendingCode = -1;
         }
         int gen = jobGen;
+        liveToken = randomToken();
         int port = openLive();
-        Intent intent = new Intent();
-        intent.setClassName("com.termux", "com.termux.app.RunCommandService");
-        intent.setAction("com.termux.RUN_COMMAND");
-        intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/bash");
-        intent.putExtra("com.termux.RUN_COMMAND_ARGUMENTS", new String[] { "-lc", prepare(cmd, port) });
-        intent.putExtra("com.termux.RUN_COMMAND_WORKDIR", "/data/data/com.termux/files/home");
-        intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", true);
-        intent.putExtra("com.termux.RUN_COMMAND_SESSION_ACTION", "0");
+        Intent intent = termuxIntent(prepare(cmd, port), true);
         Intent back = new Intent(this, TermuxResult.class);
         back.setAction("com.meridian.deck.TERMUX_RESULT");
         back.putExtra("gen", gen);
@@ -288,6 +380,9 @@ public class MainActivity extends Activity {
                 java.net.Socket client = sock.accept();
                 try {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));
+                    String first = reader.readLine();
+                    // Any local app can connect to 127.0.0.1; only streams that know this job's token may write to the console.
+                    if (first == null || !first.equals(liveToken)) continue;
                     String line;
                     while ((line = reader.readLine()) != null) {
                         sb.append(line).append('\n');
@@ -306,36 +401,44 @@ public class MainActivity extends Activity {
 
     private String prepare(String cmd, int port) {
         if (cmd == null) cmd = "";
-        String hello = port > 0
-            ? "printf '%s\\n' 'Termux' | /system/bin/toybox nc -w 2 127.0.0.1 " + port + " >/dev/null 2>&1 || true\n"
-            : "";
+        // Random heredoc tags: a user line equal to a fixed tag would end the heredoc early and run the rest as the outer script.
+        String cmdTag = "MERIDIAN_CMD_" + randomToken();
+        String runTag = "MERIDIAN_RUN_" + randomToken();
+        String tok = "printf '%s\\n' '" + liveToken + "'";
+        String nc = "/system/bin/toybox nc 127.0.0.1 " + port;
+        String hello = port > 0 ? "{ " + tok + "; } | /system/bin/toybox nc -w 2 127.0.0.1 " + port + " >/dev/null 2>&1 || true\n" : "";
         String run;
         if (port > 0) {
-            run = "if [ -x /system/bin/script ]; then /system/bin/script -q -c \"bash \\\"$HOME/.meridian/run.sh\\\"\" \"$HOME/.meridian/live.log\" | /system/bin/toybox nc 127.0.0.1 " + port + "; status=${PIPESTATUS[0]}; "
-                + "elif command -v script >/dev/null 2>&1; then script -q -f -c \"bash \\\"$HOME/.meridian/run.sh\\\"\" \"$HOME/.meridian/live.log\" | /system/bin/toybox nc 127.0.0.1 " + port + "; status=${PIPESTATUS[0]}; "
-                + "else bash \"$HOME/.meridian/run.sh\" > \"$HOME/.meridian/live.log\" 2>&1 & pid=$!; pos=0; while kill -0 \"$pid\" 2>/dev/null; do size=$(wc -c < \"$HOME/.meridian/live.log\" 2>/dev/null || echo 0); if [ \"$size\" -gt \"$pos\" ]; then tail -c +$((pos+1)) \"$HOME/.meridian/live.log\" | /system/bin/toybox nc 127.0.0.1 " + port + " || true; pos=$size; fi; sleep 0.4; done; wait \"$pid\"; status=$?; fi\n";
+            run = "if [ -x /system/bin/script ]; then { " + tok + "; /system/bin/script -q -c \"bash \\\"$HOME/.meridian/run.sh\\\"\" \"$HOME/.meridian/live.log\"; } | " + nc + "; status=${PIPESTATUS[0]}; "
+                + "elif command -v script >/dev/null 2>&1; then { " + tok + "; script -q -f -c \"bash \\\"$HOME/.meridian/run.sh\\\"\" \"$HOME/.meridian/live.log\"; } | " + nc + "; status=${PIPESTATUS[0]}; "
+                + "else bash \"$HOME/.meridian/run.sh\" > \"$HOME/.meridian/live.log\" 2>&1 & pid=$!; pos=0; while kill -0 \"$pid\" 2>/dev/null; do size=$(wc -c < \"$HOME/.meridian/live.log\" 2>/dev/null || echo 0); if [ \"$size\" -gt \"$pos\" ]; then { " + tok + "; tail -c +$((pos+1)) \"$HOME/.meridian/live.log\"; } | " + nc + " || true; pos=$size; fi; sleep 0.4; done; wait \"$pid\"; status=$?; fi\n";
         } else {
             run = "bash \"$HOME/.meridian/run.sh\" > \"$HOME/.meridian/live.log\" 2>&1; status=$?\n";
         }
+        String locks = "\"$PREFIX/var/lib/dpkg/lock-frontend\" \"$PREFIX/var/lib/dpkg/lock\" \"$PREFIX/var/cache/apt/archives/lock\" \"$PREFIX/var/lib/apt/lists/lock\"";
+        String scanApt = "alive=0; for d in /proc/[0-9]*; do c=$(cat \"$d/comm\" 2>/dev/null) || continue; case \"$c\" in apt|apt-get|dpkg) alive=1;; esac; done; ";
         return "export DEBIAN_FRONTEND=noninteractive; export DEBCONF_NONINTERACTIVE_SEEN=true; "
             + "mkdir -p \"$PREFIX/etc/apt/apt.conf.d\" \"$PREFIX/etc/dpkg/dpkg.cfg.d\" \"$HOME/.meridian\" 2>/dev/null; "
             + "printf '%s\\n' 'Dpkg::Options {\"--force-confdef\";\"--force-confold\";};' > \"$PREFIX/etc/apt/apt.conf.d/99meridian\" 2>/dev/null; "
             + "printf '%s\\n' 'force-confdef' 'force-confold' > \"$PREFIX/etc/dpkg/dpkg.cfg.d/99meridian\" 2>/dev/null; "
-            + "cat > \"$HOME/.meridian/cmd.sh\" << 'MERIDIAN_CMD_END'\n"
+            + "cat > \"$HOME/.meridian/cmd.sh\" << '" + cmdTag + "'\n"
             + cmd + "\n"
-            + "MERIDIAN_CMD_END\n"
-            + "cat > \"$HOME/.meridian/run.sh\" << 'MERIDIAN_RUN_END'\n"
-            + "bash \"$HOME/.meridian/cmd.sh\"\n"
-            + "echo $? > \"$HOME/.meridian/code\"\n"
-            + "MERIDIAN_RUN_END\n"
+            + cmdTag + "\n"
+            + "cat > \"$HOME/.meridian/run.sh\" << '" + runTag + "'\n"
+            // The command runs as a child whose PID is recorded, so Stop can kill exactly this job.
+            + "bash \"$HOME/.meridian/cmd.sh\" </dev/null & p=$!\n"
+            + "echo $p > \"$HOME/.meridian/pid\"\n"
+            + "wait $p; rc=$?\n"
+            + "rm -f \"$HOME/.meridian/pid\"\n"
+            + "echo $rc > \"$HOME/.meridian/code\"\n"
+            + runTag + "\n"
             + hello
+            // Never kill -9 a live dpkg: that is how package databases get corrupted. Only clear locks nobody holds.
+            + scanApt
             + (usesPackage(cmd)
-                ? "alive=0; for d in /proc/[0-9]*; do c=$(cat \"$d/comm\" 2>/dev/null) || continue; case \"$c\" in apt|apt-get|dpkg) alive=1; kill \"$(basename \"$d\")\" 2>/dev/null || true ;; esac; done; "
-                    + "if [ \"$alive\" = 1 ]; then sleep 1; for d in /proc/[0-9]*; do c=$(cat \"$d/comm\" 2>/dev/null) || continue; case \"$c\" in apt|apt-get|dpkg) kill -9 \"$(basename \"$d\")\" 2>/dev/null || true ;; esac; done; sleep 1; "
-                    + "rm -f \"$PREFIX/var/lib/dpkg/lock-frontend\" \"$PREFIX/var/lib/dpkg/lock\" \"$PREFIX/var/cache/apt/archives/lock\" \"$PREFIX/var/lib/apt/lists/lock\"; echo Stopped the stuck installer.; fi; "
-                    + "dpkg --configure -a --force-confdef --force-confold || true\n"
-                : "alive=0; for d in /proc/[0-9]*; do c=$(cat \"$d/comm\" 2>/dev/null) || continue; case \"$c\" in apt|apt-get|dpkg) alive=1;; esac; done; "
-                    + "if [ \"$alive\" = 0 ] && { [ -e \"$PREFIX/var/lib/dpkg/lock-frontend\" ] || [ -e \"$PREFIX/var/lib/dpkg/lock\" ]; }; then rm -f \"$PREFIX/var/lib/dpkg/lock-frontend\" \"$PREFIX/var/lib/dpkg/lock\" \"$PREFIX/var/cache/apt/archives/lock\" \"$PREFIX/var/lib/apt/lists/lock\"; fi\n")
+                ? "if [ \"$alive\" = 1 ]; then echo 'Another package command is still running in Termux. Wait for it, or stop it there, then run this again.'; exit 75; fi; "
+                    + "rm -f " + locks + "; dpkg --configure -a --force-confdef --force-confold || true\n"
+                : "if [ \"$alive\" = 0 ] && { [ -e \"$PREFIX/var/lib/dpkg/lock-frontend\" ] || [ -e \"$PREFIX/var/lib/dpkg/lock\" ]; }; then rm -f " + locks + "; fi\n")
             + ": > \"$HOME/.meridian/live.log\"\n"
             + run
             + "cat \"$HOME/.meridian/live.log\" 2>/dev/null || true\n"
@@ -367,22 +470,33 @@ public class MainActivity extends Activity {
         return "'" + value.replace("'", "'\\''") + "'";
     }
 
+    /** Quoted shell path, or null when the path is outside the Termux home or malformed. Callers must refuse to act on null. */
     private String shellPath(String path) {
         String value = safePath(path);
+        if (value == null) return null;
         if ("$HOME".equals(value)) return "\"$HOME\"";
         if (value.startsWith("$HOME/")) return "\"$HOME\"/" + sh(value.substring(6));
         return sh(value);
     }
 
+    private static final String BAD_PATH = "That path is outside the Termux home, so nothing was done\nexit 1";
+
+    /**
+     * The original fell back to "$HOME" for any path it did not like, which turned
+     * removePath("bad") into rm -rf "$HOME". Invalid paths are now rejected, never substituted.
+     */
     private String safePath(String path) {
-        if (path == null) return "$HOME";
+        if (path == null) return null;
         String value = path.trim();
-        if (value.length() == 0 || value.contains("\n") || value.contains("..")) return "$HOME";
+        if (value.length() == 0 || value.indexOf('\n') >= 0 || value.indexOf('\0') >= 0) return null;
+        for (String part : value.split("/")) if (part.equals("..")) return null;
         if (value.startsWith("/")) {
             String home = "/data/data/com.termux/files/home";
-            if (!value.equals(home) && !value.startsWith(home + "/")) return "$HOME";
+            if (!value.equals(home) && !value.startsWith(home + "/")) return null;
+            return value;
         }
-        return value;
+        if (value.equals("$HOME") || value.startsWith("$HOME/")) return value;
+        return null;
     }
 
     class Deck {
@@ -657,9 +771,86 @@ public class MainActivity extends Activity {
                 }
                 return "missing";
             }
+            if (jobLive) return "busy";
             jobLive = true;
             launch(cmd);
             return "ok";
+        }
+
+        @JavascriptInterface
+        public String cancelJob() {
+            boolean sent = MainActivity.this.cancelJob();
+            jobLive = false;
+            return sent ? "ok" : "none";
+        }
+
+        @JavascriptInterface
+        public String openInTermux(String cmd) {
+            if (!termuxInstalled()) return "missing";
+            return MainActivity.this.openInTermux(cmd) ? "ok" : "asleep";
+        }
+
+        @JavascriptInterface
+        public void openTermux() {
+            wakeTermux();
+        }
+
+        @JavascriptInterface
+        public String version() {
+            try {
+                return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (Exception ex) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public void haptic() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (web != null) web.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void keepAwake(boolean on) {
+            MainActivity.this.keepAwake(on);
+        }
+
+        /**
+         * Activates a licence key of the form MERIDIAN-<payload>.<signature> where payload is
+         * base64url JSON {"sku":"pro","iat":...,"ref":"..."} and signature is a P-256 ECDSA (SHA-256)
+         * signature over the raw payload bytes. Verified offline against LICENSE_PUBKEY.
+         */
+        @JavascriptInterface
+        public String activate(String key) {
+            if (LICENSE_PUBKEY.length() == 0) return "{\"ok\":false,\"error\":\"This build has no licence public key. See tools/license.\"}";
+            try {
+                String k = key == null ? "" : key.trim();
+                if (k.startsWith("MERIDIAN-")) k = k.substring(9);
+                int dot = k.indexOf('.');
+                if (dot <= 0) return "{\"ok\":false,\"error\":\"That is not a Meridian key.\"}";
+                byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
+                byte[] sig = android.util.Base64.decode(k.substring(dot + 1), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
+                byte[] der = android.util.Base64.decode(LICENSE_PUBKEY, android.util.Base64.DEFAULT);
+                java.security.PublicKey pub = java.security.KeyFactory.getInstance("EC").generatePublic(new java.security.spec.X509EncodedKeySpec(der));
+                java.security.Signature verifier = java.security.Signature.getInstance("SHA256withECDSA");
+                verifier.initVerify(pub);
+                verifier.update(payload);
+                if (!verifier.verify(sig)) return "{\"ok\":false,\"error\":\"The key did not verify.\"}";
+                JSONObject claims = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8));
+                if (!"pro".equals(claims.optString("sku", ""))) return "{\"ok\":false,\"error\":\"That key is for a different product.\"}";
+                markPaid();
+                return "{\"ok\":true}";
+            } catch (Exception ex) {
+                return "{\"ok\":false,\"error\":\"The key could not be read.\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String payUrl() {
+            return PAY_URL;
         }
 
         @JavascriptInterface
@@ -698,33 +889,49 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String entries(String path) {
-            return run("ls -1p --color=never " + shellPath(path));
+            String p = shellPath(path);
+            if (p == null) return BAD_PATH;
+            return run("ls -1p --color=never " + p);
         }
 
+        /** Reads at most 200 KB and refuses binary files, so a tap on a .gguf does not stall the bridge or dump garbage into the editor. */
         @JavascriptInterface
         public String readFile(String path) {
-            return run("cat " + shellPath(path));
+            String p = shellPath(path);
+            if (p == null) return BAD_PATH;
+            return run("f=" + p + "; if [ ! -f \"$f\" ]; then echo 'Not a file'; exit 1; fi; "
+                + "if [ \"$(head -c 4000 \"$f\" | tr -d '\\000' | wc -c)\" -ne \"$(head -c 4000 \"$f\" | wc -c)\" ]; then echo \"[binary file, $(wc -c < \"$f\") bytes. Meridian only edits text.]\"; exit 2; fi; "
+                + "s=$(wc -c < \"$f\"); if [ \"$s\" -gt 200000 ]; then head -c 200000 \"$f\"; printf '\\n[Meridian showed the first 200 KB of %s bytes. Saving is disabled for files this large.]\\n' \"$s\"; exit 3; fi; cat \"$f\"");
         }
 
         @JavascriptInterface
         public String writeFile(String path, String body) {
+            String p = shellPath(path);
+            if (p == null) return BAD_PATH;
             String b64 = android.util.Base64.encodeToString((body == null ? "" : body).getBytes(java.nio.charset.StandardCharsets.UTF_8), android.util.Base64.NO_WRAP);
-            return run("printf %s " + sh(b64) + " | base64 -d > " + shellPath(path));
+            return run("printf %s " + sh(b64) + " | base64 -d > " + p);
         }
 
         @JavascriptInterface
         public String removePath(String path) {
-            return run("rm -rf " + shellPath(path));
+            String p = shellPath(path);
+            if (p == null || "\"$HOME\"".equals(p)) return BAD_PATH;
+            return run("rm -rf -- " + p);
         }
 
         @JavascriptInterface
         public String renamePath(String from, String to) {
-            return run("mv " + shellPath(from) + " " + shellPath(to));
+            String a = shellPath(from);
+            String b = shellPath(to);
+            if (a == null || b == null || "\"$HOME\"".equals(a)) return BAD_PATH;
+            return run("mv -n -- " + a + " " + b);
         }
 
         @JavascriptInterface
         public String makeDir(String path) {
-            return run("mkdir -p " + shellPath(path));
+            String p = shellPath(path);
+            if (p == null) return BAD_PATH;
+            return run("mkdir -p -- " + p);
         }
 
         @JavascriptInterface
@@ -802,7 +1009,6 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String netUp() {
-            HttpURLConnection conn = null;
             try {
                 byte[] warm = new byte[32768];
                 new java.util.Random().nextBytes(warm);
@@ -818,8 +1024,6 @@ public class MainActivity extends Activity {
                 return o.toString();
             } catch (Exception ex) {
                 return netErr(ex);
-            } finally {
-                if (conn != null) conn.disconnect();
             }
         }
 
@@ -845,6 +1049,47 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 String msg = ex.getMessage() == null ? "blocked" : ex.getMessage();
                 return "{\"error\":" + JSONObject.quote(msg) + "}";
+            }
+        }
+
+        /**
+         * Non-blocking variant of askNet. The synchronous call froze the WebView for up to 50 s
+         * while the model answered; this one returns at once and later calls
+         * window.onAskDone(ticket, resultJson) on the page.
+         */
+        @JavascriptInterface
+        public void askNetStart(final String ticket, final String base, final String key, final String model, final String goal) {
+            new Thread(new Runnable() {
+                public void run() {
+                    final String result = askNet(base, key, model, goal);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (web == null) return;
+                            web.evaluateJavascript("window.onAskDone && window.onAskDone(" + JSONObject.quote(ticket == null ? "" : ticket) + "," + JSONObject.quote(result) + ")", null);
+                        }
+                    });
+                }
+            }, "meridian-ask").start();
+        }
+
+        /** Days left in the 7-day trial, 0 when over. The first-run stamp lives in filesDir so clearing WebView storage does not restart it. */
+        @JavascriptInterface
+        public int trialLeft() {
+            try {
+                File stamp = new File(getFilesDir(), "first.run");
+                long first;
+                if (stamp.isFile()) {
+                    first = stamp.lastModified();
+                } else {
+                    new java.io.FileOutputStream(stamp).close();
+                    first = System.currentTimeMillis();
+                    stamp.setLastModified(first);
+                }
+                long elapsedDays = (System.currentTimeMillis() - first) / 86400000L;
+                long left = TRIAL_DAYS - elapsedDays;
+                return left < 0 ? 0 : (int) left;
+            } catch (Exception ex) {
+                return 0;
             }
         }
 
@@ -880,8 +1125,8 @@ public class MainActivity extends Activity {
                 URL url;
                 JSONObject body = new JSONObject();
                 if ("gemini".equals(kind)) {
-                    String path = root.contains(":generateContent") ? root : root + "/models/" + which + ":generateContent";
-                    url = new URL(path + "?key=" + java.net.URLEncoder.encode(key.trim(), "UTF-8"));
+                    // The key travels in the x-goog-api-key header only; a ?key= query string ends up in proxy and server logs.
+                    url = new URL(root.contains(":generateContent") ? root : root + "/models/" + which + ":generateContent");
                     JSONArray parts = new JSONArray();
                     JSONObject part = new JSONObject();
                     part.put("text", prompt);
@@ -1066,7 +1311,8 @@ public class MainActivity extends Activity {
     }
 
     private boolean isCommand(String line) {
-        return line.matches("(?i)^(pkg|apt|apt-get|dpkg|curl|wget|getprop|termux-[a-z0-9-]+|python3?|pip|npm|node|git|clang|cmake|make|ls|cat|free|df|uname|ping|ssh|vim|nvim)\\b.*");
+        // The old list dropped cd/mkdir/echo/export/chmod lines as prose, so multi-step scripts came back mangled.
+        return line.matches("(?i)^(?:(?:pkg|apt|apt-get|dpkg|curl|wget|getprop|termux-[a-z0-9-]+|python3?|pip3?|npm|npx|node|git|clang|gcc|cmake|make|ninja|ls|cat|free|df|du|uname|ping|ssh|ssh-keygen|sshd|vim|nvim|nano|cd|mkdir|echo|printf|export|chmod|chown|cp|mv|rm|tar|unzip|zip|sed|awk|grep|rg|find|which|source|bash|sh|proot-distro|cargo|rustc|go|java|javac|ruby|php|lua|perl|ffmpeg|sqlite3|rsync|tmux|nproc|env|test|llama-cli|llama-server)\\b|clang\\+\\+|g\\+\\+|\\[ |\\./).*");
     }
 
     private void markPaid() {
@@ -1078,37 +1324,18 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * The original embedded the checkout in a WebView and unlocked when the page text contained
+     * "thank you". That is both spoofable (any page saying thank you) and fragile (a wording change
+     * on the merchant side breaks every sale). Checkout now opens in the system browser and the
+     * merchant emails a signed licence key that Deck.activate() verifies offline.
+     */
     private void showPay() {
-        if (web == null) return;
-        WebView pay = new WebView(this);
-        WebSettings settings = pay.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        pay.setWebViewClient(new android.webkit.WebViewClient() {
-            public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("(document.body && document.body.innerText) || ''", new android.webkit.ValueCallback<String>() {
-                    public void onReceiveValue(String value) {
-                        String text = value == null ? "" : value.toLowerCase();
-                        if (text.contains("payment successful") || text.contains("thank you") || text.contains("you're all set") || text.contains("you are all set") || text.contains("payment complete")) {
-                            markPaid();
-                            setContentView(web);
-                            web.evaluateJavascript("if (window.onPaid) window.onPaid();", null);
-                        }
-                    }
-                });
-            }
-        });
-        android.widget.LinearLayout box = new android.widget.LinearLayout(this);
-        box.setOrientation(android.widget.LinearLayout.VERTICAL);
-        android.widget.Button close = new android.widget.Button(this);
-        close.setText("Close");
-        close.setOnClickListener(new android.view.View.OnClickListener() {
-            public void onClick(android.view.View v) { setContentView(web); }
-        });
-        box.addView(close);
-        box.addView(pay, new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
-        setContentView(box);
-        pay.loadUrl(PAY_URL);
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(PAY_URL));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        } catch (Exception ignored) {}
     }
 
     private boolean knownLink(String target) {
@@ -1591,7 +1818,7 @@ public class MainActivity extends Activity {
     }
 
     private JSONObject props() throws Exception {
-        if (cachedProps.length() > 0) return new JSONObject(cachedProps);
+        if (cachedProps != null) return cachedProps;
         JSONObject o = new JSONObject();
         o.put("soc", prop("ro.soc.model"));
         o.put("hardware", prop("ro.hardware"));
@@ -1621,7 +1848,7 @@ public class MainActivity extends Activity {
         o.put("oneui", oneUi(prop("ro.build.version.oneui")));
         o.put("fingerprint", prop("ro.build.fingerprint"));
         o.put("ramType", ramKind());
-        cachedProps = o.toString();
+        cachedProps = o;
         return o;
     }
 
@@ -1727,7 +1954,23 @@ public class MainActivity extends Activity {
         return major + "." + minor;
     }
 
+    private static java.lang.reflect.Method sysPropGet;
+    private static boolean sysPropTried = false;
+
+    /** android.os.SystemProperties.get is an in-process read; the getprop fallback forks a process per key (~25 forks on first paint). */
     private static String prop(String key) {
+        try {
+            if (!sysPropTried) {
+                sysPropTried = true;
+                sysPropGet = Class.forName("android.os.SystemProperties").getMethod("get", String.class, String.class);
+            }
+            if (sysPropGet != null) {
+                Object v = sysPropGet.invoke(null, key, "");
+                return v == null ? "" : String.valueOf(v).trim();
+            }
+        } catch (Throwable ignored) {
+            sysPropGet = null;
+        }
         try {
             Process process = new ProcessBuilder("getprop", key).redirectErrorStream(true).start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
