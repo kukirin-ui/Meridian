@@ -1,6 +1,8 @@
 # Meridian 1.8.6 — audit and roadmap
 
-Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by `AUDIT.md` and the 2.0 app at the repo root.** The 1.8.6 UI was one WebView page, `original/assets/www/index.html`. The 1.8.6 phone bridge was `original/src/com/meridian/shell/MainActivity.java` plus `TermuxResult.java`. 2.0 lives in `app/`.
+Current release is in `CHANGELOG.md` and `app/build.gradle.kts`. Do not treat 1.8.6 as the app. This file is the old audit.
+
+Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by `AUDIT.md` and the app in `app/`.** The 1.8.6 UI was one WebView page, `original/assets/www/index.html`. The 1.8.6 phone bridge was `original/src/com/meridian/shell/MainActivity.java` plus `TermuxResult.java`.
 
 This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account. A Revolut WebView is the only checkout.
 

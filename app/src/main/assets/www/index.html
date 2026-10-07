@@ -287,6 +287,7 @@
   #devicecare { align-self: center; width: auto; min-height: 44px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { width: auto; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--chip); color: var(--fg); font-size: 0.8125rem; }
+  .chip.on { background: var(--accent); color: var(--btnfg); border-color: var(--accent); }
   .planhead { display: flex; align-items: center; gap: 12px; }
   .blink { display: inline-block; width: 9px; height: 16px; margin-left: 2px; background: var(--accent); vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
@@ -1685,7 +1686,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.1.0"; } catch (e) { return "2.1.0"; }
+  try { return String(MeridianPhone.version() || "") || "2.2.0"; } catch (e) { return "2.2.0"; }
 }
 function aboutPage() {
   const state = licensed() ? "This phone is unlocked." : trialDays() > 0 ? "Trial: " + trialDays() + " day" + (trialDays() === 1 ? "" : "s") + " left." : "This phone is on the free version.";
@@ -1799,22 +1800,51 @@ function payNote(licensedNow) {
   if (licMsg) return licMsg;
   return licensedNow ? "paid still restores a 1.8.6 purchase." : "Restore accepts paid, full, unlocked, or MERIDIAN- keys.";
 }
+const PAY_PICKS = [1, 5, 10, 25, 50, 100, 1000];
+let payEuros = 1;
+try { payEuros = payAmount(localStorage.getItem("m-pay-amount") || "1") || 1; } catch (e) { payEuros = 1; }
+function payAmount(raw) {
+  const s = String(raw == null ? "" : raw).trim().replace(/€/g, "").replace(/,/g, "").replace(/\s/g, "");
+  if (!/^[0-9]+$/.test(s)) return 0;
+  const n = Number(s);
+  if (!Number.isInteger(n) || n < 1 || n > 1000000) return 0;
+  return n;
+}
+function euroLabel(n) {
+  return "€" + Number(n).toLocaleString("en-GB");
+}
+function savedPaidAmount() {
+  try {
+    const n = payAmount(MeridianPhone.paidAmount());
+    return n || 0;
+  } catch (e) { return 0; }
+}
 function payPage() {
   let html = '<div class="stack">';
   const keyField = '<label class="muted" for="lickey">Licence key</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-… or paid" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">Paste</button></div>';
   if (licensed()) {
-    html += '<article class="plate stack pricecard"><p class="priceem">Unlocked</p><h2>You have Pro</h2><p>This phone is unlocked. Thank you.</p>';
+    const paidN = savedPaidAmount();
+    html += '<article class="plate stack pricecard"><p class="priceem">Unlocked</p><h2>You have everything</h2><p>This phone is unlocked. Thank you.</p>';
+    if (paidN) html += '<p class="price">' + euroLabel(paidN) + '</p><p class="muted">€1 and €1,000,000 unlock the same app.</p>';
     html += '<ul><li>Build recipes, including Media box and On-device AI</li><li>Plan, with your own API key</li><li>Tweaks</li><li>Four named console sessions</li><li>Create, edit, rename, delete, and zip files</li></ul>';
     html += '<p class="muted">The licence is stored on this phone and travels with an Android backup. Keep the key from your receipt in case you reset the phone.</p></article>';
     html += '<article class="plate stack"><p class="muted">Need to restore on another install? Paste paid (the old full.key) or a MERIDIAN- key below. Activating again is harmless.</p>' + keyField + '<button class="btn" type="button" id="activate">Activate again</button><p class="muted" id="licnote">' + esc(payNote(true)) + '</p></article>';
     return html + '</div>';
   }
   const days = trialDays();
-  html += '<article class="plate stack pricecard"><p class="priceem">Meridian Pro</p><h2>Full version</h2><span class="price">one payment</span>';
+  let picks = '<div class="chips">';
+  PAY_PICKS.forEach(function (n) {
+    picks += '<button class="chip' + (n === payEuros ? " on" : "") + '" type="button" data-euro="' + n + '">' + euroLabel(n) + '</button>';
+  });
+  picks += '</div>';
+  html += '<article class="plate stack pricecard"><p class="priceem">Paid version</p><h2>Everything</h2><span class="price" id="payprice">' + euroLabel(payEuros) + '</span>';
+  html += '<p class="muted">One payment. Choose any whole euro from €1 to €1,000,000. Both ends unlock the same app.</p>';
+  html += picks;
+  html += '<label class="muted" for="payamount">Amount in euros</label><input id="payamount" inputmode="numeric" min="1" max="1000000" step="1" value="' + payEuros + '" />';
   html += '<ul><li>Build: Workstation, Media box, On-device AI</li><li>Plan: your AI key writes the steps</li><li>Tweaks: wake lock, threads, clocks</li><li>Four named console sessions</li><li>Create, edit, rename, delete and zip files</li><li>Every future update on this phone</li></ul>';
   if (days > 0) html += '<p class="trialline">Trial: ' + days + ' day' + (days === 1 ? "" : "s") + ' left. Everything is open until then.</p>';
   else html += '<p class="trialline">The trial is over. Dashboard, Hardware, System, Battery, one console, Setup and Doctor stay free.</p>';
-  html += '<button class="btn pay" id="pay" type="button">Buy a licence</button><p class="muted">Checkout opens in your browser and emails a key that starts with MERIDIAN-. Nothing about this phone is sent anywhere.</p></article>';
+  html += '<button class="btn pay" id="pay" type="button">Pay ' + euroLabel(payEuros) + '</button><p class="muted" id="paynote">Revolut opens next. This amount is copied, so paste it if the page asks. One link covers every amount.</p></article>';
   html += '<article class="plate stack"><b>Already paid?</b><p class="muted">Paste the word paid if you bought 1.8.6, or a MERIDIAN- key from your receipt.</p>' + keyField + '<button class="btn" type="button" id="activate">Activate</button><p class="muted" id="licnote">' + esc(payNote(false)) + '</p></article>';
   return html + '</div>';
 }
@@ -2356,8 +2386,42 @@ function bind() {
     try { ans = MeridianPhone.openCare(); } catch (e) { ans = "none"; }
     if (node) node.textContent = ans === "open" ? "The phone's care app is open." : ans === "settings" ? "This phone has no care app Meridian can open. Settings is open." : "This phone has no care app Meridian can open.";
   };
+  document.querySelectorAll("[data-euro]").forEach(function (b) {
+    b.onclick = function () {
+      const n = payAmount(b.getAttribute("data-euro"));
+      if (!n) return;
+      payEuros = n;
+      localStorage.setItem("m-pay-amount", String(n));
+      render();
+    };
+  });
+  const payField = document.getElementById("payamount");
+  if (payField) payField.oninput = function () {
+    const n = payAmount(payField.value);
+    const price = document.getElementById("payprice");
+    const btn = document.getElementById("pay");
+    const note = document.getElementById("paynote");
+    if (price) price.textContent = n ? euroLabel(n) : "—";
+    if (btn) btn.textContent = n ? "Pay " + euroLabel(n) : "Enter €1 to €1,000,000";
+    if (n) {
+      payEuros = n;
+      localStorage.setItem("m-pay-amount", String(n));
+    } else if (note) note.textContent = "Enter a whole euro amount from 1 to 1000000.";
+  };
   const pay = document.getElementById("pay");
-  if (pay) pay.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
+  if (pay) pay.onclick = function () {
+    const field = document.getElementById("payamount");
+    const note = document.getElementById("paynote");
+    const amount = payAmount(field ? field.value : payEuros);
+    if (!amount) {
+      if (note) note.textContent = "Enter a whole euro amount from 1 to 1000000.";
+      return;
+    }
+    payEuros = amount;
+    localStorage.setItem("m-pay-amount", String(amount));
+    if (note) note.textContent = "Opening Revolut for " + euroLabel(amount) + ". The amount is copied.";
+    try { MeridianPhone.pay(String(amount)); } catch (e) {}
+  };
   document.querySelectorAll("[data-crumb]").forEach(function (b) {
     b.onclick = function () { cwd = b.getAttribute("data-crumb"); editing = false; render(); };
   });

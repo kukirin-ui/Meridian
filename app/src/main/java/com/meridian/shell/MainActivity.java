@@ -871,6 +871,11 @@ public class MainActivity extends Activity {
                 if (!verifier.verify(sig)) return "{\"ok\":false,\"error\":\"The key did not verify.\"}";
                 JSONObject claims = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8));
                 if (!"pro".equals(claims.optString("sku", ""))) return "{\"ok\":false,\"error\":\"That key is for a different product.\"}";
+                if (claims.has("euros")) {
+                    int euros = claims.optInt("euros", 0);
+                    if (euros < 1 || euros > 1000000) return "{\"ok\":false,\"error\":\"That key is for an amount outside €1 to €1,000,000.\"}";
+                    writePayAmount(euros);
+                }
                 markPaid();
                 return "{\"ok\":true}";
             } catch (Exception ex) {
@@ -881,6 +886,12 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String payUrl() {
             return PAY_URL;
+        }
+
+        /** Whole euros the last Pay tap chose, or empty if they have not chosen one yet. */
+        @JavascriptInterface
+        public String paidAmount() {
+            return readPayAmount();
         }
 
         @JavascriptInterface
@@ -914,7 +925,19 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void pay() {
-            runOnUiThread(new Runnable() { public void run() { showPay(); } });
+            pay("1");
+        }
+
+        /**
+         * One paid version. Any whole euro from 1 to 1,000,000 unlocks the same app.
+         * The amount is saved and copied, then the single Revolut link opens.
+         */
+        @JavascriptInterface
+        public void pay(String euros) {
+            final int amount = parseEuros(euros);
+            if (amount == 0) return;
+            writePayAmount(amount);
+            runOnUiThread(new Runnable() { public void run() { showPay(amount); } });
         }
 
         @JavascriptInterface
@@ -1391,8 +1414,52 @@ public class MainActivity extends Activity {
      * on the merchant side breaks every sale). Checkout now opens in the system browser and the
      * merchant emails a signed licence key that Deck.activate() verifies offline.
      */
-    private void showPay() {
+    private int parseEuros(String euros) {
+        if (euros == null) return 0;
+        String t = euros.trim();
+        if (t.length() == 0 || t.length() > 7) return 0;
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (c < '0' || c > '9') return 0;
+        }
         try {
+            int n = Integer.parseInt(t);
+            if (n < 1 || n > 1000000) return 0;
+            return n;
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private void writePayAmount(int euros) {
+        try {
+            java.io.File out = new java.io.File(getFilesDir(), "pay-amount.txt");
+            java.io.FileOutputStream stream = new java.io.FileOutputStream(out);
+            stream.write(Integer.toString(euros).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            stream.close();
+        } catch (Exception ignored) {}
+    }
+
+    private String readPayAmount() {
+        try {
+            java.io.File file = new java.io.File(getFilesDir(), "pay-amount.txt");
+            if (!file.isFile() || file.length() == 0 || file.length() > 16) return "";
+            byte[] buf = new byte[(int) file.length()];
+            java.io.FileInputStream in = new java.io.FileInputStream(file);
+            int n = in.read(buf);
+            in.close();
+            if (n <= 0) return "";
+            int euros = parseEuros(new String(buf, 0, n, java.nio.charset.StandardCharsets.UTF_8));
+            return euros == 0 ? "" : Integer.toString(euros);
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+    private void showPay(int euros) {
+        try {
+            ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("euros", Integer.toString(euros)));
             Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(PAY_URL));
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);

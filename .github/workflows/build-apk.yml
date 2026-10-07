@@ -23,9 +23,13 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload Meridian-2.1.0-debug.apk
+      - name: Read versionName
+        id: ver
+        run: echo "name=$(sed -n 's/.*versionName = \"\([^\"]*\)\".*/\1/p' app/build.gradle.kts | head -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: Meridian-2.1.0-debug
+          name: Meridian-${{ steps.ver.outputs.name }}-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
