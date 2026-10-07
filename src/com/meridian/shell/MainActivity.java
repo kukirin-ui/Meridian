@@ -693,6 +693,26 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void pay() {
+            pay("1");
+        }
+
+        @JavascriptInterface
+        public void pay(String euros) {
+            int amount = 1;
+            try {
+                amount = Integer.parseInt(euros == null ? "" : euros.trim());
+            } catch (NumberFormatException ignored) {
+                amount = 0;
+            }
+            if (amount < 1 || amount > 1000000) amount = 0;
+            final int chosen = amount;
+            if (chosen == 0) return;
+            try {
+                java.io.File out = new java.io.File(getFilesDir(), "pay-amount.txt");
+                java.io.FileOutputStream stream = new java.io.FileOutputStream(out);
+                stream.write(Integer.toString(chosen).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                stream.close();
+            } catch (Exception ignored) {}
             runOnUiThread(new Runnable() { public void run() { showPay(); } });
         }
 

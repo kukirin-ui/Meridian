@@ -18,4 +18,4 @@ Readings come from the device. Commands run in Termux on that phone. The shippin
 
 The signing key is not included. The app is MIT; see `LICENSE`.
 
-People may study it, share it, change it, and fork it. Because the unlock check ships in this source, a local paywall is not a business. `docs/ROADMAP.md` says what to charge for instead.
+People may study it, share it, change it, and fork it. Because the unlock check ships in this source, a local paywall is not a business. The paid version is everything, at any amount from €1 to €1,000,000. `docs/ROADMAP.md` is the rest of the decision list.

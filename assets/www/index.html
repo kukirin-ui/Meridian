@@ -1339,11 +1339,20 @@ function linksPage() {
   });
   return html + '</div>';
 }
+function payAmount(raw) {
+  const n = Math.round(Number(raw));
+  if (!Number.isFinite(n) || n < 1 || n > 1000000) return 0;
+  return n;
+}
+function payChooser() {
+  const saved = payAmount(localStorage.getItem("m-pay-amount") || "1") || 1;
+  return '<label class="k" for="payamount">Amount in euros</label><input id="payamount" inputmode="numeric" min="1" max="1000000" step="1" value="' + saved + '" /><p class="muted">The paid version is everything. Choose any whole euro from €1 to €1,000,000. €1 and €1,000,000 unlock the same app.</p>';
+}
 function supportPage() {
-  return '<article class="plate stack about"><h2>Support</h2><p>The full version is optional. It unlocks Build, Plan, the console, setup, tweaks, doctor, and commands.</p><p class="muted">Pay inside the app. This phone remembers the payment. Leaving this page before Revolut confirms it changes nothing.</p><button class="btn" id="pay" type="button">Pay with Revolut</button></article>';
+  return '<article class="plate stack about"><h2>Support</h2><p>The paid version is everything. Build, Plan, the console, setup, tweaks, doctor, commands, and the rest of this app.</p>' + payChooser() + '<p class="muted">Pay inside the app. This phone remembers the payment. Leaving this page before Revolut confirms it changes nothing.</p><button class="btn" id="pay" type="button">Pay with Revolut</button><p class="muted" id="paynote"></p></article>';
 }
 function aboutPage() {
-  return '<article class="plate stack about"><div class="osx"><b></b></div><h2>Meridian</h2><p>1.8.6</p><p>A dashboard for this phone, bonded to Termux.</p><p class="muted">Readings come from the device. Commands run in Termux on this phone. There is no account and no server. A key, if you save one, stays here and is sent only when you press Plan.</p><p>' + (paid() ? "This phone is unlocked." : "This phone is locked until you pay inside the app.") + '</p><p>Copyright 2026</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
+  return '<article class="plate stack about"><div class="osx"><b></b></div><h2>Meridian</h2><p>1.8.6</p><p>A dashboard for this phone, bonded to Termux.</p><p class="muted">Readings come from the device. Commands run in Termux on this phone. There is no account and no server. A key, if you save one, stays here and is sent only when you press Plan.</p><p>' + (paid() ? "This phone is unlocked. The paid version is everything." : "The paid version is everything, from €1 to €1,000,000.") + '</p><p>Copyright 2026</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
 }
 function toolsPage() {
   if (more !== "menu") {
@@ -1407,7 +1416,7 @@ function paid() {
   try { return MeridianPhone.unlocked() === "yes"; } catch (e) { return false; }
 }
 function payPage() {
-  return '<div class="stack"><h2>Full version</h2><p class="muted">Dashboard, hardware, system, and battery stay open. Build, Plan, the console, setup, tweaks, doctor, and commands unlock on this phone after Revolut confirms the payment here. The phone keeps that, so you do not pay again.</p><button class="btn" id="pay" type="button">Pay with Revolut</button></div>';
+  return '<div class="stack"><h2>Paid version</h2><p>The paid version is everything.</p>' + payChooser() + '<p class="muted">One payment on this phone unlocks the whole app. You do not pay again for another screen.</p><button class="btn" id="pay" type="button">Pay with Revolut</button><p class="muted" id="paynote"></p></div>';
 }
 window.onPaid = function () { view = "build"; render(); };
 function render() {
@@ -1665,7 +1674,20 @@ function bind() {
     }, 40);
   };
   const pay = document.getElementById("pay");
-  if (pay) pay.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
+  if (pay) pay.onclick = function () {
+    const field = document.getElementById("payamount");
+    const note = document.getElementById("paynote");
+    const amount = payAmount(field ? field.value : "");
+    if (!amount) {
+      if (note) note.textContent = "Enter a whole euro amount from 1 to 1000000.";
+      return;
+    }
+    localStorage.setItem("m-pay-amount", String(amount));
+    if (note) note.textContent = "Opening checkout for €" + amount.toLocaleString("en-GB") + ". The paid version is everything.";
+    try { MeridianPhone.pay(String(amount)); } catch (e) {
+      try { MeridianPhone.pay(); } catch (err) {}
+    }
+  };
   document.querySelectorAll("[data-idea]").forEach(function (b) {
     b.onclick = function () {
       const idea = IDEAS[Number(b.getAttribute("data-idea"))];

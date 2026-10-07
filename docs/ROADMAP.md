@@ -33,16 +33,21 @@ The paywall also blocks the activation path. `gate()` in `index.html` sends `set
 
 ### What to sell instead
 
-Sell a service and a signed entitlement. Keep the instrument (dashboard, hardware, system, battery, connect, and the first setup steps) free. That is the demo.
+There is one paid version. The paid version is everything: Build, Plan, the console, setup, tweaks, doctor, commands, files, and every later feature in this document. It is not a bundle of packs and it is not a monthly add-on.
 
-| Offer | Price shape | What is actually scarce |
-|---|---|---|
-| Meridian Pro, one time | €6.99 via Google Play Billing on the Play build, or a license key on the F-Droid / sideload build | Doctor, command library, build recipes, multi-session console, file move/delete, export |
-| Meridian Relay, optional monthly | €3.99 / month, cancel any time | Your server holds the provider key. The phone sends the goal, you call Groq or OpenRouter, you meter tokens. The user’s own key stays free forever |
-| Packs | €1.99 each, or included in Pro | Local model pack, SSH pack, proot Debian/Ubuntu pack. Each pack is a tested script plus a “what it will change” card |
-| Supporter | €3, no features | Separate from Pro, on the Support screen, so dashboard-only people can pay without hitting a wall |
+The amount is whatever the payer chooses, any whole euro from **€1** through **€1,000,000** inclusive. €1 and €1,000,000 unlock the same app. There is no second price.
 
-Do not paywall Setup, Connect, System check, or Copy the bond line. Those are the funnel. Paywall the library after the first command has printed `ok`.
+```javascript
+function payAmount(raw) {
+  const n = Math.round(Number(raw));
+  if (!Number.isFinite(n) || n < 1 || n > 1000000) return 0;
+  return n;
+}
+```
+
+The pay screen already says this, with an amount field clamped to that range (`supportPage` and `payPage` in `assets/www/index.html`). The current Revolut URL is still one fixed checkout, so a typed amount is not what Revolut charges until that link is a variable-amount payment from €1 to €1,000,000. Store the chosen euros on the receipt. Reject 0, decimals, and anything outside the range before opening checkout.
+
+Keep Connect and Copy the bond line usable before payment so the phone can bond. The paid version, once any amount in that range is confirmed, is the rest of the app.
 
 Play Store digital unlocks must use Play Billing. The Revolut WebView can stay on the sideload build only. Shipping the Revolut checkout inside a Play listing is a policy rejection, not a pricing choice.
 
@@ -63,17 +68,9 @@ private boolean entitlementOk(String payload, String sigB64) {
 }
 ```
 
-Generate the keypair off the phone. The APK holds only the public key. The private key stays on the machine that fulfills Play or the license site. `markPaid()` goes away.
+Generate the keypair off the phone. The APK holds only the public key. The private key stays on the machine that fulfills Play or the license site. `markPaid()` goes away. The signed payload includes the euros paid, and any value from 1 to 1000000 is a full unlock.
 
-Relay (the monthly product) is a tiny HTTPS endpoint:
-
-- `POST /v1/plan` with the Play token or license, the goal string, and no provider key.
-- Server checks the entitlement, calls the provider, returns `{ answer, steps }`.
-- Rate limit per license (for example 40 plans / day).
-- Log tokens and cost, not the raw key.
-- The on-device `askNet` path remains for people who paste their own key, and it stays free. You make money when they would rather not create a Groq or OpenRouter account.
-
-Own-key users are not a leak. They are the free tier that makes the paid relay feel optional, which is what this audience will tolerate.
+Pasting your own model key stays inside the paid version. A hosted model call, if you add one, is included in that same payment. It is not a second subscription.
 
 ---
 
@@ -346,7 +343,7 @@ Five, in the order they earn their keep. Each one sits on a bridge that already 
 
 ### 1. Command receipt
 
-After every `exec`, persist `{ title, cmd, exit, at }` in `localStorage` (cap 100) and show it under Termux → Recent. One tap fills the dock. This is the feature people return for, and it makes Pro tangible: free keeps 10, Pro keeps 100 and exports a `.txt` into Termux home via `writeFile`.
+After every `exec`, persist `{ title, cmd, exit, at }` in `localStorage` (cap 100) and show it under Termux → Recent. One tap fills the dock. This is included in the paid version, the same as every other feature, whether they paid €1 or €1,000,000. Export a `.txt` into Termux home via `writeFile`.
 
 ### 2. “What this will change” on every Run
 
@@ -360,11 +357,11 @@ After every `exec`, persist `{ title, cmd, exit, at }` in `localStorage` (cap 10
 
 Key defaults to `https://api.x.ai/v1` and `grok-3`, which is a paid API, while APIs lists Groq, Gemini, and OpenRouter as the free path. First open of Plan with no key should land on APIs, not on an empty error after “Write the steps”. Store the provider name next to `m-base` / `m-model` / `m-key`. Add “Test key” that sends `goal: "Reply with the single word pong"` and shows the HTTP error from `apiError` without creating steps.
 
-Relay customers skip this sheet. Own-key customers need it to work the first time, or they blame the app and never subscribe.
+Someone who paid and brought their own key needs this sheet to work the first time. The paid version already includes it. There is no second product to subscribe to.
 
 ### 5. Paired read-only status on the LAN
 
-A checkbox in You: “Share readings on this Wi-Fi.” Bind `127.0.0.1` only unless the box is on, then bind the Wi-Fi address, one JSON snapshot from `status()` + `probe()`, no shell, no key, token in the path (`/s/<16 random bytes>`). The laptop opens it. This is the cross-device story that does not pretend Meridian is an iOS app. Pro feature. Off by default. The current `ServerSocket` in `openLive()` is the pattern; do not reuse that port for the public snapshot.
+A checkbox in You: “Share readings on this Wi-Fi.” Bind `127.0.0.1` only unless the box is on, then bind the Wi-Fi address, one JSON snapshot from `status()` + `probe()`, no shell, no key, token in the path (`/s/<16 random bytes>`). The laptop opens it. This is the cross-device story that does not pretend Meridian is an iOS app. It is part of the paid version, same as everything else. Off by default. The current `ServerSocket` in `openLive()` is the pattern; do not reuse that port for the public snapshot.
 
 Skip, on purpose: a social feed, accounts, cloud sync of shell history, a second theme pack store, RAM booster marketing. They fight the “no account, runs on this phone” sentence the about page already uses. That sentence is the brand. Bend money around it, do not delete it.
 
@@ -407,7 +404,7 @@ Implement with one `keydown` listener on `document`, ignore it when the target i
 - `configChanges` includes orientation, so the WebView is not recreated. Good. Persist `view`, `cwd`, and `sessions` anyway, because the process still dies.
 - `onRequestPermissionsResult` is missing. After the user answers `RUN_COMMAND`, nothing calls `bond()` again until they press Connect. Override it and `render()` from JS via `web.evaluateJavascript`.
 - Notification permission is not required for a low channel on 26+, but a foreground service is the right way to keep a long `pkg upgrade` alive. Termux already runs the command; Meridian only needs the ongoing notification so Android does not freeze the WebView timer.
-- Ship per-ABI or a universal APK plus a SHA-256 on meridian0.grok.me. The site currently has three steps and no version, no checksum, and no price. Put `1.8.6`, the hash, and “dashboard free, Pro €6.99” on that page before any redesign.
+- Ship per-ABI or a universal APK plus a SHA-256 on meridian0.grok.me. The site currently has three steps and no version, no checksum, and no price. Put `1.8.6`, the hash, and “the paid version is everything, any amount from €1 to €1,000,000” on that page before any redesign.
 - `cpuCores()` stops at 16. Read `/sys/devices/system/cpu/present` instead of `for (i < 16)`.
 
 ### Not a desktop app, not an iOS app
@@ -416,7 +413,7 @@ The bridge is `com.termux.permission.RUN_COMMAND` and `/data/data/com.termux/fil
 
 Do this instead:
 
-- **Web:** keep meridian0.grok.me as the download page. Add the price, the checksum, and a short “free vs Pro” list. No account portal.
+- **Web:** keep meridian0.grok.me as the download page. Add the checksum and one line: the paid version is everything, from €1 to €1,000,000. No account portal.
 - **Laptop:** the LAN snapshot in P2 item 5, plus the Remote shell recipe that already installs `sshd`. Document the port and that `sshd` with no password is a hole; the recipe should print “set a password or a key before you leave this screen” and refuse to start `sshd` until `passwd` has been run or an authorized key exists.
 - **iOS:** do not promise it. If you ever do a cousin app, it is a different shell (a-Shell or libssh to the Android phone), not a port of this Activity.
 
@@ -432,7 +429,7 @@ The UI jank source is `setInterval(paintGraph, 80)` calling `live()` → `Meridi
 
 There is no database. Do not add one for readings. A ring buffer of 120 samples in a `float[]` inside the Activity is enough, and it lets the page ask for “last minute” without re-reading sysfs 12 times a second.
 
-Uptime for a sideloaded APK is a phone fact, not a server SLO. The 99.9% line applies only to Relay and the download site: one region, health check on `GET /health`, static APK on a host that can serve a file if the app server is down. Put the APK on two URLs and print both on the site.
+Uptime for a sideloaded APK is a phone fact, not a server SLO. The 99.9% line applies to the download site: one region, health check on `GET /health`, static APK on a host that can serve a file if the app server is down. Put the APK on two URLs and print both on the site.
 
 ### Access
 
@@ -455,10 +452,10 @@ and set `healthtext.textContent` in `paintMeters`.
 
 ## Suggested build order
 
-1. **Trust and cash.** Receiver `exported=false`. Stop unlocking on page text. Free Setup and System check. Play Billing or signed licenses. Price and checksum on the download site. This is the only week that changes revenue.
+1. **Trust and cash.** Receiver `exported=false`. Stop unlocking on page text. One paid version: everything, any whole euro from €1 to €1,000,000, same unlock at both ends. Play Billing or signed licenses. That sentence and the checksum on the download site. This is the only week that changes revenue.
 2. **Stop the dead ends.** `WebChromeClient` prompts, sticky `sick()`, persisted disconnect, recipe confirmations, heredoc/base64 runner, `startJob` overlap and timeout.
 3. **Five tabs and a command filter.** Same brass palette, fixed tokens, reduced motion that includes the orb.
-4. **Receipts, reattach, Test key.** Then Relay if own-key usage shows people actually press Plan.
+4. **Receipts, reattach, Test key.** All of that is inside the paid version. Do not add a second price.
 5. **LAN snapshot and the sshd warning.** Not an iOS port.
 
 The clone in this repository is 1.8.6 as shipped, plus this document. Pick from the list. Do not start with a new theme.
