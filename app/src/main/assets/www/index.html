@@ -143,40 +143,40 @@
   .stage { width: 190px; height: 190px; margin: 0 auto; perspective: 900px; display: block; }
   .stage.compact { width: 96px; height: 96px; margin: 0; flex: none; }
   .globe {
-    width: 100%; height: 100%; position: relative; border-radius: 50%; overflow: hidden;
+    width: 100%; height: 100%; position: relative; border-radius: 50%; overflow: hidden; contain: paint;
     background:
-      radial-gradient(circle at 28% 24%, rgba(255,255,255,.62) 0 5%, transparent 22%),
-      radial-gradient(circle at 34% 32%, var(--accent2) 0 18%, var(--accent) 38%, #1a1208 66%, #050403 100%);
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,.55) 0 4%, transparent 18%),
+      radial-gradient(circle at 40% 42%, #1d4e89 0 28%, #0c3a66 46%, #071e36 68%, #02060c 100%);
     box-shadow:
-      inset -16px -14px 22px rgba(0,0,0,.78),
-      inset 10px 8px 16px rgba(255,255,255,.22),
-      0 0 28px var(--accent-glow);
-    transform: translateZ(0);
+      inset -18px -16px 28px rgba(0,0,0,.82),
+      inset 8px 6px 14px rgba(255,255,255,.18),
+      0 0 0 1px rgba(255,255,255,.12),
+      0 0 32px var(--accent-glow);
   }
-  .globe-spin {
-    position: absolute; inset: -18%; animation: globe-spin 26s linear infinite; will-change: transform;
-    background:
-      radial-gradient(ellipse 20% 11% at 32% 40%, rgba(228,210,174,.55) 0 38%, transparent 62%),
-      radial-gradient(ellipse 24% 13% at 64% 36%, rgba(196,164,106,.42) 0 40%, transparent 64%),
-      radial-gradient(ellipse 16% 20% at 48% 60%, rgba(196,164,106,.38) 0 40%, transparent 66%),
-      radial-gradient(ellipse 10% 8% at 70% 62%, rgba(228,210,174,.3) 0 40%, transparent 70%);
+  .globe-drift {
+    position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+    animation: globe-drift 22s linear infinite;
   }
-  .globe-grid { width: 100%; height: 100%; display: block; stroke: var(--accent); stroke-width: 0.7; fill: none; opacity: 0.58; }
+  .globe-map { width: 100%; height: 100%; display: block; }
+  .globe-map .land { fill: #c4a46a; }
+  .globe-map .graticule { fill: none; stroke: rgba(255,255,255,.28); stroke-width: 0.6; }
   .globe-shine {
-    position: absolute; left: 12%; top: 10%; width: 42%; height: 24%; border-radius: 50%;
-    background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0));
-    pointer-events: none; animation: globe-gleam 4.8s ease-in-out infinite;
+    position: absolute; left: 14%; top: 8%; width: 46%; height: 28%; border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
+    pointer-events: none; animation: globe-gleam 5.2s ease-in-out infinite;
   }
   .globe-night {
     position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-    background: linear-gradient(105deg, transparent 42%, rgba(0,0,0,.38) 72%, rgba(0,0,0,.55) 100%);
+    background: linear-gradient(100deg, transparent 36%, rgba(0,0,0,.22) 58%, rgba(0,0,0,.72) 100%);
   }
   .globe-ring {
-    position: absolute; inset: -3px; border-radius: 50%; pointer-events: none; text-decoration: none;
-    border: 1px solid var(--accent-border); box-shadow: 0 0 16px var(--accent-glow); opacity: .7;
+    position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; text-decoration: none;
+    border: 1px solid var(--accent-border);
+    box-shadow: 0 0 18px var(--accent-glow), inset 0 0 12px rgba(120,180,255,.25);
+    opacity: .85;
   }
-  @keyframes globe-spin { to { transform: rotate(360deg); } }
-  @keyframes globe-gleam { 0%, 100% { opacity: .55; transform: translate(0,0); } 50% { opacity: 1; transform: translate(6%, 4%); } }
+  @keyframes globe-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+  @keyframes globe-gleam { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }
   .orb { display: none; }
   .status-text { margin-top: 16px; text-align: center; font-weight: 700; font-size: 0.8125rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); transition: color 0.4s ease; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -308,7 +308,7 @@
   .filegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
-  .filegrid .ico em { font-size: 0.8125rem; text-align: left; -webkit-line-clamp: 2; word-break: normal; }
+  .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
   #devicecare { align-self: center; width: auto; min-height: 44px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { width: auto; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--chip); color: var(--fg); font-size: 0.8125rem; }
@@ -326,15 +326,15 @@
     box-shadow: inset 0 1px 0 rgba(243,234,215,.14);
   }
   .ico, .btn, .ghost, nav button, .chip, .swatch, .aboutbtn {
-    transition: transform 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out;
+    transition: border-color 150ms ease-out, background-color 150ms ease-out, opacity 150ms ease-out;
   }
   .ico:active, .btn:active, .ghost:active, nav button:active, .chip:active, .swatch:active, .aboutbtn:active {
-    transform: scale(0.98);
+    opacity: 0.72;
   }
   .winbody > * { animation: rise 280ms ease-out; }
   @keyframes rise {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: none; }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translate(-50%, 8px); z-index: 9; max-width: calc(100% - 40px); padding: 10px 16px; border-radius: 12px; background: var(--plate); color: var(--fg); border: 1px solid var(--accent); box-shadow: 0 12px 28px rgba(0,0,0,.3); font-size: 0.8125rem; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out, transform 180ms ease-out; }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
@@ -379,13 +379,13 @@
   #carrierline { margin: 0; min-width: 0; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
-    display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8125rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 0.8125rem; letter-spacing: 0; text-shadow: none; font-synthesis: none;
   }
   html[data-motion="full"] .motionpulse { animation: motion-demo 1.15s ease-in-out !important; }
   @keyframes motion-demo {
-    0% { opacity: 0.12; transform: scale(0.92); }
-    45% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
+    0% { opacity: 0.15; }
+    45% { opacity: 1; }
+    100% { opacity: 1; }
   }
   .deskbar b { font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; filter: none; }
   /* Motion Off kills every animation. Motion On (data-motion=full) overrides OS reduced-motion. */
@@ -397,8 +397,8 @@
   html[data-motion="reduce"] *,
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
-  html[data-motion="full"] .globe-spin { animation: globe-spin 26s linear infinite !important; }
-  html[data-motion="full"] .globe-shine { animation: globe-gleam 4.8s ease-in-out infinite !important; }
+  html[data-motion="full"] .globe-drift { animation: globe-drift 22s linear infinite !important; }
+  html[data-motion="full"] .globe-shine { animation: globe-gleam 5.2s ease-in-out infinite !important; }
   html[data-motion="full"] .osx b { animation: osx-spin var(--spin-speed) linear infinite !important; }
   html[data-motion="full"] .osx b::after { animation: osx-pulse var(--pulse-speed) ease-in-out infinite !important; }
   html[data-motion="full"] .logo i:nth-child(2),
@@ -869,15 +869,25 @@ function gaugeHtml(id, pct, label) {
   return '<div><div class="gauge" data-g="' + id + '" style="--p:' + p + '"><b>' + esc(shown) + '</b></div><span>' + esc(label) + '</span></div>';
 }
 function globeHtml() {
-  return '<div class="globe" aria-hidden="true"><s class="globe-ring"></s><div class="globe-spin"><svg class="globe-grid" viewBox="0 0 100 100">'
-    + '<ellipse cx="50" cy="50" rx="48" ry="48"/>'
-    + '<ellipse cx="50" cy="50" rx="36" ry="48"/>'
-    + '<ellipse cx="50" cy="50" rx="22" ry="48"/>'
-    + '<ellipse cx="50" cy="50" rx="8" ry="48"/>'
-    + '<ellipse cx="50" cy="50" rx="48" ry="16"/>'
-    + '<ellipse cx="50" cy="50" rx="48" ry="32"/>'
-    + '<line x1="50" y1="2" x2="50" y2="98"/>'
-    + '<line x1="2" y1="50" x2="98" y2="50"/>'
+  const land = ''
+    + '<path d="M18 62c6-16 18-14 24-4 4 6 2 4 10-2 8-6 16-4 18 4 2 8-6 12-8 16-8 2-14-2-20 2-6 4-16 2-18-6-2-6-8-4-6-10z"/>'
+    + '<path d="M52 78c4-8 12-10 14-2 2 6-2 10-8 12-6 2-10-2-6-10z"/>'
+    + '<path d="M78 48c10-10 22-6 26 2 2 6-4 8-2 14 2 6-6 10-14 8-8-2-10 4-16 2-4-8 0-16 6-26z"/>'
+    + '<path d="M112 58c8-12 20-8 22 2 2 8-6 10-4 16 2 4-8 8-14 6-8-2-12-8-4-24z"/>'
+    + '<path d="M138 86c6-8 14-6 16 2 1 6-6 8-12 6-6-2-8-4-4-8z"/>'
+    + '<path d="M156 70c4-14 16-12 22-2 4 8-2 12-8 16-8 2-16-2-14-14z"/>'
+    + '<path d="M168 96c8-4 16-2 14 6-2 6-10 8-16 4-4-2-2-8 2-10z"/>';
+  const grat = '<g class="graticule">'
+    + '<ellipse cx="100" cy="90" rx="92" ry="28"/>'
+    + '<ellipse cx="100" cy="90" rx="92" ry="52"/>'
+    + '<ellipse cx="100" cy="90" rx="92" ry="74"/>'
+    + '<path d="M100 16v148M16 90h168M40 28c18 40 18 84 0 124M160 28c-18 40-18 84 0 124"/>'
+    + '</g>';
+  const half = '<g class="land">' + land + '</g>' + grat;
+  return '<div class="globe" aria-hidden="true"><s class="globe-ring"></s>'
+    + '<div class="globe-drift"><svg class="globe-map" viewBox="0 0 400 180" preserveAspectRatio="none">'
+    + half
+    + '<g transform="translate(200,0)">' + half + '</g>'
     + '</svg></div><i class="globe-shine"></i><b class="globe-night"></b></div>';
 }
 let netNameCache = { name: "—", at: 0 };
@@ -2125,13 +2135,18 @@ function render() {
   line.textContent = bond === "termux" ? t("connected") : bond === "ask" ? t("allowTermux") : bond === "missing" ? t("noTermux") : t("notConnected");
   bind();
   paintChrome();
+  function putScroll(topBody, topMain) {
+    const body = document.querySelector(".winbody");
+    if (body) body.scrollTop = topBody;
+    if (main) main.scrollTop = topMain;
+  }
   if (same) {
-    const body = document.querySelector(".winbody");
-    if (body) body.scrollTop = savedBody;
-    if (main) main.scrollTop = savedMain;
+    putScroll(savedBody, savedMain);
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () { putScroll(savedBody, savedMain); });
+    }
   } else {
-    const body = document.querySelector(".winbody");
-    if (body) body.scrollTop = 0;
+    putScroll(0, 0);
   }
   if ((view === "system" || view === "home") && bond === "termux" && !senseAsked) setTimeout(loadSense, 40);
   if (view === "files") loadFiles();

@@ -25,7 +25,7 @@ or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
 **2.1.1 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
-2. Open the latest green run for this branch (`cursor/meridian-2-1-look-modes-sell-ce79`).
+2. Open the latest green run for this branch (`cursor/meridian-2-1-1-fixes-ce79`).
 3. Download the artifact **Meridian-2.1.1-debug** (a zip with `app-debug.apk` inside).
 4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.1.1** (versionCode 39) so you can tell it apart from 2.1.0.
 
@@ -35,19 +35,6 @@ or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 - **Carrier:** on the dashboard, next to **Test network speed**. Wi‑Fi or the SIM operator when Android already allows it. Shows **—** if unknown. No extra dangerous permissions.
 - **Linux PC:** Termux shelf → **Linux PC**, or Build → **Linux PC** pack. Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
 - **Globe:** the dashboard orb is a CSS/SVG globe. Settings → Motion **On** spins it (and overrides the phone’s reduced-motion setting). Motion **Off** freezes it.
-
-## Why PR #4 has no Merge on a phone
-
-GitHub’s **mobile website** shows **Open**, the commit count, and **Review**. It does **not** show **Merge**. That is GitHub’s phone-browser UI, not a draft, a failed check, or a conflict.
-
-Facts from `gh pr view 4` at the time of this note:
-
-- State can be **MERGED** once someone merges from desktop or the GitHub app. It was **not a draft** (`isDraft: false`).
-- Checks: **Assemble debug APK** → **SUCCESS**.
-- `reviewDecision` was empty (no pending required review blocking the merge).
-- After merge, extra 2.1.1 commits on this branch are **not** merged automatically. Open a new PR into `main`, or merge from a computer.
-
-Merge from: the GitHub Android/iOS app, or a desktop browser. This README is not a merge.
 
 You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.
 
