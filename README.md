@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.2.0**.
+A dashboard for an Android phone, bonded to Termux. Version **2.2.1**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,11 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.2.0 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.2.1 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch (`cursor/meridian-2-2-logo-premium-ce79`).
-3. Download the artifact **Meridian-2.2.0-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.2.0** (versionCode 40).
+3. Download the artifact **Meridian-2.2.1-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.2.1** (versionCode 41).
 
 ### Language, carrier, Linux PC, terminal mark
 
@@ -66,7 +66,7 @@ buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
 
 ## Free and Pro
 
-The price is **Pro €15 once**. An earlier draft used a pay-what-you-want span of €1–€1,000,000. That is not the price.
+The price is **Pro €15 once**. Each purchase includes two Pro keys: one for the buyer, and one they can give to a friend. An earlier draft used a pay-what-you-want span of €1–€1,000,000. That is not the price.
 
 | Free | Pro (€15 once) |
 |---|---|
@@ -94,12 +94,14 @@ Premium is designed and **not for sale**. The app has no Premium buy button. See
 
 2. Point `PAY_URL` at your checkout. The app opens it in the system browser. The button says **Buy Pro · €15**.
 
-3. Issue a Pro key after each sale:
+3. Issue two Pro keys after each €15 sale (one line each, two refs):
 
    ```bash
-   node tools/license/sign.mjs --sku pro --ref ORDER
+   node tools/license/sign.mjs --sku pro --ref ORDER --copies 2
    node tools/license/verify.mjs MERIDIAN-xxxx.yyyy
    ```
+
+   Omit `--copies` when you only need one key. The default is 1.
 
    `sign.mjs` still accepts `--sku premium` for a later release. Do not sell that SKU yet.
 
