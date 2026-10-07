@@ -9,8 +9,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.TrafficStats;
 import android.net.Uri;
+import android.telephony.TelephonyManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -1002,6 +1006,64 @@ public class MainActivity extends Activity {
         public String speedStatus() {
             String now = speedJson;
             return now == null || now.length() == 0 ? "run" : now;
+        }
+
+        /**
+         * Carrier / transport next to the speed test. ACCESS_NETWORK_STATE is a normal
+         * permission. READ_PHONE_STATE is not requested — operator name is best-effort.
+         */
+        @JavascriptInterface
+        public String networkName() {
+            try {
+                JSONObject o = new JSONObject();
+                String kind = "";
+                String name = "";
+                try {
+                    ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                    if (cm != null) {
+                        Network net = cm.getActiveNetwork();
+                        NetworkCapabilities caps = net == null ? null : cm.getNetworkCapabilities(net);
+                        if (caps != null) {
+                            if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                                    || caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE)) kind = "wifi";
+                            else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) kind = "cell";
+                            else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) kind = "ethernet";
+                            else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) kind = "vpn";
+                        }
+                    }
+                } catch (Exception ignored) {}
+                try {
+                    TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                    if (tm != null) {
+                        String op = tm.getNetworkOperatorName();
+                        if (op == null || op.trim().length() == 0) op = tm.getSimOperatorName();
+                        if (op != null) name = op.trim();
+                    }
+                } catch (SecurityException ignored) {
+                } catch (Exception ignored) {}
+                if ("wifi".equals(kind)) {
+                    o.put("kind", "wifi");
+                    o.put("name", "Wi-Fi");
+                } else if ("cell".equals(kind)) {
+                    o.put("kind", "cell");
+                    o.put("name", name.length() > 0 ? name : "Mobile");
+                } else if ("ethernet".equals(kind)) {
+                    o.put("kind", "ethernet");
+                    o.put("name", "Ethernet");
+                } else if ("vpn".equals(kind) && name.length() > 0) {
+                    o.put("kind", "vpn");
+                    o.put("name", name);
+                } else if (name.length() > 0) {
+                    o.put("kind", kind.length() > 0 ? kind : "cell");
+                    o.put("name", name);
+                } else {
+                    o.put("kind", kind);
+                    o.put("name", "—");
+                }
+                return o.toString();
+            } catch (Exception ex) {
+                return "{\"kind\":\"\",\"name\":\"—\"}";
+            }
         }
 
         @JavascriptInterface

@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.1.0**.
+A dashboard for an Android phone, bonded to Termux. Version **2.1.1**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -23,11 +23,18 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.1 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.1.1 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
-2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.1.0-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source.
+2. Open the latest green run for this branch (`cursor/meridian-2-1-1-fixes-ce79`).
+3. Download the artifact **Meridian-2.1.1-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.1.1** (versionCode 39) so you can tell it apart from 2.1.0.
+
+### Language, carrier, Linux PC, globe
+
+- **Language:** Settings (or About) → Language. English, Hrvatski, Deutsch, 日本語, हिन्दी, Español, Français. Stored as `m-lang`. Recipes stay in English (they are shell).
+- **Carrier:** on the dashboard, next to **Test network speed**. Wi‑Fi or the SIM operator when Android already allows it. Shows **—** if unknown. No extra dangerous permissions.
+- **Linux PC:** Termux shelf → **Linux PC**, or Build → **Linux PC** pack. Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
+- **Globe:** the dashboard orb is a CSS/SVG globe. Settings → Motion **On** spins it (and overrides the phone’s reduced-motion setting). Motion **Off** freezes it.
 
 You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.
 
@@ -56,8 +63,8 @@ buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
 
 | Free                                                     | Pro (one-time purchase)                       |
 |----------------------------------------------------------|-----------------------------------------------|
-| Dashboard, Hardware, System, Battery                     | Build packs: Workstation, Media box, On-device AI |
-| One console session, Setup, Doctor, Commands, Links      | Plan (AI goal → command plan, bring your key) |
+| Dashboard, Hardware, System, Battery                     | Build packs: Workstation, Media box, On-device AI, Linux PC recipes |
+| One console session, Setup, Doctor, Linux PC, Commands, Links | Plan (AI goal → command plan, bring your key) |
 | Files (read-only browse and view)                        | Tweaks, four named console sessions           |
 | Hardware report share, OLED / accent / Settings          | File create / edit / rename / delete / zip    |
 
