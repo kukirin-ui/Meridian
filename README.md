@@ -15,21 +15,28 @@ The public page at [meridian0.grok.me](https://meridian0.grok.me) still hands ou
 | `docs/ROADMAP.md` | Earlier 1.8.6-only roadmap. Prefer `AUDIT.md` |
 | `meridian-source.zip` | Untouched 1.8.6 archive |
 
-## See the app
+## Install the app (APK)
 
-There is no hosted web preview: Meridian is an Android + Termux app. The source you open on GitHub **is** the changed app:
+A GitHub zip of the source **does not contain an `.apk`**. That file is built, not committed.
 
-- UI: [`app/src/main/assets/www/index.html`](app/src/main/assets/www/index.html)
-- Bridge: [`app/src/main/java/com/meridian/shell/MainActivity.java`](app/src/main/java/com/meridian/shell/MainActivity.java)
+**Ready-made (1.8.6, current public build):**
+[Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
+or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-To run it on a phone:
+**2.0 debug APK (this branch):** GitHub Actions builds it on every push.
+1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
+2. Open the latest green run for this branch.
+3. Download the artifact **Meridian-2.0.0-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source.
+
+You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.
+
+To build the APK yourself (Android Studio, or JDK 17 + Android SDK):
 
 ```bash
-gradle wrapper --gradle-version 8.9      # once, if you do not have a wrapper yet
-./gradlew assembleDebug                  # app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleDebug
+# output: app/build/outputs/apk/debug/app-debug.apk
 ```
-
-Install that APK on a device with Termux and `allow-external-apps=true` in `~/.termux/termux.properties`. Then open Meridian and run Setup / Doctor.
 
 Release builds need a signing config (see below). `app/proguard-rules.pro` keeps the JavaScript bridge and the Termux receiver intact.
 

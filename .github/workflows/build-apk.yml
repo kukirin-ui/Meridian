@@ -1,0 +1,31 @@
+name: Build APK
+
+on:
+  push:
+    branches: ["main", "cursor/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  debug-apk:
+    name: Assemble debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Meridian-2.0.0-debug.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: Meridian-2.0.0-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
