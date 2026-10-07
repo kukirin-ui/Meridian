@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.0.0**.
+A dashboard for an Android phone, bonded to Termux. Version **2.1.0**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -23,10 +23,10 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.0 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.1 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.0.0-debug** (a zip with `app-debug.apk` inside).
+3. Download the artifact **Meridian-2.1.0-debug** (a zip with `app-debug.apk` inside).
 4. Copy that APK to the phone, open it, allow install from this source.
 
 You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.
@@ -56,10 +56,10 @@ buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
 
 | Free                                                     | Pro (one-time purchase)                       |
 |----------------------------------------------------------|-----------------------------------------------|
-| Dashboard, Hardware, System, Battery                     | Build recipes (Workstation, Machine, Library) |
+| Dashboard, Hardware, System, Battery                     | Build packs: Workstation, Media box, On-device AI |
 | One console session, Setup, Doctor, Commands, Links      | Plan (AI goal → command plan, bring your key) |
-| Files (read-only browse and view)                        | Tweaks, extra console sessions                |
-|                                                          | File create / edit / rename / delete          |
+| Files (read-only browse and view)                        | Tweaks, four named console sessions           |
+| Hardware report share, OLED / accent / Settings          | File create / edit / rename / delete / zip    |
 
 Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). After that the Pro tabs show a `PRO` badge and route to the purchase page.
 
