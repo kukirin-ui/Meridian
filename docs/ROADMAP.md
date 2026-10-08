@@ -2,6 +2,8 @@
 
 Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by the app in `app/`.** The 1.8.6 copy that used to live in `original/` and `meridian-source.zip` was removed in 2.3.0. The current phone UI is `app/src/main/assets/www/index.html` and the bridge is `app/src/main/java/com/meridian/shell/MainActivity.java`.
 
+**Licence (from 2.3.4):** The MIT sentence in the next section describes that 1.8.6 tree. Current Meridian is proprietary. All rights reserved. See `LICENSE`.
+
 This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account. A Revolut WebView is the only checkout.
 
 Work in the order below. Each item names the file and the change. Nothing here is a generic “add tests” note without a target.

@@ -1,6 +1,8 @@
 # Meridian — A-to-Z audit, enhancement roadmap and monetization plan
 
 Scope: the shipped 1.8.6 source, evaluated as product manager, UX designer and QA lead. That tree (`original/` and `meridian-source.zip`) was removed in 2.3.0. The current app is `app/`.
+
+**Licence (from 2.3.4):** Meridian is proprietary. All rights reserved. The MIT and “keep the repo public” lines later in this file are historical notes about 1.8.6. Copies already published under MIT stay under MIT. See `LICENSE`.
 Every finding below is paired with the exact fix. Findings marked **[fixed in 2.0]** are already
 implemented at the repo root (`app/`); the rest are specified so they can be built next.
 

@@ -586,7 +586,7 @@ navHome:"Dashboard",navHardware:"Hardware",navSystem:"System",navBattery:"Batter
 connect:"Connect",disconnect:"Disconnect",connected:"Connected",allowTermux:"Allow Termux",noTermux:"No Termux",notConnected:"Not connected",
 settingsAria:"Settings",commandPh:"Query the terminal or enter a command...",run:"Run",
 work:"Work",machine:"Machine",library:"Library",files:"Files",console:"Console",tweaks:"Tweaks",doctor:"Doctor",commands:"Commands",links:"Links",setup:"Setup",meridian:"Meridian",licence:"Licence",fullVersion:"Plans",lookModesFoot:"Look, modes, and the licence",linuxPc:"Linux PC",
-titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleSecurity:"Security",titleBuild:"Build",titlePlan:"Plan",titlePay:"Plans",titleKeys:"API Platforms",titleSettings:"App preferences",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleEnvironment:"Environment",titleHome:"Dashboard",titleLinux:"Linux PC",contactSupport:"Contact Support",aboutLicense:"MIT / open source. Licence texts ship with the app.",aboutCredits:"Developer: Kukirin",
+titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleSecurity:"Security",titleBuild:"Build",titlePlan:"Plan",titlePay:"Plans",titleKeys:"API Platforms",titleSettings:"App preferences",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleEnvironment:"Environment",titleHome:"Dashboard",titleLinux:"Linux PC",contactSupport:"Contact Support",aboutLicense:"Proprietary. All rights reserved.",aboutCredits:"Developer: Kukirin",
 thisPhone:"This phone",hardwareFromDevice:"Hardware from this device",systemStrained:"System strained",systemOptimal:"System optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Battery",heat:"Bat. Temp.",voltage:"Voltage",ramFree:"RAM free",memory:"Memory",virtual:"Virtual",deviceCare:"Device care",settings:"Settings",about:"About",liveClocks:"Live clocks",hold:"Hold",live:"Live",quietCool:"Quiet and cool",heatOrRam:"Heat or RAM is high",storage:"Storage",network:"Network",testSpeed:"Test network speed",testing:"Testing…",noRamPlus:"No RAM Plus",usedOf:" used · ",connectTermux:"Connect Termux",connectTermuxBody:"Install F-Droid, then Termux from F-Droid, not Play. Open Setup and follow it. When this line says Connected, Setup moves to the end of Termux.",connectedTermux:"Connected to Termux",copyLine:"Copy the line",reading:"Reading…",
 look:"Look",theme:"Theme",themeSystem:"System",themeDark:"Dark",themeLight:"Light",themeOled:"OLED",accent:"Accent",feel:"Feel",refresh:"Refresh",refreshSaver:"Battery-saver 2s",refreshNormal:"Normal 1s",refreshLive:"Live 250ms",consoleFont:"Console font",keepAwake:"Keep awake while a job runs",haptics:"Haptics",on:"On",off:"Off",motion:"Motion",motionSystem:"System",motionOff:"Off",motionOn:"On",motionTestOn:"Motion is on — this bar just faded in.",motionTestOff:"Motion is off — no fade, no globe spin.",language:"Language",shortcuts:"Keyboard shortcuts",
 aboutBlurb:"A dashboard for this phone, bonded to Termux.",aboutReadings:"Readings come from the device. Commands run in Termux on this phone. There is no account and no server. A key, if you save one, stays here and is sent only when you press Plan.",unlockedPhone:"This phone is unlocked.",trialLeft:"Trial:",freeVersion:"This phone is on the free version.",shareReport:"Share hardware report",copyright:"Copyright 2026",
@@ -2324,7 +2324,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.3"; } catch (e) { return "2.3.3"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.4"; } catch (e) { return "2.3.4"; }
 }
 function savedDownloads() {
   try {
@@ -2866,30 +2866,6 @@ function armKeyboard() {
     try { MeridianPhone.hideKeyboard(); } catch (e) {}
   }, true);
 }
-function armUnlock(node) {
-  if (!node || node.dataset.hold) return;
-  node.dataset.hold = "1";
-  let holdTimer = 0;
-  let hintTimer = 0;
-  const stop = function () { clearTimeout(holdTimer); clearTimeout(hintTimer); };
-  node.addEventListener("pointerdown", function (ev) {
-    if (ev && ev.button != null && ev.button !== 0) return;
-    stop();
-    hintTimer = setTimeout(function () { toast("Hold"); }, 1200);
-    holdTimer = setTimeout(function () {
-      let answer = "no";
-      try { answer = String(MeridianPhone.devUnlock() || "no"); } catch (e) { answer = "no"; }
-      if (answer === "yes") {
-        paidAt = 0;
-        tierAt = 0;
-        toast("Pro and Premium are open.");
-        goNav({ view: "pay", more: "menu", openCmd: "" });
-      } else toast("Debug builds only.");
-    }, 5000);
-  });
-  node.addEventListener("pointerup", stop);
-  node.addEventListener("pointercancel", stop);
-}
 function bind() {
   const openset = document.getElementById("openset");
   const setmenu = document.getElementById("setmenu");
@@ -3233,8 +3209,6 @@ function bind() {
     };
   }
   armKeyboard();
-  armUnlock(document.getElementById("pagetitle"));
-  armUnlock(document.getElementById("appversion"));
   document.querySelectorAll("[data-slot]").forEach(function (b) {
     b.onclick = function () {
       const slot = b.getAttribute("data-slot");
@@ -4073,7 +4047,7 @@ function openSheet(kind) {
   if (kind === "help") {
     body += '<h2>Help</h2><p><b>Where do commands run?</b></p><p>Commands run in Termux on this phone. There is no account and no server.</p><p><b>Permission denied</b></p><p>Android is asking for the Termux command permission. Allow it. That is not a ban.</p><p><b>Network looks stuck</b></p><p>If the phone closes its counters, the gauge shows the link speed instead of a dash.</p><button class="btn" type="button" id="sheetsetup">Open Setup</button><button class="ghost" type="button" id="sheetdoctor">Troubleshooting</button><button class="ghost" type="button" id="sheetmail">Contact Support</button><button class="ghost" type="button" id="sheetintro">Show the intro</button>';
   } else if (kind === "terms") {
-    body += '<h2>Terms</h2><p>Meridian is free to install. Pro is €15 once and includes two keys. It is not a subscription. Premium is a separate key.</p><p>Commands run in Termux on this phone. You read a command before it runs.</p>';
+    body += '<h2>Terms</h2><p>Meridian is proprietary software. All rights reserved. It is free to install. That install is not a licence to the source.</p><p>Pro is €15 once and includes two keys. It is not a subscription. Premium is a separate key.</p><p>Commands run in Termux on this phone. You read a command before it runs.</p>';
   } else {
     body += '<h2>Privacy</h2><p>Commands run in Termux on this phone. There is no account and no server.</p><p>Readings stay on this handset. A saved API key stays here and is sent only when you press Plan. The licence check is offline.</p>';
   }
