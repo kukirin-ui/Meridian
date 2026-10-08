@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
     private double shownRx = 0;
     private double shownTx = 0;
     private boolean netClosed = false;
+    private int netStall = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -651,11 +652,14 @@ public class MainActivity extends Activity {
             try {
                 long now = System.currentTimeMillis();
                 double[] net = netRate();
+                long[] link = linkBytes();
                 if (cachedProbe.length() > 0 && now - probeAt < 80) {
                     JSONObject cached = new JSONObject(cachedProbe);
                     cached.put("rx", net[0]);
                     cached.put("tx", net[1]);
                     cached.put("netClosed", netClosed);
+                    cached.put("linkDown", link[0]);
+                    cached.put("linkUp", link[1]);
                     return cached.toString();
                 }
                 JSONObject props = props();
@@ -687,6 +691,8 @@ public class MainActivity extends Activity {
                 o.put("rx", net[0]);
                 o.put("tx", net[1]);
                 o.put("netClosed", netClosed);
+                o.put("linkDown", link[0]);
+                o.put("linkUp", link[1]);
                 o.put("kernel", readLine("/proc/version"));
                 o.put("cpuinfo", cpuName());
                 String[] keys = new String[] { "brand", "device", "board", "maker", "hardware", "soc", "egl", "vulkan", "renderer", "glVersion", "glVendor", "platform", "abi", "sdk", "patch", "buildId", "built", "oneui", "fingerprint", "gpu", "ramType", "ufs" };
@@ -1235,6 +1241,38 @@ public class MainActivity extends Activity {
             String p = shellPath(path);
             if (p == null) return BAD_PATH;
             return run("mkdir -p -- " + p);
+        }
+
+        @JavascriptInterface
+        public void stopSpeed() {
+            if ("run".equals(speedJson)) speedJson = "{\"ok\":false,\"error\":\"The test timed out.\"}";
+        }
+
+        @JavascriptInterface
+        public String choosePlan(String sku) {
+            try {
+                if ("free".equals(sku)) {
+                    new File(getFilesDir(), "full.key").delete();
+                    new File(getFilesDir(), "dev.unlock").delete();
+                    return "{\"ok\":true,\"sku\":\"free\"}";
+                }
+                if ("pro".equals(sku)) {
+                    String now = tier();
+                    if (!"pro".equals(now) && !"premium".equals(now)) {
+                        return "{\"ok\":false,\"error\":\"Pro needs a licence key.\"}";
+                    }
+                    markTier("pro");
+                    return "{\"ok\":true,\"sku\":\"pro\"}";
+                }
+                if ("premium".equals(sku)) {
+                    String key = readSmallText(slotFile("enterprise"), 12000);
+                    if (key.length() == 0) return "{\"ok\":false,\"error\":\"Paste a Premium key into Premium Enterprise.\"}";
+                    return useWorkspace("enterprise");
+                }
+                return "{\"ok\":false,\"error\":\"Unknown plan.\"}";
+            } catch (Exception ex) {
+                return "{\"ok\":false,\"error\":\"The plan could not be changed.\"}";
+            }
         }
 
         @JavascriptInterface
@@ -2179,28 +2217,50 @@ public class MainActivity extends Activity {
         return arr;
     }
 
+    private int netPick = -1;
+
     private double[] netRate() {
-        long[] bytes = ifaceBytes();
+        long[] bytes = ifaceBytes(-1);
         long now = System.currentTimeMillis();
         if (bytes == null) {
             netClosed = true;
+            shownRx = 0;
+            shownTx = 0;
+            prevRx = -1;
+            netStall = 0;
             return new double[] { 0, 0 };
         }
         netClosed = false;
         if (prevRx >= 0 && now > prevNetAt) {
-            if (bytes[0] < prevRx || bytes[1] < prevTx) {
-                prevRx = bytes[0];
-                prevTx = bytes[1];
-                prevNetAt = now;
-                return new double[] { shownRx, shownTx };
-            }
             double sec = (now - prevNetAt) / 1000.0;
-            if (sec >= 0.04 && sec < 5) {
+            // A second probe in the same frame must not throw the byte delta away.
+            if (sec < 0.04) return new double[] { shownRx, shownTx };
+            if (bytes[0] < prevRx || bytes[1] < prevTx) {
+                shownRx = 0;
+                shownTx = 0;
+                netStall = 0;
+            } else if (sec < 8) {
                 double rx = (bytes[0] - prevRx) / sec;
                 double tx = (bytes[1] - prevTx) / sec;
-                if (rx < 500000000 && tx < 500000000) {
-                    shownRx = shownRx * 0.3 + rx * 0.7;
-                    shownTx = shownTx * 0.3 + tx * 0.7;
+                if (rx == 0 && tx == 0) netStall++;
+                else netStall = 0;
+                if (rx >= 0 && tx >= 0 && rx < 500000000 && tx < 500000000) {
+                    shownRx = shownRx * 0.35 + rx * 0.65;
+                    shownTx = shownTx * 0.35 + tx * 0.65;
+                }
+                if (netStall >= 5) {
+                    netStall = 0;
+                    int stuck = netPick;
+                    long[] next = ifaceBytes(stuck);
+                    if (next == null) netPick = stuck;
+                    else {
+                        prevRx = next[0];
+                        prevTx = next[1];
+                        prevNetAt = now;
+                        shownRx = 0;
+                        shownTx = 0;
+                        return new double[] { 0, 0 };
+                    }
                 }
             }
         }
@@ -2210,26 +2270,67 @@ public class MainActivity extends Activity {
         return new double[] { shownRx, shownTx };
     }
 
-    private long[] ifaceBytes() {
-        long[] best = null;
-        long bestSum = -1;
-        long[][] rows = new long[][] { trafficBytes(), sysNet(), procNet() };
+    /** skip >= 0 drops that source so a frozen counter can fall through to the next one. */
+    private long[] ifaceBytes(int skip) {
+        long[][] rows = new long[][] { trafficBytes(), activeIface(), sysNet(), procNet() };
+        if (skip < 0 && netPick >= 0 && netPick < rows.length && rows[netPick] != null) return rows[netPick];
+        int previous = netPick;
         for (int i = 0; i < rows.length; i++) {
-            long[] row = rows[i];
-            if (row == null) continue;
-            long sum = row[0] + row[1];
-            if (sum > bestSum) {
-                bestSum = sum;
-                best = row;
+            if (i == skip) continue;
+            if (rows[i] == null) continue;
+            if (previous != i) {
+                prevRx = -1;
+                shownRx = 0;
+                shownTx = 0;
             }
+            netPick = i;
+            return rows[i];
         }
-        return best;
+        if (skip >= 0 && skip < rows.length && rows[skip] != null) {
+            netPick = skip;
+            return rows[skip];
+        }
+        netPick = -1;
+        return null;
+    }
+
+    private long[] activeIface() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            Network net = cm == null ? null : cm.getActiveNetwork();
+            LinkProperties lp = (cm == null || net == null) ? null : cm.getLinkProperties(net);
+            if (lp == null) return null;
+            String name = lp.getInterfaceName();
+            if (name == null || name.length() == 0 || name.indexOf('/') >= 0 || name.indexOf('.') >= 0) return null;
+            long r = parseLong(readLine("/sys/class/net/" + name + "/statistics/rx_bytes"));
+            long t = parseLong(readLine("/sys/class/net/" + name + "/statistics/tx_bytes"));
+            if (r <= 0 && t <= 0) return null;
+            return new long[] { r, t };
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private long[] linkBytes() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            Network net = cm == null ? null : cm.getActiveNetwork();
+            NetworkCapabilities caps = (cm == null || net == null) ? null : cm.getNetworkCapabilities(net);
+            if (caps == null) return new long[] { 0, 0 };
+            int down = caps.getLinkDownstreamBandwidthKbps();
+            int up = caps.getLinkUpstreamBandwidthKbps();
+            long downB = down > 0 ? (down * 1000L) / 8L : 0L;
+            long upB = up > 0 ? (up * 1000L) / 8L : 0L;
+            return new long[] { downB, upB };
+        } catch (Exception ex) {
+            return new long[] { 0, 0 };
+        }
     }
 
     private long[] trafficBytes() {
         long rx = TrafficStats.getTotalRxBytes();
         long tx = TrafficStats.getTotalTxBytes();
-        if (rx < 0 || tx < 0) return null;
+        if (rx < 0 || tx < 0 || (rx == 0 && tx == 0)) return null;
         return new long[] { rx, tx };
     }
 
