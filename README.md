@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.2**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.3**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,11 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.2 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.3 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.2-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.2** (versionCode 45). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.3-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.3** (versionCode 46). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 Hold the page title, or the version number on About, for 5 seconds. On a **debug** build that opens Pro and Premium on this phone without a payment token. A release build ignores that switch. Do not publish the debug APK as the public download if that hold should stay private. The words paid, full, and unlocked are still not keys.
 
@@ -86,7 +86,7 @@ Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). A
 
 Plans has one buy button, **Buy Pro · €15**. Premium is described on that page and unlocked by a separate `sku: premium` key. It does not reuse the Pro checkout.
 
-A phone that already has a licence sees a short thank-you. The paste field is only there when the phone is not unlocked.
+Plans always shows the current plan, Upgrade to Premium, Switch to Pro, and Use the free plan. Upgrade to Premium activates a Premium key pasted in the field, or a Premium key already saved in the Premium Enterprise workspace. The €15 button stays the Pro checkout. There is no second checkout button.
 
 Premium is a business key at €15 and up. The app does not sell it through the Pro button. See [PRICES.md](PRICES.md).
 
