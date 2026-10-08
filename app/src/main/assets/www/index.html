@@ -587,6 +587,7 @@ freeKeeps:"Dashboard, Hardware, System, Battery, one console, Setup, Doctor, Com
 proKeeps:"Build recipes, Plan (including a local model), Tweaks, extra console sessions, file write, and Linux PC.",
 buyPro:"Buy Pro · €15",
 twoKeys:"€15 includes two Pro keys: one for you, and one you can give to a friend.",
+downloads:"Downloads",
 premiumCheckout:"Open the same checkout",
 runThePlan:"Run the plan",
 premiumLock:"Premium",
@@ -621,6 +622,7 @@ proKeeps:"Recepti, Plan (vi pokrećete svaki korak), Podešavanja, dodatne sesij
 premiumKeeps:"Pokretanje cijelog plana, raspored poslova i dijeljenje hardvera bez podnožja Meridian.",
 buyPro:"Kupi Pro · €15",
 twoKeys:"€15 uključuje dva Pro ključa: jedan za vas i jedan koji možete dati prijatelju.",
+downloads:"Preuzimanja",
 premiumCheckout:"Otvori istu naplatu",runThePlan:"Pokreni plan",premiumLock:"Premium",
 scheduler:"Raspored",schedulerBlurb:"Odaberite recept i razmak. Meridian napiše naredbu termux-job-scheduler. Vi je pokrenete. Android ne ponavlja posao brže od oko 15 minuta.",
 interval:"Razmak",copyCommand:"Kopiraj naredbu",runScheduler:"Pokreni naredbu rasporeda",checkJobs:"Provjeri čekajuće poslove",lastStatus:"Zadnji status",
@@ -642,6 +644,7 @@ proKeeps:"Build-Rezepte, Plan (du startest jeden Schritt), Anpassungen, extra Si
 premiumKeeps:"Den ganzen Plan ausführen, einen Zeitplan und einen Hardwarebericht ohne Meridian-Fußzeile.",
 buyPro:"Pro kaufen · €15",
 twoKeys:"€15 enthält zwei Pro-Schlüssel: einen für dich und einen für eine Freundin oder einen Freund.",
+downloads:"Downloads",
 premiumCheckout:"Dieselbe Kasse öffnen",runThePlan:"Plan ausführen",premiumLock:"Premium",
 scheduler:"Zeitplan",schedulerBlurb:"Wähle ein Rezept und ein Intervall. Meridian schreibt einen termux-job-scheduler-Befehl. Du startest ihn. Android wiederholt einen Job nicht schneller als etwa 15 Minuten.",
 interval:"Intervall",copyCommand:"Befehl kopieren",runScheduler:"Zeitplan-Befehl ausführen",checkJobs:"Offene Jobs prüfen",lastStatus:"Letzter Status",
@@ -663,6 +666,7 @@ proKeeps:"ビルドレシピ、プラン（手順は自分で実行）、調整�
 premiumKeeps:"プラン全体の実行、スケジューラ、フッターなしのハードウェア共有。",
 buyPro:"Pro を買う · €15",
 twoKeys:"€15 には Pro キーが2つ付きます。1つはあなた用、もう1つは友だちに渡せます。",
+downloads:"ダウンロード",
 premiumCheckout:"同じ決済を開く",runThePlan:"プランを実行",premiumLock:"Premium",
 scheduler:"スケジューラ",schedulerBlurb:"レシピと間隔を選びます。Meridian が termux-job-scheduler のコマンドを書きます。実行するのはあなたです。Android は約15分より短い繰り返しをしません。",
 interval:"間隔",copyCommand:"コマンドをコピー",runScheduler:"スケジューラコマンドを実行",checkJobs:"予約ジョブを確認",lastStatus:"前回の状態",
@@ -684,6 +688,7 @@ proKeeps:"बिल्ड रेसिपी, योजना (हर कदम 
 premiumKeeps:"पूरी योजना चलाना, शेड्यूलर, और बिना Meridian फ़ुटर के हार्डवेयर शेयर।",
 buyPro:"Pro खरीदें · €15",
 twoKeys:"€15 में दो Pro कुंजियाँ हैं: एक आपके लिए, और एक जिसे आप दोस्त को दे सकते हैं।",
+downloads:"डाउनलोड",
 premiumCheckout:"वही चेकआउट खोलें",runThePlan:"योजना चलाएँ",premiumLock:"Premium",
 scheduler:"शेड्यूलर",schedulerBlurb:"रेसिपी और अंतराल चुनें। Meridian termux-job-scheduler कमांड लिखता है। आप चलाते हैं। Android लगभग 15 मिनट से तेज़ दोहराव नहीं करता।",
 interval:"अंतराल",copyCommand:"कमांड कॉपी करें",runScheduler:"शेड्यूलर कमांड चलाएँ",checkJobs:"लंबित जॉब देखें",lastStatus:"पिछली स्थिति",
@@ -705,6 +710,7 @@ proKeeps:"Recetas, Plan (tú ejecutas cada paso), ajustes, sesiones extra, escri
 premiumKeeps:"Ejecutar todo el plan, un programador y un informe de hardware sin el pie de Meridian.",
 buyPro:"Comprar Pro · €15",
 twoKeys:"€15 incluye dos claves Pro: una para ti y otra que puedes dar a un amigo.",
+downloads:"Descargas",
 premiumCheckout:"Abrir el mismo pago",runThePlan:"Ejecutar el plan",premiumLock:"Premium",
 scheduler:"Programador",schedulerBlurb:"Elige una receta y un intervalo. Meridian escribe un comando termux-job-scheduler. Tú lo ejecutas. Android no repite un trabajo antes de unos 15 minutos.",
 interval:"Intervalo",copyCommand:"Copiar comando",runScheduler:"Ejecutar el programador",checkJobs:"Ver trabajos pendientes",lastStatus:"Último estado",
@@ -726,6 +732,7 @@ proKeeps:"Recettes, Plan (vous lancez chaque étape), réglages, sessions en plu
 premiumKeeps:"Lancer tout le plan, un planificateur, et un partage matériel sans le pied Meridian.",
 buyPro:"Acheter Pro · €15",
 twoKeys:"€15 comprend deux clés Pro : une pour vous, et une à offrir à un ami.",
+downloads:"Téléchargements",
 premiumCheckout:"Ouvrir le même paiement",runThePlan:"Lancer le plan",premiumLock:"Premium",
 scheduler:"Planificateur",schedulerBlurb:"Choisissez une recette et un intervalle. Meridian écrit une commande termux-job-scheduler. Vous la lancez. Android ne répète pas un travail plus vite qu’environ 15 minutes.",
 interval:"Intervalle",copyCommand:"Copier la commande",runScheduler:"Lancer la commande",checkJobs:"Voir les tâches en attente",lastStatus:"Dernier état",
@@ -2096,12 +2103,20 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.2.1"; } catch (e) { return "2.2.1"; }
+  try { return String(MeridianPhone.version() || "") || "2.2.2"; } catch (e) { return "2.2.2"; }
+}
+function savedDownloads() {
+  try {
+    const n = localStorage.getItem("m-downloads");
+    if (n && /^\d+$/.test(n)) return n;
+  } catch (e) {}
+  return "";
 }
 function aboutPage() {
   const days = trialDays();
   const state = licensed() ? t("thisPhoneIsPro") : days > 0 ? t("trialLeft") + " " + days + " " + (days === 1 ? "day" : "days") + "." : t("freeVersion");
-  return '<article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
+  const shown = savedDownloads() || "—";
+  return '<article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -2324,7 +2339,31 @@ function render() {
     if (end) end.scrollIntoView({ block: "end" });
   }
   if (focused) { const input = document.getElementById("line"); if (input) input.focus(); }
+  if (document.getElementById("dlcount")) refreshDownloads();
 }
+let dlFlight = false;
+function refreshDownloads() {
+  const node = document.getElementById("dlcount");
+  if (!node || dlFlight) return;
+  const cached = savedDownloads();
+  node.textContent = cached || "—";
+  let at = 0;
+  try { at = Number(localStorage.getItem("m-downloads-at") || 0); } catch (e) { at = 0; }
+  if (cached && Date.now() - at < 3600000) return;
+  dlFlight = true;
+  try { MeridianPhone.loadDownloads(); } catch (e) { dlFlight = false; }
+}
+window.onDownloads = function (n) {
+  dlFlight = false;
+  const s = String(n == null ? "" : n);
+  if (!/^\d+$/.test(s)) return;
+  try {
+    localStorage.setItem("m-downloads", s);
+    localStorage.setItem("m-downloads-at", String(Date.now()));
+  } catch (e) {}
+  const node = document.getElementById("dlcount");
+  if (node) node.textContent = s;
+};
 function gate(name) {
   if (paid()) return false;
   if (PRO[name]) {

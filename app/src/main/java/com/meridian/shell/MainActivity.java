@@ -134,6 +134,70 @@ public class MainActivity extends Activity {
         return sb.toString();
     }
 
+    /**
+     * Sum of download_count on .apk assets from the public GitHub releases list.
+     * The request is only that URL. It does not send a licence, a key, or the device model.
+     */
+    private String apkDownloadTotal() {
+        String next = "https://api.github.com/repos/kukirin-ui/Meridian/releases?per_page=100";
+        long total = 0;
+        for (int page = 0; page < 5 && next != null; page++) {
+            if (!releasesUrl(next)) return null;
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) new URL(next).openConnection();
+                conn.setInstanceFollowRedirects(false);
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("User-Agent", "Meridian");
+                conn.setRequestProperty("Accept", "application/vnd.github+json");
+                if (conn.getResponseCode() != 200) return null;
+                JSONArray releases = new JSONArray(readCap(conn.getInputStream(), 1000000));
+                for (int i = 0; i < releases.length(); i++) {
+                    JSONObject rel = releases.optJSONObject(i);
+                    if (rel == null) continue;
+                    JSONArray assets = rel.optJSONArray("assets");
+                    if (assets == null) continue;
+                    for (int j = 0; j < assets.length(); j++) {
+                        JSONObject asset = assets.optJSONObject(j);
+                        if (asset == null) continue;
+                        String name = asset.optString("name", "");
+                        if (name.toLowerCase(Locale.US).endsWith(".apk")) total += asset.optLong("download_count", 0);
+                    }
+                }
+                next = nextReleasePage(conn.getHeaderField("Link"));
+            } catch (Exception ex) {
+                return null;
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+        }
+        return String.valueOf(total);
+    }
+
+    private boolean releasesUrl(String url) {
+        if (url == null || !url.startsWith("https://api.github.com/")) return false;
+        if (url.indexOf('@') >= 0 || url.indexOf(' ') >= 0 || url.indexOf('\\') >= 0) return false;
+        if (url.startsWith("https://api.github.com/repos/kukirin-ui/Meridian/releases")) return true;
+        return url.startsWith("https://api.github.com/repositories/") && url.indexOf("/releases") >= 0;
+    }
+
+    private String nextReleasePage(String link) {
+        if (link == null) return null;
+        String[] parts = link.split(",");
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i].trim();
+            if (part.indexOf("rel=\"next\"") < 0) continue;
+            int a = part.indexOf('<');
+            int b = part.indexOf('>');
+            if (a < 0 || b <= a) return null;
+            String url = part.substring(a + 1, b);
+            return releasesUrl(url) ? url : null;
+        }
+        return null;
+    }
+
     private String netErr(Exception ex) {
         String msg = ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage();
         return "{\"ok\":false,\"error\":" + JSONObject.quote(msg) + "}";
@@ -1196,6 +1260,23 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 return 0;
             }
+        }
+
+        /** Public GitHub .apk download total. Calls back with a number, or "" when the request fails. */
+        @JavascriptInterface
+        public void loadDownloads() {
+            new Thread(new Runnable() {
+                public void run() {
+                    final String n = apkDownloadTotal();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            if (web == null) return;
+                            String arg = n == null ? "\"\"" : JSONObject.quote(n);
+                            web.evaluateJavascript("window.onDownloads && window.onDownloads(" + arg + ")", null);
+                        }
+                    });
+                }
+            }).start();
         }
 
         @JavascriptInterface

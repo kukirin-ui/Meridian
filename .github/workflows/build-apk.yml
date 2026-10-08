@@ -23,9 +23,9 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload Meridian-2.2.1-debug.apk
+      - name: Upload Meridian-2.2.2-debug.apk
         uses: actions/upload-artifact@v4
         with:
-          name: Meridian-2.2.1-debug
+          name: Meridian-2.2.2-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
