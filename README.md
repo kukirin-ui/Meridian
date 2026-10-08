@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.2.2**.
+A dashboard for an Android phone, bonded to Termux. Version **2.2.3**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,19 +26,19 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.2.2 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.2.3 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
-2. Open the latest green run for this branch (`cursor/meridian-2-2-logo-premium-ce79`).
-3. Download the artifact **Meridian-2.2.2-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.2.2** (versionCode 42). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+2. Open the latest green run for this branch (`cursor/meridian-logo-sync-ce79`).
+3. Download the artifact **Meridian-2.2.3-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.2.3** (versionCode 43). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 ### Language, carrier, Linux PC, terminal mark
 
 - **Language:** Settings → Language only. English, Hrvatski, Deutsch, 日本語, हिन्दी, Español, Français. Stored as `m-lang`. Recipes stay in English (they are shell). About does not have a language picker.
-- **Settings:** the gear in the top bar is the only way in. Dashboard and About do not add another Settings button.
+- **Settings:** the gear in the top bar, and one **Settings** button on the Dashboard. About and Termux do not add another.
 - **Carrier:** on the dashboard, next to **Test network speed**. Wi‑Fi or the SIM operator when Android already allows it. Shows **—** if unknown. No extra dangerous permissions.
-- **Window mark:** one logo in the window header on every page. It does not spin or change when you change pages. A tap can press it or go home; the glyph stays the same.
-- **Dashboard orb:** a terminal prompt (`>_`) with a caret. Settings → Motion **On** blinks the caret. Motion **Off** freezes it. It is not a globe.
+- **Window mark:** the same animated window logo (rounded square, spinning ring, caret) in the window header on every page, including the small mark beside the title. A tap goes home. The glyph does not change shape.
+- **Dashboard mark:** a rounded terminal window with a prompt (`>_`) and a caret, not a circle. Settings → Motion **On** blinks the caret. Motion **Off** freezes it.
 - **Linux PC:** Termux shelf → **Linux PC**, or Build → **Linux PC** pack. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
 
 You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.

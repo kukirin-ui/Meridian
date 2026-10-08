@@ -101,9 +101,10 @@
   .osx.mini { width: 16px; height: 16px; margin: 0; border-radius: 5px; flex: none; box-shadow: none; }
   .osx.mini b { inset: 2px; animation: none; }
   .osx.mini b::after { width: 1px; height: 8px; animation: none; }
-  .osx.bar { width: 28px; height: 28px; min-height: 28px; margin: 0; padding: 0; border: 0; border-radius: 8px; z-index: 1; flex: none; }
-  .osx.bar b { inset: 5px; animation: none !important; }
-  .osx.bar b::after { height: 10px; animation: none !important; }
+  .osx.bar { width: 28px; height: 28px; min-height: 28px; margin: 0; padding: 0; border: 0; border-radius: 8px; z-index: 1; flex: none; appearance: none; -webkit-appearance: none; background: linear-gradient(145deg, var(--bg-light), var(--bg-dark)); }
+  .osx.bar b { inset: 5px; }
+  .osx.bar b::after { animation: osx-pulse-bar var(--pulse-speed) ease-in-out infinite; }
+  @keyframes osx-pulse-bar { 0%, 100% { opacity: 1; height: 10px; } 50% { opacity: 0.4; height: 6px; } }
   .osxtile { display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .healthrow { display: flex; justify-content: center; }
   .healthrow .tile { width: 168px; }
@@ -141,26 +142,23 @@
   .corebars b { margin-top: 3px; font-size: 9px; font-weight: 650; line-height: 1; color: var(--muted); }
   .system-core { position: relative; }
   .stage { width: 190px; height: 190px; margin: 0 auto; perspective: 900px; display: block; }
-  .stage.compact { width: 96px; height: 96px; margin: 0; flex: none; }
-  .termorb {
-    width: 100%; height: 100%; border-radius: 50%; position: relative;
-    display: flex; align-items: center; justify-content: center; gap: 3px;
-    color: var(--accent);
+  .stage.compact { width: 112px; height: 68px; margin: 0; flex: none; }
+  .termwin {
+    width: 100%; height: 100%; border-radius: 12px; position: relative;
+    display: flex; align-items: flex-end; justify-content: flex-start; gap: 4px;
+    padding: 18px 10px 8px; color: var(--accent);
     background:
-      radial-gradient(circle at 32% 26%, rgba(255,255,255,.42), transparent 18%),
-      radial-gradient(circle at 48% 46%, #3a3228 0%, #1a1612 46%, #070605 100%);
-    box-shadow:
-      inset -14px -16px 22px rgba(0,0,0,.78),
-      inset 6px 5px 10px rgba(255,255,255,.12),
-      0 0 0 1px var(--accent-border),
-      0 0 28px var(--accent-glow);
-    font: 700 28px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    letter-spacing: -0.04em;
+      linear-gradient(#3a3228, #3a3228) 0 0 / 100% 16px no-repeat,
+      linear-gradient(180deg, #1c1814 16px, #0c0a08 100%);
+    box-shadow: inset 0 0 0 1px var(--accent-border), 0 8px 16px rgba(0,0,0,.35);
+    font: 700 16px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: -0.03em;
   }
-  .stage.compact .termorb { font-size: 20px; gap: 2px; }
-  .termorb-prompt { text-shadow: 0 0 12px var(--accent-glow); }
-  .termorb-caret {
-    width: 2px; height: 0.85em; border-radius: 1px; background: var(--accent);
+  .termwin-dots { position: absolute; top: 5px; left: 8px; display: flex; gap: 3px; }
+  .termwin-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .8; display: block; }
+  .termwin-prompt { text-shadow: 0 0 10px var(--accent-glow); }
+  .termwin-caret {
+    width: 2px; height: 0.9em; border-radius: 1px; background: var(--accent);
     box-shadow: 0 0 8px var(--accent);
     animation: blink 1.1s steps(1) infinite;
   }
@@ -397,7 +395,7 @@
   html[data-motion="reduce"] *,
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
-  html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
+  html[data-motion="full"] .termwin-caret { animation: blink 1.1s steps(1) infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
   html[data-motion="full"] .marklogo,
@@ -409,7 +407,7 @@
 </head>
 <body>
 <header>
-  <div id="headmark" aria-hidden="true"></div>
+  <div id="headmark" aria-hidden="true"><div class="osx mini"><b></b></div></div>
   <h1>Meridian</h1>
   <p id="bondline" role="status">Not connected</p>
   <b id="clock" aria-hidden="true"></b>
@@ -587,6 +585,7 @@ freeKeeps:"Dashboard, Hardware, System, Battery, one console, Setup, Doctor, Com
 proKeeps:"Build recipes, Plan (including a local model), Tweaks, extra console sessions, file write, and Linux PC.",
 buyPro:"Buy Pro · €15",
 twoKeys:"€15 includes two Pro keys: one for you, and one you can give to a friend.",
+updatesOnce:"Future updates are included. You pay only once.",
 downloads:"Downloads",
 premiumCheckout:"Open the same checkout",
 runThePlan:"Run the plan",
@@ -622,6 +621,7 @@ proKeeps:"Recepti, Plan (vi pokrećete svaki korak), Podešavanja, dodatne sesij
 premiumKeeps:"Pokretanje cijelog plana, raspored poslova i dijeljenje hardvera bez podnožja Meridian.",
 buyPro:"Kupi Pro · €15",
 twoKeys:"€15 uključuje dva Pro ključa: jedan za vas i jedan koji možete dati prijatelju.",
+updatesOnce:"Buduća ažuriranja su uključena. Plaćate samo jednom.",
 downloads:"Preuzimanja",
 premiumCheckout:"Otvori istu naplatu",runThePlan:"Pokreni plan",premiumLock:"Premium",
 scheduler:"Raspored",schedulerBlurb:"Odaberite recept i razmak. Meridian napiše naredbu termux-job-scheduler. Vi je pokrenete. Android ne ponavlja posao brže od oko 15 minuta.",
@@ -644,6 +644,7 @@ proKeeps:"Build-Rezepte, Plan (du startest jeden Schritt), Anpassungen, extra Si
 premiumKeeps:"Den ganzen Plan ausführen, einen Zeitplan und einen Hardwarebericht ohne Meridian-Fußzeile.",
 buyPro:"Pro kaufen · €15",
 twoKeys:"€15 enthält zwei Pro-Schlüssel: einen für dich und einen für eine Freundin oder einen Freund.",
+updatesOnce:"Künftige Updates sind enthalten. Du zahlst nur einmal.",
 downloads:"Downloads",
 premiumCheckout:"Dieselbe Kasse öffnen",runThePlan:"Plan ausführen",premiumLock:"Premium",
 scheduler:"Zeitplan",schedulerBlurb:"Wähle ein Rezept und ein Intervall. Meridian schreibt einen termux-job-scheduler-Befehl. Du startest ihn. Android wiederholt einen Job nicht schneller als etwa 15 Minuten.",
@@ -666,6 +667,7 @@ proKeeps:"ビルドレシピ、プラン（手順は自分で実行）、調整�
 premiumKeeps:"プラン全体の実行、スケジューラ、フッターなしのハードウェア共有。",
 buyPro:"Pro を買う · €15",
 twoKeys:"€15 には Pro キーが2つ付きます。1つはあなた用、もう1つは友だちに渡せます。",
+updatesOnce:"今後の更新は含まれます。支払いは一度だけです。",
 downloads:"ダウンロード",
 premiumCheckout:"同じ決済を開く",runThePlan:"プランを実行",premiumLock:"Premium",
 scheduler:"スケジューラ",schedulerBlurb:"レシピと間隔を選びます。Meridian が termux-job-scheduler のコマンドを書きます。実行するのはあなたです。Android は約15分より短い繰り返しをしません。",
@@ -688,6 +690,7 @@ proKeeps:"बिल्ड रेसिपी, योजना (हर कदम 
 premiumKeeps:"पूरी योजना चलाना, शेड्यूलर, और बिना Meridian फ़ुटर के हार्डवेयर शेयर।",
 buyPro:"Pro खरीदें · €15",
 twoKeys:"€15 में दो Pro कुंजियाँ हैं: एक आपके लिए, और एक जिसे आप दोस्त को दे सकते हैं।",
+updatesOnce:"आगे के अपडेट शामिल हैं। भुगतान केवल एक बार है।",
 downloads:"डाउनलोड",
 premiumCheckout:"वही चेकआउट खोलें",runThePlan:"योजना चलाएँ",premiumLock:"Premium",
 scheduler:"शेड्यूलर",schedulerBlurb:"रेसिपी और अंतराल चुनें। Meridian termux-job-scheduler कमांड लिखता है। आप चलाते हैं। Android लगभग 15 मिनट से तेज़ दोहराव नहीं करता।",
@@ -710,6 +713,7 @@ proKeeps:"Recetas, Plan (tú ejecutas cada paso), ajustes, sesiones extra, escri
 premiumKeeps:"Ejecutar todo el plan, un programador y un informe de hardware sin el pie de Meridian.",
 buyPro:"Comprar Pro · €15",
 twoKeys:"€15 incluye dos claves Pro: una para ti y otra que puedes dar a un amigo.",
+updatesOnce:"Las actualizaciones futuras están incluidas. Pagas solo una vez.",
 downloads:"Descargas",
 premiumCheckout:"Abrir el mismo pago",runThePlan:"Ejecutar el plan",premiumLock:"Premium",
 scheduler:"Programador",schedulerBlurb:"Elige una receta y un intervalo. Meridian escribe un comando termux-job-scheduler. Tú lo ejecutas. Android no repite un trabajo antes de unos 15 minutos.",
@@ -732,6 +736,7 @@ proKeeps:"Recettes, Plan (vous lancez chaque étape), réglages, sessions en plu
 premiumKeeps:"Lancer tout le plan, un planificateur, et un partage matériel sans le pied Meridian.",
 buyPro:"Acheter Pro · €15",
 twoKeys:"€15 comprend deux clés Pro : une pour vous, et une à offrir à un ami.",
+updatesOnce:"Les mises à jour à venir sont incluses. Vous ne payez qu’une fois.",
 downloads:"Téléchargements",
 premiumCheckout:"Ouvrir le même paiement",runThePlan:"Lancer le plan",premiumLock:"Premium",
 scheduler:"Planificateur",schedulerBlurb:"Choisissez une recette et un intervalle. Meridian écrit une commande termux-job-scheduler. Vous la lancez. Android ne répète pas un travail plus vite qu’environ 15 minutes.",
@@ -1042,9 +1047,8 @@ function gaugeHtml(id, pct, label) {
   const p = shown === "—" ? 0 : n;
   return '<div><div class="gauge" data-g="' + id + '" style="--p:' + p + '"><b>' + esc(shown) + '</b></div><span>' + esc(label) + '</span></div>';
 }
-const LOGO_SVG = '<svg class="marklogo" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#14110e" stroke="currentColor" stroke-width="1.15"/><path d="M14 6.2v4.4" fill="none" stroke="#f4efe6" stroke-width="2.05" stroke-linecap="round"/><path d="M9.7 10.1a6.35 6.35 0 1 0 8.6 0" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/></svg>';
 function termOrbHtml() {
-  return '<div class="termorb" aria-hidden="true"><span class="termorb-prompt">&gt;_</span><i class="termorb-caret"></i></div>';
+  return '<div class="termwin" aria-hidden="true"><span class="termwin-dots"><i></i><i></i><i></i></span><span class="termwin-prompt">&gt;_</span><i class="termwin-caret"></i></div>';
 }
 let netNameCache = { name: "—", at: 0 };
 function carrierLabel() {
@@ -1139,12 +1143,16 @@ function homePage() {
   else html += '<div class="linkline">' + esc(t("connectedTermux")) + '</div>';
   const freeGb = gb(p.memFree);
   html += '<article class="hero">';
-  const brand = String(p.brand || s.brand || "").trim();
-  const product = String(s.product || "").trim();
-  const heroTitle = brand || product || t("thisPhone");
-  const heroDetail = [product && product !== heroTitle ? product : "", p.soc || s.chip, s.release ? "Android " + s.release : ""].filter(Boolean).join(" · ") || t("hardwareFromDevice");
+  const brand = String(p.brand || s.brand || "").trim().toLowerCase();
+  const shown = String(s.model || "").trim();
+  const model = String(s.product || "").trim();
+  let heroTitle = shown;
+  if (!heroTitle || heroTitle.toLowerCase() === brand) heroTitle = model;
+  if (heroTitle && brand && heroTitle.toLowerCase() === brand) heroTitle = "";
+  const chip = String(p.soc || s.chip || "").trim();
+  const heroDetail = [chip, s.release ? "Android " + s.release : ""].filter(Boolean).join(" · ");
   html += '<div class="herotop"><div class="stage compact" aria-hidden="true">' + termOrbHtml() + '</div>';
-  html += '<div class="herocopy"><p class="k">' + esc(t("thisPhone")) + '</p><h2>' + esc(heroTitle) + '</h2>';
+  html += '<div class="herocopy"><h2>' + esc(heroTitle) + '</h2>';
   html += '<p class="muted">' + esc(heroDetail) + '</p>';
   html += '<div class="healthpill' + (bad ? " bad" : "") + '" id="healthtext">' + (bad ? t("systemStrained") : t("systemOptimal")) + '</div></div></div>';
   html += '<div class="gaugerow">';
@@ -1164,9 +1172,9 @@ function homePage() {
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
-  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button><button class="ghost" type="button" data-more="about">' + esc(t("about")) + '</button></div><p class="muted" id="ramout"></p>';
+  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button><button class="ghost" type="button" data-go="settings">' + esc(t("settings")) + '</button><button class="ghost" type="button" data-more="about">' + esc(t("about")) + '</button></div><p class="muted" id="ramout"></p>';
   html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg></article>';
-  html += '<div class="healthrow"><article class="tile osxtile"><div class="logo-mark lg" id="healthlogo" aria-hidden="true">' + LOGO_SVG + '</div><div class="status-text">' + (bad ? t("heatOrRam") : t("quietCool")) + '</div></article></div>';
+  html += '<div class="healthrow"><article class="tile osxtile"><div class="osx' + (bad ? " bad" : "") + '" id="healthlogo" aria-hidden="true"><b></b></div><div class="status-text">' + (bad ? t("heatOrRam") : t("quietCool")) + '</div></article></div>';
   html += '<article class="plate">';
   html += '<div class="kv"><span>' + esc(t("battery")) + '</span><b data-k="Battery">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b></div>';
   html += '<div class="kv"><span>' + esc(t("storage")) + '</span><b data-k="Storage">' + esc(diskPct) + '</b></div>';
@@ -1248,10 +1256,8 @@ function paintMeters() {
   setCard("SensRAM", gb(p.memFree), gb(p.memRaw) + " unused · " + gb(p.memCached) + " cached");
   setCard("SensSwap", v.total ? gb(v.total) : "—", v.total ? gb(v.free) + " free" : "No RAM Plus");
   const mark = document.getElementById("healthlogo");
-  const head = document.getElementById("headmark");
   const bad = sick(p, s);
-  if (mark) mark.className = "logo-mark lg" + (bad ? " bad" : "");
-  if (head && !head.querySelector("svg")) head.innerHTML = LOGO_SVG;
+  if (mark) mark.className = bad ? "osx bad" : "osx";
   const healthText = document.getElementById("healthtext");
   if (healthText) {
     healthText.textContent = bad ? t("systemStrained") : t("systemOptimal");
@@ -1826,7 +1832,7 @@ function askHint(text) {
 }
 function planPage() {
   const chips = ["Python", "Local model", "GPU compute", "Format", "Remote shell", "Fastfetch"];
-  let html = '<div class="stack"><article class="plate planhead"><div class="logo-mark md">' + LOGO_SVG + '</div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p></div></article>';
+  let html = '<div class="stack"><article class="plate planhead"><div class="osx"><b></b></div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p></div></article>';
   html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
   html += '</div><textarea id="goal" rows="3" placeholder="What is a star?  or  Install Python"></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
@@ -2103,7 +2109,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.2.2"; } catch (e) { return "2.2.2"; }
+  try { return String(MeridianPhone.version() || "") || "2.2.3"; } catch (e) { return "2.2.3"; }
 }
 function savedDownloads() {
   try {
@@ -2116,7 +2122,7 @@ function aboutPage() {
   const days = trialDays();
   const state = licensed() ? t("thisPhoneIsPro") : days > 0 ? t("trialLeft") + " " + days + " " + (days === 1 ? "day" : "days") + "." : t("freeVersion");
   const shown = savedDownloads() || "—";
-  return '<article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
+  return '<article class="plate stack about"><div class="osx"><b></b></div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -2228,7 +2234,6 @@ let tierAt = 0;
 let tierCache = "free";
 let licMsg = "";
 let licDraft = "";
-let logoPressed = false;
 function licensed() {
   const now = Date.now();
   if (now - paidAt < 2000) return paidCache;
@@ -2279,7 +2284,7 @@ function payPage() {
   let proExtra = "";
   if (days > 0) proExtra += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
   else proExtra += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
-  proExtra += '<button class="btn pay" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("twoKeys")) + '</p><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
+  proExtra += '<button class="btn pay" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("updatesOnce")) + '</p><p class="muted">' + esc(t("twoKeys")) + '</p><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
   html += priceCard(t("tierPro"), t("tierPro"), t("pricePro"), t("proKeeps"), proExtra);
   const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
   html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote()) + '</p></article>';
@@ -2302,9 +2307,7 @@ function render() {
     const d = trialDays();
     trial = '<p class="trialline">' + esc(tN("trialLine", d)) + '<button type="button" data-go="pay">' + esc(t("getFull")) + '</button></p>';
   }
-  main.innerHTML = '<section class="win"><div class="wintop"><button class="logo-slot' + (logoPressed ? " pressed" : "") + '" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '">' + LOGO_SVG + '</button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + about + '</div></div></section>';
-  const headmark = document.getElementById("headmark");
-  if (headmark) headmark.innerHTML = LOGO_SVG;
+  main.innerHTML = '<section class="win"><div class="wintop"><button class="osx bar" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '"><b></b></button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + about + '</div></div></section>';
   document.body.className = view === "console" ? "term" : "";
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
@@ -2659,12 +2662,9 @@ function bind() {
   };
   const winlogo = document.getElementById("winlogo");
   if (winlogo) winlogo.onclick = function () {
-    logoPressed = !logoPressed;
     if (view !== "home" || more !== "menu" || openCmd !== "" || editing) {
       goNav({ view: "home", more: "menu", openCmd: "", editing: false });
-      return;
     }
-    winlogo.classList.toggle("pressed", logoPressed);
   };
   document.querySelectorAll("[data-shelf]").forEach(function (b) {
     b.onclick = function () { goNav({ openCmd: b.getAttribute("data-shelf") }); };
