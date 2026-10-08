@@ -32,4 +32,4 @@ verifier.update(payload);
 const ok = verifier.verify({ key: pub, dsaEncoding: "der" }, sig);
 const claims = JSON.parse(payload.toString("utf8"));
 console.log(JSON.stringify({ ok, claims }, null, 2));
-process.exit(ok && claims.sku === "pro" ? 0 : 3);
+process.exit(ok && (claims.sku === "pro" || claims.sku === "premium") ? 0 : 3);
