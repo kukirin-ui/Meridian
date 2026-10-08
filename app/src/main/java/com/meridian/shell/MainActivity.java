@@ -1021,20 +1021,10 @@ public class MainActivity extends Activity {
             });
         }
 
-        /**
-         * Debug builds only. Writes files/dev.unlock so this handset can open Pro and Premium
-         * without a payment token. Release builds ignore that file. It does not accept the words
-         * paid, full, or unlocked, and it does not write files/full.key.
-         */
+        /** Licence keys are the only unlock. This bridge does not grant a plan. */
         @JavascriptInterface
         public String devUnlock() {
-            if (!debuggable()) return "no";
-            try {
-                writeText(new File(getFilesDir(), "dev.unlock"), "premium");
-                return "yes";
-            } catch (Exception ex) {
-                return "no";
-            }
+            return "no";
         }
 
         @JavascriptInterface
