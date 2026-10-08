@@ -10,10 +10,14 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.TrafficStats;
 import android.net.Uri;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.telephony.TelephonyManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -29,13 +33,23 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.Locale;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
     static final boolean OPEN = false;
@@ -578,7 +592,7 @@ public class MainActivity extends Activity {
                 String shown = props.optString("shown", "");
                 if (shown.length() < 2) shown = model;
                 if (shown.length() == 0) shown = "This phone";
-                String brand = props.optString("brand", "");
+                String brand = present(props.optString("brand", ""));
                 o.put("model", shown);
                 // Build.MODEL and brand stay language-neutral. shown/marketname can be a
                 // locale string from the ROM (for example a Croatian marketing name).
@@ -594,9 +608,11 @@ public class MainActivity extends Activity {
                 int pct = bm == null ? -1 : bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
                 o.put("battery", pct);
                 Intent bat = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-                int temp = bat == null ? 0 : bat.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0);
+                boolean tempKnown = bat != null && bat.hasExtra(BatteryManager.EXTRA_TEMPERATURE);
+                int temp = tempKnown ? bat.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) : 0;
                 int volt = bat == null ? 0 : bat.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
-                o.put("temp", temp / 10.0);
+                o.put("tempKnown", tempKnown && temp > 0);
+                o.put("temp", tempKnown ? temp / 10.0 : 0);
                 o.put("voltage", volt / 1000.0);
                 int state = bat == null ? -1 : bat.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
                 String stateName = "Battery";
@@ -670,7 +686,7 @@ public class MainActivity extends Activity {
                 o.put("netClosed", netClosed);
                 o.put("kernel", readLine("/proc/version"));
                 o.put("cpuinfo", cpuName());
-                String[] keys = new String[] { "brand", "device", "board", "maker", "hardware", "soc", "egl", "vulkan", "renderer", "glVersion", "glVendor", "platform", "abi", "sdk", "patch", "buildId", "built", "oneui", "fingerprint", "gpu", "ramType" };
+                String[] keys = new String[] { "brand", "device", "board", "maker", "hardware", "soc", "egl", "vulkan", "renderer", "glVersion", "glVendor", "platform", "abi", "sdk", "patch", "buildId", "built", "oneui", "fingerprint", "gpu", "ramType", "ufs" };
                 for (String key : keys) o.put(key, props.optString(key, ""));
                 cachedProbe = o.toString();
                 probeAt = now;
@@ -744,6 +760,77 @@ public class MainActivity extends Activity {
                 return "settings";
             } catch (Exception ignored) {}
             return "none";
+        }
+
+        /** Opens the system Settings app, or Developer options when `which` is "developer". */
+        @JavascriptInterface
+        public void openDeviceSettings(String which) {
+            final String action = "developer".equals(which)
+                ? Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS
+                : Settings.ACTION_SETTINGS;
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        Intent intent = new Intent(action);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (Exception ex) {
+                        try {
+                            Intent fallback = new Intent(Settings.ACTION_SETTINGS);
+                            fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(fallback);
+                        } catch (Exception ignored) {}
+                    }
+                }
+            });
+        }
+
+        /** This phone's own link, DNS, and listening sockets. No remote probe and no packet capture. */
+        @JavascriptInterface
+        public String networkPosture() {
+            JSONObject o = new JSONObject();
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                Network net = cm == null ? null : cm.getActiveNetwork();
+                NetworkCapabilities caps = (cm == null || net == null) ? null : cm.getNetworkCapabilities(net);
+                if (caps != null) {
+                    o.put("vpn", caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN));
+                    o.put("wifi", caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI));
+                    o.put("cell", caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR));
+                    int down = caps.getLinkDownstreamBandwidthKbps();
+                    int up = caps.getLinkUpstreamBandwidthKbps();
+                    if (down > 0) o.put("downKbps", down);
+                    if (up > 0) o.put("upKbps", up);
+                }
+                LinkProperties lp = (cm == null || net == null) ? null : cm.getLinkProperties(net);
+                if (lp != null) {
+                    String iface = lp.getInterfaceName();
+                    if (iface != null && iface.length() > 0) o.put("iface", iface);
+                    JSONArray dns = new JSONArray();
+                    for (InetAddress address : lp.getDnsServers()) {
+                        String host = address.getHostAddress();
+                        if (host != null && host.length() > 0) dns.put(host);
+                    }
+                    o.put("dns", dns);
+                    JSONArray addrs = new JSONArray();
+                    for (LinkAddress link : lp.getLinkAddresses()) addrs.put(String.valueOf(link));
+                    o.put("addrs", addrs);
+                }
+                o.put("listeners", localListeners());
+            } catch (Exception ex) {
+                try { o.put("error", "posture"); } catch (Exception ignored) {}
+            }
+            return o.toString();
+        }
+
+        @JavascriptInterface
+        public String loadPlatforms() {
+            return readPlatforms();
+        }
+
+        @JavascriptInterface
+        public String savePlatforms(String json) {
+            return writePlatforms(json);
         }
 
         @JavascriptInterface
@@ -2057,18 +2144,19 @@ public class MainActivity extends Activity {
         o.put("device", prop("ro.product.device"));
         o.put("board", prop("ro.product.board"));
         o.put("maker", prop("ro.product.manufacturer"));
-        String gpu = prop("ro.hardware.vulkan");
-        o.put("vulkan", gpu);
-        String egl = prop("ro.hardware.egl");
-        o.put("egl", egl);
         String[] gl = glStrings();
-        o.put("renderer", gl[0]);
-        o.put("glVersion", gl[1]);
-        o.put("glVendor", gl[2]);
-        if (gl[0].length() > 3 && !gl[0].equalsIgnoreCase("samsung") && !gl[0].equalsIgnoreCase(egl)) gpu = gl[0];
-        else if (gpu.length() == 0) gpu = egl;
-        if (gpu.length() == 0) gpu = prop("ro.hardware");
-        o.put("gpu", gpu);
+        String renderer = gl[0] == null ? "" : gl[0].trim();
+        String glVersion = gl[1] == null ? "" : gl[1].trim();
+        String glVendor = gpuVendor(gl[2], renderer);
+        String gpu = marketingGpu(renderer);
+        if (gpu.length() == 0 && !oemOnly(renderer)) gpu = renderer;
+        String egl = glEsVersion();
+        o.put("renderer", renderer);
+        o.put("glVersion", glVersion);
+        o.put("glVendor", glVendor);
+        o.put("egl", egl);
+        o.put("vulkan", gpu);
+        o.put("gpu", gpu.length() > 0 ? gpu : renderer);
         o.put("shown", shownName());
         o.put("platform", prop("ro.board.platform"));
         o.put("abi", prop("ro.product.cpu.abi"));
@@ -2078,7 +2166,10 @@ public class MainActivity extends Activity {
         o.put("built", prop("ro.build.date"));
         o.put("oneui", oneUi(prop("ro.build.version.oneui")));
         o.put("fingerprint", prop("ro.build.fingerprint"));
+        o.put("brand", present(o.optString("brand", "")));
+        o.put("maker", present(o.optString("maker", "")));
         o.put("ramType", ramKind());
+        o.put("ufs", ufsVersion());
         cachedProps = o;
         return o;
     }
@@ -2113,15 +2204,343 @@ public class MainActivity extends Activity {
             "/sys/devices/platform/ddr_type"
         };
         for (int i = 0; i < files.length; i++) {
-            String value = readLine(files[i]).trim();
-            if (value.length() > 0) return value;
+            String named = normalizeRam(readLine(files[i]));
+            if (named.length() > 0) return named;
         }
         String[] keys = new String[] { "ro.boot.ddr_type", "ro.boot.hardware.ddr", "ro.vendor.ddr_type" };
         for (int i = 0; i < keys.length; i++) {
-            String value = prop(keys[i]).trim();
-            if (value.length() > 1) return value;
+            String named = normalizeRam(prop(keys[i]));
+            if (named.length() > 0) return named;
+        }
+        return ramFromSoc();
+    }
+
+    /** Module type is not a public Android API. Known SoCs map to the memory they ship with. */
+    private String ramFromSoc() {
+        String blob = socBlob();
+        if (containsAny(blob, "s5e9965", "exynos2600", "exynos 2600", "sm-s942", "m1s",
+                "s5e9955", "exynos2500", "exynos 2500", "sm-s938", "sm-s931",
+                "s5e9945", "exynos2400", "exynos 2400", "sm-s921", "sm-s926", "sm-s928",
+                "sm8650", "sm8750", "sm8735", "sm8635", "mt6989", "mt6991",
+                "dimensity 9300", "dimensity 9400", "tensor g4", "tensor g5", "zuma")) return "LPDDR5X";
+        if (containsAny(blob, "sm8550", "sm8475", "sm8450", "s5e9925", "exynos2200", "exynos 2200", "tensor g3")) return "LPDDR5X";
+        if (containsAny(blob, "sm7325", "sm6375", "sm6225", "mt6769", "mt6765", "helio g85", "helio g80", "helio g99")) return "LPDDR4X";
+        return "";
+    }
+
+    private String ufsVersion() {
+        String measured = ufsFromSys();
+        if (measured.length() > 0) return measured;
+        String blob = socBlob();
+        if (containsAny(blob, "s5e9965", "exynos2600", "exynos 2600", "sm-s942", "m1s", "sm8750", "sm8735")) return "UFS 4.1 class";
+        if (containsAny(blob, "s5e9955", "exynos2500", "exynos 2500", "s5e9945", "exynos2400", "exynos 2400", "sm8650", "sm8550")) return "UFS 4.0 class";
+        if (containsAny(blob, "sm8450", "sm7325", "exynos2200", "exynos 2200")) return "UFS 3.1 class";
+        return "";
+    }
+
+    private String socBlob() {
+        String model = Build.MODEL == null ? "" : Build.MODEL;
+        String device = Build.DEVICE == null ? "" : Build.DEVICE;
+        return (prop("ro.soc.model") + " " + prop("ro.hardware") + " " + prop("ro.product.board") + " "
+            + prop("ro.board.platform") + " " + model + " " + device + " " + prop("ro.product.device")).toLowerCase(Locale.US);
+    }
+
+    private static boolean containsAny(String blob, String... needles) {
+        for (int i = 0; i < needles.length; i++) if (blob.contains(needles[i])) return true;
+        return false;
+    }
+
+    private String ufsFromSys() {
+        String[] direct = new String[] {
+            "/sys/block/sda/device/spec_version",
+            "/sys/block/sda/device/rev",
+            "/sys/class/scsi_host/host0/ufs_version",
+            "/sys/devices/platform/soc/1d84000.ufshc/ufs_version",
+            "/sys/devices/platform/112b0000.ufshc/ufs_version",
+            "/sys/devices/platform/soc/1d84000.ufshc/device_descriptor/specification_version"
+        };
+        for (int i = 0; i < direct.length; i++) {
+            String hit = parseUfs(readLine(direct[i]));
+            if (hit.length() > 0) return hit;
+        }
+        File plat = new File("/sys/devices/platform");
+        File[] kids = plat.listFiles();
+        if (kids == null) return "";
+        int seen = 0;
+        for (int i = 0; i < kids.length && seen < 48; i++) {
+            seen++;
+            String hit = ufsIn(kids[i]);
+            if (hit.length() > 0) return hit;
+            File[] grand = kids[i].listFiles();
+            if (grand == null) continue;
+            for (int j = 0; j < grand.length && j < 24; j++) {
+                hit = ufsIn(grand[j]);
+                if (hit.length() > 0) return hit;
+            }
         }
         return "";
+    }
+
+    private static String ufsIn(File dir) {
+        if (dir == null || !dir.getName().toLowerCase(Locale.US).contains("ufs")) return "";
+        String hit = parseUfs(readLine(new File(dir, "ufs_version").getPath()));
+        if (hit.length() > 0) return hit;
+        return parseUfs(readLine(new File(dir, "device_descriptor/specification_version").getPath()));
+    }
+
+    private static String parseUfs(String raw) {
+        if (raw == null) return "";
+        String v = raw.trim().toLowerCase(Locale.US).replace("ufs", "").trim();
+        if (v.length() == 0 || v.equals("0")) return "";
+        if (v.startsWith("4.2") || v.equals("420") || v.equals("0420")) return "UFS 4.2";
+        if (v.startsWith("4.1") || v.equals("410") || v.equals("0410")) return "UFS 4.1";
+        if (v.startsWith("4.0") || v.equals("400") || v.equals("0400")) return "UFS 4.0";
+        if (v.startsWith("3.1") || v.equals("310") || v.equals("0310")) return "UFS 3.1";
+        if (v.startsWith("3.0") || v.equals("300")) return "UFS 3.0";
+        if (v.startsWith("2.2") || v.equals("220")) return "UFS 2.2";
+        if (v.startsWith("2.1") || v.equals("210")) return "UFS 2.1";
+        if (v.startsWith("2.0") || v.equals("200")) return "UFS 2.0";
+        return "";
+    }
+
+    private static String normalizeRam(String raw) {
+        if (raw == null) return "";
+        String low = raw.trim().toLowerCase(Locale.US).replace("_", "").replace(" ", "").replace("-", "");
+        if (low.length() == 0) return "";
+        if (low.contains("lpddr5x")) return "LPDDR5X";
+        if (low.contains("lpddr5")) return "LPDDR5";
+        if (low.contains("lpddr4x")) return "LPDDR4X";
+        if (low.contains("lpddr4")) return "LPDDR4";
+        if (low.contains("lpddr3")) return "LPDDR3";
+        return "";
+    }
+
+    private String glEsVersion() {
+        try {
+            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            if (am == null) return "";
+            android.content.pm.ConfigurationInfo info = am.getDeviceConfigurationInfo();
+            if (info == null) return "";
+            String version = info.getGlEsVersion();
+            return version == null ? "" : version.trim();
+        } catch (Throwable ignored) {
+            return "";
+        }
+    }
+
+    private static boolean oemOnly(String value) {
+        if (value == null) return true;
+        String v = value.toLowerCase(Locale.US).replace(".", "").replace(",", "").replace("  ", " ").trim();
+        return v.length() == 0
+            || v.equals("samsung")
+            || v.equals("samsung electronics")
+            || v.equals("samsung electronics co ltd")
+            || v.equals("samsung electronics co ltd.");
+    }
+
+    /** GL_VENDOR on Samsung GPUs is often the phone maker. Prefer the company that built the GPU. */
+    private static String gpuVendor(String glVendor, String renderer) {
+        String r = renderer == null ? "" : renderer.toLowerCase(Locale.US);
+        if (r.contains("xclipse")) return "AMD";
+        if (r.contains("adreno")) return "Qualcomm";
+        if (r.contains("mali") || r.contains("immortalis")) return "ARM";
+        if (r.contains("powervr")) return "Imagination";
+        if (r.contains("maleoon")) return "Huawei";
+        if (r.contains("nvidia") || r.contains("tegra")) return "NVIDIA";
+        if (glVendor == null || oemOnly(glVendor)) return "";
+        return glVendor.trim();
+    }
+
+    private static String marketingGpu(String renderer) {
+        if (renderer == null || renderer.length() == 0) return "";
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+            "(?i)(xclipse\\s*\\d+|adreno\\s*(?:\\d+[a-z]*)|mali-?[a-z0-9]+|immortalis-?[a-z0-9]+|powervr\\s*[a-z0-9]+)"
+        ).matcher(renderer);
+        if (!m.find()) return "";
+        String name = m.group(1).replaceAll("\\s+", " ").trim();
+        return present(name);
+    }
+
+    private static String present(String raw) {
+        if (raw == null) return "";
+        String v = raw.trim().replaceAll("\\s+", " ");
+        if (v.length() == 0) return "";
+        boolean hasUpper = false;
+        for (int i = 0; i < v.length(); i++) if (Character.isUpperCase(v.charAt(i))) { hasUpper = true; break; }
+        if (hasUpper) return v;
+        StringBuilder sb = new StringBuilder(v.length());
+        boolean up = true;
+        for (int i = 0; i < v.length(); i++) {
+            char c = v.charAt(i);
+            if (c == ' ' || c == '-' || c == '/' || c == '_') { sb.append(c); up = true; continue; }
+            if (up && Character.isLetter(c)) { sb.append(Character.toUpperCase(c)); up = false; }
+            else { sb.append(c); up = false; }
+        }
+        return sb.toString();
+    }
+
+    private JSONArray localListeners() {
+        JSONArray out = new JSONArray();
+        readListeners("/proc/net/tcp", false, out);
+        readListeners("/proc/net/tcp6", true, out);
+        return out;
+    }
+
+    private static void readListeners(String path, boolean v6, JSONArray out) {
+        if (out.length() >= 24) return;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(path));
+            String line;
+            boolean first = true;
+            while ((line = reader.readLine()) != null && out.length() < 24) {
+                if (first) { first = false; continue; }
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length < 4) continue;
+                if (!"0A".equalsIgnoreCase(parts[3])) continue;
+                int colon = parts[1].indexOf(':');
+                if (colon <= 0) continue;
+                String ip = v6 ? "" : hexIp4(parts[1].substring(0, colon));
+                if (!v6 && ip.length() == 0) continue;
+                int port = Integer.parseInt(parts[1].substring(colon + 1), 16);
+                if (port <= 0 || port > 65535) continue;
+                out.put(v6 ? ("tcp6:" + port) : (ip + ":" + port));
+            }
+        } catch (Exception ignored) {
+        } finally {
+            if (reader != null) try { reader.close(); } catch (Exception ignored) {}
+        }
+    }
+
+    private static String hexIp4(String hex) {
+        if (hex == null || hex.length() != 8) return "";
+        try {
+            long v = Long.parseLong(hex, 16);
+            return (v & 255) + "." + ((v >> 8) & 255) + "." + ((v >> 16) & 255) + "." + ((v >> 24) & 255);
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+    private String effectiveTier() {
+        File licence = new File(getFilesDir(), "full.key");
+        if (licence.isFile() && licence.length() > 0) {
+            if ("premium".equals(readSmallText(licence, 32))) return "premium";
+            return "pro";
+        }
+        try {
+            if (new Deck().trialLeft() > 0) return "pro";
+        } catch (Exception ignored) {}
+        return "free";
+    }
+
+    private int platformCap() {
+        String tier = effectiveTier();
+        if ("premium".equals(tier)) return 32;
+        if ("pro".equals(tier)) return 8;
+        return 1;
+    }
+
+    private File platformFile() {
+        return new File(getFilesDir(), "api-platforms.bin");
+    }
+
+    private SecretKey platformKey() throws Exception {
+        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+        ks.load(null);
+        if (!ks.containsAlias("meridian.platforms")) {
+            KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+            KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
+                "meridian.platforms",
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(true)
+                .build();
+            kg.init(spec);
+            kg.generateKey();
+        }
+        return (SecretKey) ks.getKey("meridian.platforms", null);
+    }
+
+    private String readPlatforms() {
+        File file = platformFile();
+        if (!file.isFile() || file.length() < 13 || file.length() > 65536) return "{}";
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(file);
+            byte[] blob = new byte[(int) file.length()];
+            int off = 0;
+            while (off < blob.length) {
+                int n = in.read(blob, off, blob.length - off);
+                if (n < 0) break;
+                off += n;
+            }
+            if (off < 13) return "{}";
+            byte[] iv = Arrays.copyOfRange(blob, 0, 12);
+            byte[] ct = Arrays.copyOfRange(blob, 12, off);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, platformKey(), new GCMParameterSpec(128, iv));
+            String json = new String(cipher.doFinal(ct), java.nio.charset.StandardCharsets.UTF_8);
+            if (json.length() == 0 || json.charAt(0) != '{') return "{}";
+            return json;
+        } catch (Exception ex) {
+            return "{}";
+        } finally {
+            if (in != null) try { in.close(); } catch (Exception ignored) {}
+        }
+    }
+
+    private String writePlatforms(String json) {
+        if (json == null) return "Nothing to store.";
+        String body = json.trim();
+        if (body.length() == 0 || body.length() > 32000 || body.charAt(0) != '{') return "That key file is not valid.";
+        try {
+            JSONObject root = new JSONObject(body);
+            JSONArray items = root.optJSONArray("items");
+            int count = items == null ? 0 : items.length();
+            int cap = platformCap();
+            if (count > cap) {
+                return cap == 1
+                    ? "Free keeps one API platform. Pro keeps the list."
+                    : "This plan keeps " + cap + " API platforms.";
+            }
+            if (items != null) {
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.optJSONObject(i);
+                    if (item == null) return "That key file is not valid.";
+                    String base = item.optString("base", "");
+                    String key = item.optString("key", "");
+                    if (base.length() > 200 || key.length() > 512 || item.optString("model", "").length() > 120) return "That field is too long.";
+                    if (base.length() > 0 && !base.startsWith("https://")) return "The address must start with https://";
+                }
+            }
+            JSONObject active = root.optJSONObject("active");
+            if (active != null) {
+                String base = active.optString("base", "");
+                if (base.length() > 0 && !base.startsWith("https://")) return "The address must start with https://";
+                if (active.optString("key", "").length() > 512) return "That field is too long.";
+            }
+            byte[] plain = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            byte[] iv = new byte[12];
+            new java.security.SecureRandom().nextBytes(iv);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, platformKey(), new GCMParameterSpec(128, iv));
+            byte[] ct = cipher.doFinal(plain);
+            File out = platformFile();
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(out);
+                fos.write(iv);
+                fos.write(ct);
+                fos.flush();
+            } finally {
+                if (fos != null) fos.close();
+            }
+            return "ok";
+        } catch (Exception ex) {
+            return "The key could not be stored.";
+        }
     }
 
     private String powerNow() {

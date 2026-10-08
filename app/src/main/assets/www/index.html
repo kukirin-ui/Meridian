@@ -48,9 +48,20 @@
   header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: 56px; height: 56px; padding: 0 10px; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
   header h1 { margin: 0; font-size: 0.9375rem; font-weight: 600; letter-spacing: 0; -webkit-text-stroke: 0; text-shadow: none; font-synthesis: none; color: var(--fg); white-space: nowrap; }
-  header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+  header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #bondline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .grow { flex: 1; min-width: 0; }
+  .setmenu { position: absolute; top: 52px; right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
+  .setmenu[hidden] { display: none !important; }
+  .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
+  .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; }
+  .meridian-pulse i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); display: block; animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  .meridian-pulse b { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
+  .logo-slot .meridian-pulse { width: 28px; height: 28px; }
+  .logo-slot .meridian-pulse i { width: 22px; height: 22px; }
   #clock { color: var(--fg); font-size: 0.75rem; font-weight: 650; font-variant-numeric: tabular-nums; }
-  .leads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .leads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .leads div { min-width: 0; text-align: center; padding: 8px 2px; border-radius: 12px; background: var(--plate); border: 1px solid var(--line); }
   .leads b { display: block; color: var(--accent); font-size: 0.9375rem; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .leads span { color: var(--muted); font-size: 0.6875rem; letter-spacing: .04em; }
@@ -134,7 +145,8 @@
   .gauge b { width: 58px; height: 58px; border-radius: 50%; background: var(--plate); display: grid; place-items: center; color: var(--accent); font-size: 0.9375rem; }
   .tile span { display: block; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile span.fit { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
-  .spark { width: 100%; height: 52px; display: block; }
+  .plate.freq { padding: 14px 14px 0; }
+  .spark { width: calc(100% + 28px); height: 64px; margin: 8px -14px 0; display: block; }
   .corebars { height: 92px; display: flex; align-items: flex-end; gap: 3px; }
   .corebars span { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
   .corebars i { width: 100%; display: block; border-radius: 3px 3px 0 0; background: linear-gradient(var(--fg), var(--accent)); box-shadow: 0 0 8px var(--accent-glow); }
@@ -179,7 +191,9 @@
   .orb { display: none; }
   .status-text { margin-top: 16px; text-align: center; font-weight: 700; font-size: 0.8125rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); transition: color 0.4s ease; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .linkline { text-align: center; font-weight: 750; letter-spacing: .02em; padding: 8px 0 10px; border-bottom: 2px solid var(--accent); box-shadow: 0 10px 22px var(--accent-glow); }
+  .speedometers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; text-align: center; }
+  .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
+  .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
   #main { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 8px 10px calc(84px + env(safe-area-inset-bottom)); }
   body.term #main { padding-bottom: calc(148px + env(safe-area-inset-bottom)); }
   .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--accent); box-shadow: none; background: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px), var(--win); background-size: 18px 18px, 18px 18px, auto; background-attachment: local; }
@@ -398,6 +412,8 @@
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
   html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
+  html[data-motion="full"] .meridian-pulse i,
+  html[data-motion="full"] .meridian-pulse b { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
   html[data-motion="full"] .marklogo,
@@ -411,17 +427,23 @@
 <header>
   <div id="headmark" aria-hidden="true"></div>
   <h1>Meridian</h1>
-  <p id="bondline" role="status">Not connected</p>
+  <p id="bondline" class="sr-only" role="status">Not connected</p>
+  <div class="grow"></div>
   <b id="clock" aria-hidden="true"></b>
-  <button class="ghost iconbtn" id="openset" type="button" data-go="settings" aria-label="Settings" data-i18n-aria="settingsAria">
+  <button class="ghost iconbtn" id="openset" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" data-i18n-aria="settingsAria">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.5 1.5M16.9 16.9l1.5 1.5M18.4 5.6l-1.5 1.5M7.1 16.9l-1.5 1.5"/></svg>
   </button>
+  <div id="setmenu" class="setmenu" hidden role="menu">
+    <button type="button" role="menuitem" data-device="settings">Device settings</button>
+    <button type="button" role="menuitem" data-device="developer">Developer options</button>
+    <button type="button" role="menuitem" data-go="settings">App preferences</button>
+  </div>
   <button class="ghost" id="link" type="button">Connect</button>
 </header>
 <main id="main"></main>
 <div id="srstatus" class="sr-only" role="status" aria-live="polite"></div>
 <div id="toast" class="toast" aria-hidden="true"></div>
-<form id="dock"><input id="line" placeholder="Command" aria-label="Command to run in Termux" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" /><button class="btn" type="submit" style="width:auto" id="dockrun">Run</button></form>
+<form id="dock"><input id="line" placeholder="Query the terminal or enter a command..." aria-label="Query the terminal or enter a command..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" /><button class="btn" type="submit" style="width:auto" id="dockrun">Run</button></form>
 <div id="cheat" hidden role="dialog" aria-label="Keyboard shortcuts">
   <div class="cheatcard">
     <h2 id="cheattitle">Shortcuts</h2>
@@ -429,7 +451,7 @@
     <div class="row"><span id="cheatdock">Focus command dock</span><kbd>Ctrl+K</kbd> or <kbd>/</kbd></div>
     <div class="row"><span id="cheatclear">Clear this console</span><kbd>Ctrl+L</kbd></div>
     <div class="row"><span id="cheatstop">Stop running job</span><kbd>Ctrl+C</kbd></div>
-    <div class="row"><span id="cheattab">Jump to a tab</span><kbd>Ctrl+1…8</kbd></div>
+    <div class="row"><span id="cheattab">Jump to a tab</span><kbd>Ctrl+1…9</kbd></div>
     <div class="row"><span id="cheatlist">This list</span><kbd>?</kbd></div>
     <button class="btn" type="button" id="cheatclose">Close</button>
   </div>
@@ -439,9 +461,10 @@
   <button type="button" data-view="hardware" data-i18n="navHardware"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>Hardware</button>
   <button type="button" data-view="system" data-i18n="navSystem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v3H4zM6 11h12v3H6zM8 15h8v3H8z"/></svg>System</button>
   <button type="button" data-view="battery" data-i18n="navBattery"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M20 10v4"/></svg>Battery</button>
+  <button type="button" data-view="security" data-i18n="navSecurity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v6c0 4.5-3.2 7.4-8 9-4.8-1.6-8-4.5-8-9V7z"/></svg>Security</button>
   <button type="button" data-view="build" data-i18n="navBuild"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4-8 4-8-4 8-4zM4 12l8 4 8-4M4 16l8 4 8-4"/></svg>Build</button>
   <button type="button" data-view="plan" data-i18n="navPlan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v4H5zM5 11h9v3H5zM5 16h14v3H5z"/></svg>Plan</button>
-  <button type="button" data-view="apis" data-i18n="navKeys"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="3"/><path d="M11 12h10M17 12v3M20 12v2"/></svg>Keys</button>
+  <button type="button" data-view="apis" data-i18n="navKeys"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="3"/><path d="M11 12h10M17 12v3M20 12v2"/></svg>API Platforms</button>
   <button type="button" data-view="tools" data-i18n="navTermux"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l6 6-6 6M12 18h8"/></svg>Termux</button>
 </nav>
 <script>
@@ -465,12 +488,12 @@ const ACCENTS = {
 const LANGS = [["en","English"],["hr","Hrvatski"],["de","Deutsch"],["ja","日本語"],["hi","हिन्दी"],["es","Español"],["fr","Français"]];
 const I18N = {
 en: {
-navHome:"Dashboard",navHardware:"Hardware",navSystem:"System",navBattery:"Battery",navBuild:"Build",navPlan:"Plan",navKeys:"Keys",navTermux:"Termux",
+navHome:"Dashboard",navHardware:"Hardware",navSystem:"System",navBattery:"Battery",navSecurity:"Security",navBuild:"Build",navPlan:"Plan",navKeys:"API Platforms",navTermux:"Termux",
 connect:"Connect",disconnect:"Disconnect",connected:"Connected",allowTermux:"Allow Termux",noTermux:"No Termux",notConnected:"Not connected",
-settingsAria:"Settings",commandPh:"Command",run:"Run",
-work:"Work",machine:"Machine",library:"Library",files:"Files",console:"Console",tweaks:"Tweaks",doctor:"Doctor",commands:"Commands",links:"Links",setup:"Setup",meridian:"Meridian",licence:"Licence",fullVersion:"Full version",lookModesFoot:"Look, modes, and the licence",linuxPc:"Linux PC",
-titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleBuild:"Build",titlePlan:"Plan",titlePay:"Full version",titleKeys:"Keys",titleSettings:"Settings",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleHome:"Dashboard",titleLinux:"Linux PC",
-thisPhone:"This phone",hardwareFromDevice:"Hardware from this device",systemStrained:"System strained",systemOptimal:"System optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Battery",heat:"Heat",voltage:"Voltage",ramFree:"RAM free",memory:"Memory",virtual:"Virtual",deviceCare:"Device care",settings:"Settings",about:"About",liveClocks:"Live clocks",hold:"Hold",live:"Live",quietCool:"Quiet and cool",heatOrRam:"Heat or RAM is high",storage:"Storage",network:"Network",testSpeed:"Test network speed",testing:"Testing…",noRamPlus:"No RAM Plus",usedOf:" used · ",connectTermux:"Connect Termux",connectTermuxBody:"Install F-Droid, then Termux from F-Droid, not Play. Open Setup and follow it. When this line says Connected, Setup moves to the end of Termux.",connectedTermux:"Connected to Termux",copyLine:"Copy the line",reading:"Reading…",
+settingsAria:"Settings",commandPh:"Query the terminal or enter a command...",run:"Run",
+work:"Work",machine:"Machine",library:"Library",files:"Files",console:"Console",tweaks:"Tweaks",doctor:"Doctor",commands:"Commands",links:"Links",setup:"Setup",meridian:"Meridian",licence:"Licence",fullVersion:"Plans",lookModesFoot:"Look, modes, and the licence",linuxPc:"Linux PC",
+titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleSecurity:"Security",titleBuild:"Build",titlePlan:"Plan",titlePay:"Plans",titleKeys:"API Platforms",titleSettings:"App preferences",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleHome:"Dashboard",titleLinux:"Linux PC",
+thisPhone:"This phone",hardwareFromDevice:"Hardware from this device",systemStrained:"System strained",systemOptimal:"System optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Battery",heat:"Bat. Temp.",voltage:"Voltage",ramFree:"RAM free",memory:"Memory",virtual:"Virtual",deviceCare:"Device care",settings:"Settings",about:"About",liveClocks:"Live clocks",hold:"Hold",live:"Live",quietCool:"Quiet and cool",heatOrRam:"Heat or RAM is high",storage:"Storage",network:"Network",testSpeed:"Test network speed",testing:"Testing…",noRamPlus:"No RAM Plus",usedOf:" used · ",connectTermux:"Connect Termux",connectTermuxBody:"Install F-Droid, then Termux from F-Droid, not Play. Open Setup and follow it. When this line says Connected, Setup moves to the end of Termux.",connectedTermux:"Connected to Termux",copyLine:"Copy the line",reading:"Reading…",
 look:"Look",theme:"Theme",themeSystem:"System",themeDark:"Dark",themeLight:"Light",themeOled:"OLED",accent:"Accent",feel:"Feel",refresh:"Refresh",refreshSaver:"Battery-saver 2s",refreshNormal:"Normal 1s",refreshLive:"Live 250ms",consoleFont:"Console font",keepAwake:"Keep awake while a job runs",haptics:"Haptics",on:"On",off:"Off",motion:"Motion",motionSystem:"System",motionOff:"Off",motionOn:"On",motionTestOn:"Motion is on — this bar just faded in.",motionTestOff:"Motion is off — no fade, no globe spin.",language:"Language",shortcuts:"Keyboard shortcuts",
 aboutBlurb:"A dashboard for this phone, bonded to Termux.",aboutReadings:"Readings come from the device. Commands run in Termux on this phone. There is no account and no server. A key, if you save one, stays here and is sent only when you press Plan.",unlockedPhone:"This phone is unlocked.",trialLeft:"Trial:",freeVersion:"This phone is on the free version.",shareReport:"Share hardware report",copyright:"Copyright 2026",
 payUnlocked:"Unlocked",havePro:"You have Pro",thankYou:"This phone is unlocked. Thank you.",alreadyPaidRestore:"Need to restore on another install? Paste paid (the old full.key) or a MERIDIAN- key below. Activating again is harmless.",activateAgain:"Activate again",meridianPro:"Meridian Pro",onePayment:"one payment",buyLicence:"Buy a licence",checkoutOpens:"Checkout opens in your browser and emails a key that starts with MERIDIAN-. Nothing about this phone is sent anywhere.",alreadyPaid:"Already paid?",pastePaid:"Paste the word paid if you bought 1.8.6, or a MERIDIAN- key from your receipt.",activate:"Activate",trialLeftAll:"Trial: {n} left. Everything is open until then.",trialOver:"The trial is over. Dashboard, Hardware, System, Battery, one console, Setup and Doctor stay free.",restoreHintPaid:"paid still restores a 1.8.6 purchase.",restoreHintFree:"Restore accepts paid, full, unlocked, or MERIDIAN- keys.",licKey:"Licence key",paste:"Paste",
@@ -481,12 +504,12 @@ shortcutsTitle:"Shortcuts",shortcutsBody:"Works from any page. Typing in a field
 back:"Back",trialLine:"Trial: {n} left · ",getFull:"Get the full version",carrierUnknown:"—",mainNav:"Main"
 },
 hr: {
-navHome:"Nadzorna",navHardware:"Hardver",navSystem:"Sustav",navBattery:"Baterija",navBuild:"Gradnja",navPlan:"Plan",navKeys:"Ključevi",navTermux:"Termux",
+navHome:"Nadzorna",navHardware:"Hardver",navSystem:"Sustav",navBattery:"Baterija",navBuild:"Gradnja",navPlan:"Plan",navKeys:"API platforme",navTermux:"Termux",
 connect:"Poveži",disconnect:"Prekini",connected:"Povezano",allowTermux:"Dopusti Termux",noTermux:"Nema Termuxa",notConnected:"Nije povezano",
 settingsAria:"Postavke",commandPh:"Naredba",run:"Pokreni",
-work:"Rad",machine:"Stroj",library:"Knjižnica",files:"Datoteke",console:"Konzola",tweaks:"Podešavanja",doctor:"Doktor",commands:"Naredbe",links:"Poveznice",setup:"Postavljanje",meridian:"Meridian",licence:"Licenca",fullVersion:"Puna verzija",lookModesFoot:"Izgled, načini i licenca",linuxPc:"Linux PC",
-titleFinder:"Datoteke",titleConsole:"Konzola",titleSetup:"Postavljanje",titleHardware:"Hardver",titleSystem:"Sustav",titleBattery:"Baterija",titleBuild:"Gradnja",titlePlan:"Plan",titlePay:"Puna verzija",titleKeys:"Ključevi",titleSettings:"Postavke",titleDoctor:"Doktor",titleTweaks:"Podešavanja",titleCommands:"Naredbe",titleLinks:"Poveznice",titleAbout:"O aplikaciji",titleSupport:"Podrška",titleTermux:"Termux",titleHome:"Nadzorna",titleLinux:"Linux PC",
-thisPhone:"Ovaj telefon",hardwareFromDevice:"Hardver s ovog uređaja",systemStrained:"Sustav je opterećen",systemOptimal:"Sustav je u redu",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Baterija",heat:"Toplina",voltage:"Napon",ramFree:"Slobodan RAM",memory:"Memorija",virtual:"Virtualna",deviceCare:"Briga o uređaju",settings:"Postavke",about:"O aplikaciji",liveClocks:"Živi satovi",hold:"Zadrži",live:"Uživo",quietCool:"Mirno i hladno",heatOrRam:"Toplina ili RAM su visoki",storage:"Pohrana",network:"Mreža",testSpeed:"Test brzine mreže",testing:"Testiram…",noRamPlus:"Nema RAM Plus",usedOf:" zauzeto · ",connectTermux:"Poveži Termux",connectTermuxBody:"Instaliraj F-Droid, zatim Termux s F-Droid, ne s Play. Otvori Postavljanje i slijedi korake. Kad piše Povezano, Postavljanje ide na kraj Termuxa.",connectedTermux:"Povezano s Termuxom",copyLine:"Kopiraj redak",reading:"Čitam…",
+work:"Rad",machine:"Stroj",library:"Knjižnica",files:"Datoteke",console:"Konzola",tweaks:"Podešavanja",doctor:"Doktor",commands:"Naredbe",links:"Poveznice",setup:"Postavljanje",meridian:"Meridian",licence:"Licenca",fullVersion:"Planovi",lookModesFoot:"Izgled, načini i licenca",linuxPc:"Linux PC",
+titleFinder:"Datoteke",titleConsole:"Konzola",titleSetup:"Postavljanje",titleHardware:"Hardver",titleSystem:"Sustav",titleBattery:"Baterija",titleBuild:"Gradnja",titlePlan:"Plan",titlePay:"Planovi",titleKeys:"API platforme",titleSettings:"Postavke",titleDoctor:"Doktor",titleTweaks:"Podešavanja",titleCommands:"Naredbe",titleLinks:"Poveznice",titleAbout:"O aplikaciji",titleSupport:"Podrška",titleTermux:"Termux",titleHome:"Nadzorna",titleLinux:"Linux PC",
+thisPhone:"Ovaj telefon",hardwareFromDevice:"Hardver s ovog uređaja",systemStrained:"Sustav je opterećen",systemOptimal:"Sustav je u redu",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Baterija",heat:"Temp. bat.",voltage:"Napon",ramFree:"Slobodan RAM",memory:"Memorija",virtual:"Virtualna",deviceCare:"Briga o uređaju",settings:"Postavke",about:"O aplikaciji",liveClocks:"Živi satovi",hold:"Zadrži",live:"Uživo",quietCool:"Mirno i hladno",heatOrRam:"Toplina ili RAM su visoki",storage:"Pohrana",network:"Mreža",testSpeed:"Test brzine mreže",testing:"Testiram…",noRamPlus:"Nema RAM Plus",usedOf:" zauzeto · ",connectTermux:"Poveži Termux",connectTermuxBody:"Instaliraj F-Droid, zatim Termux s F-Droid, ne s Play. Otvori Postavljanje i slijedi korake. Kad piše Povezano, Postavljanje ide na kraj Termuxa.",connectedTermux:"Povezano s Termuxom",copyLine:"Kopiraj redak",reading:"Čitam…",
 look:"Izgled",theme:"Tema",themeSystem:"Sustav",themeDark:"Tamna",themeLight:"Svijetla",themeOled:"OLED",accent:"Naglasak",feel:"Osjećaj",refresh:"Osvježavanje",refreshSaver:"Štednja 2s",refreshNormal:"Normalno 1s",refreshLive:"Uživo 250ms",consoleFont:"Font konzole",keepAwake:"Drži budnim dok naredba radi",haptics:"Vibracija",on:"Uključeno",off:"Isključeno",motion:"Pokret",motionSystem:"Sustav",motionOff:"Isključeno",motionOn:"Uključeno",motionTestOn:"Pokret je uključen — ova traka se upravo pojavila.",motionTestOff:"Pokret je isključen — nema pretapanja ni vrtnje globusa.",language:"Jezik",shortcuts:"Prečaci na tipkovnici",
 aboutBlurb:"Nadzorna ploča za ovaj telefon, povezana s Termuxom.",aboutReadings:"Očitavanja dolaze s uređaja. Naredbe se izvode u Termuxu na ovom telefonu. Nema računa ni poslužitelja. Ključ, ako ga spremite, ostaje ovdje i šalje se samo kad pritisnete Plan.",unlockedPhone:"Ovaj telefon je otključan.",trialLeft:"Probno:",freeVersion:"Ovaj telefon je na besplatnoj verziji.",shareReport:"Podijeli hardversko izvješće",copyright:"Autorsko pravo 2026",
 payUnlocked:"Otključano",havePro:"Imate Pro",thankYou:"Ovaj telefon je otključan. Hvala.",alreadyPaidRestore:"Trebate obnoviti na drugoj instalaciji? Zalijepite paid (stari full.key) ili MERIDIAN- ključ. Ponovna aktivacija ne škodi.",activateAgain:"Aktiviraj ponovo",meridianPro:"Meridian Pro",onePayment:"jedna uplata",buyLicence:"Kupi licencu",checkoutOpens:"Naplata se otvara u pregledniku i šalje ključ koji počinje s MERIDIAN-. Ništa o ovom telefonu se ne šalje.",alreadyPaid:"Već plaćeno?",pastePaid:"Zalijepite riječ paid ako ste kupili 1.8.6, ili MERIDIAN- ključ s računa.",activate:"Aktiviraj",trialLeftAll:"Probno: {n} preostalo. Sve je otvoreno do tada.",trialOver:"Probno je gotovo. Nadzorna, Hardver, Sustav, Baterija, jedna konzola, Postavljanje i Doktor ostaju besplatni.",restoreHintPaid:"paid i dalje vraća kupnju iz 1.8.6.",restoreHintFree:"Obnova prima paid, full, unlocked ili MERIDIAN- ključeve.",licKey:"Licencni ključ",paste:"Zalijepi",
@@ -496,12 +519,12 @@ shortcutsTitle:"Prečaci",shortcutsBody:"Radi sa svake stranice. Tipkanje u polj
 back:"Natrag",trialLine:"Probno: {n} preostalo · ",getFull:"Uzmi punu verziju",carrierUnknown:"—",mainNav:"Glavno"
 },
 de: {
-navHome:"Übersicht",navHardware:"Hardware",navSystem:"System",navBattery:"Akku",navBuild:"Bauen",navPlan:"Plan",navKeys:"Schlüssel",navTermux:"Termux",
+navHome:"Übersicht",navHardware:"Hardware",navSystem:"System",navBattery:"Akku",navBuild:"Bauen",navPlan:"Plan",navKeys:"API-Plattformen",navTermux:"Termux",
 connect:"Verbinden",disconnect:"Trennen",connected:"Verbunden",allowTermux:"Termux erlauben",noTermux:"Kein Termux",notConnected:"Nicht verbunden",
 settingsAria:"Einstellungen",commandPh:"Befehl",run:"Ausführen",
-work:"Arbeit",machine:"Maschine",library:"Bibliothek",files:"Dateien",console:"Konsole",tweaks:"Anpassungen",doctor:"Diagnose",commands:"Befehle",links:"Links",setup:"Einrichtung",meridian:"Meridian",licence:"Lizenz",fullVersion:"Vollversion",lookModesFoot:"Aussehen, Modi und Lizenz",linuxPc:"Linux-PC",
-titleFinder:"Dateien",titleConsole:"Konsole",titleSetup:"Einrichtung",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Akku",titleBuild:"Bauen",titlePlan:"Plan",titlePay:"Vollversion",titleKeys:"Schlüssel",titleSettings:"Einstellungen",titleDoctor:"Diagnose",titleTweaks:"Anpassungen",titleCommands:"Befehle",titleLinks:"Links",titleAbout:"Über",titleSupport:"Support",titleTermux:"Termux",titleHome:"Übersicht",titleLinux:"Linux-PC",
-thisPhone:"Dieses Telefon",hardwareFromDevice:"Hardware dieses Geräts",systemStrained:"System belastet",systemOptimal:"System in Ordnung",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Akku",heat:"Wärme",voltage:"Spannung",ramFree:"RAM frei",memory:"Speicher",virtual:"Virtuell",deviceCare:"Gerätepflege",settings:"Einstellungen",about:"Über",liveClocks:"Live-Takte",hold:"Halten",live:"Live",quietCool:"Ruhig und kühl",heatOrRam:"Wärme oder RAM ist hoch",storage:"Speicher",network:"Netzwerk",testSpeed:"Netzwerkgeschwindigkeit testen",testing:"Teste…",noRamPlus:"Kein RAM Plus",usedOf:" belegt · ",connectTermux:"Termux verbinden",connectTermuxBody:"F-Droid installieren, dann Termux von F-Droid, nicht Play. Einrichtung öffnen und folgen. Steht Verbunden, wandert Einrichtung ans Ende von Termux.",connectedTermux:"Mit Termux verbunden",copyLine:"Zeile kopieren",reading:"Lesen…",
+work:"Arbeit",machine:"Maschine",library:"Bibliothek",files:"Dateien",console:"Konsole",tweaks:"Anpassungen",doctor:"Diagnose",commands:"Befehle",links:"Links",setup:"Einrichtung",meridian:"Meridian",licence:"Lizenz",fullVersion:"Pläne",lookModesFoot:"Aussehen, Modi und Lizenz",linuxPc:"Linux-PC",
+titleFinder:"Dateien",titleConsole:"Konsole",titleSetup:"Einrichtung",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Akku",titleBuild:"Bauen",titlePlan:"Plan",titlePay:"Pläne",titleKeys:"API-Plattformen",titleSettings:"Einstellungen",titleDoctor:"Diagnose",titleTweaks:"Anpassungen",titleCommands:"Befehle",titleLinks:"Links",titleAbout:"Über",titleSupport:"Support",titleTermux:"Termux",titleHome:"Übersicht",titleLinux:"Linux-PC",
+thisPhone:"Dieses Telefon",hardwareFromDevice:"Hardware dieses Geräts",systemStrained:"System belastet",systemOptimal:"System in Ordnung",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Akku",heat:"Akku-Temp.",voltage:"Spannung",ramFree:"RAM frei",memory:"Speicher",virtual:"Virtuell",deviceCare:"Gerätepflege",settings:"Einstellungen",about:"Über",liveClocks:"Live-Takte",hold:"Halten",live:"Live",quietCool:"Ruhig und kühl",heatOrRam:"Wärme oder RAM ist hoch",storage:"Speicher",network:"Netzwerk",testSpeed:"Netzwerkgeschwindigkeit testen",testing:"Teste…",noRamPlus:"Kein RAM Plus",usedOf:" belegt · ",connectTermux:"Termux verbinden",connectTermuxBody:"F-Droid installieren, dann Termux von F-Droid, nicht Play. Einrichtung öffnen und folgen. Steht Verbunden, wandert Einrichtung ans Ende von Termux.",connectedTermux:"Mit Termux verbunden",copyLine:"Zeile kopieren",reading:"Lesen…",
 look:"Aussehen",theme:"Thema",themeSystem:"System",themeDark:"Dunkel",themeLight:"Hell",themeOled:"OLED",accent:"Akzent",feel:"Verhalten",refresh:"Aktualisierung",refreshSaver:"Sparmodus 2s",refreshNormal:"Normal 1s",refreshLive:"Live 250ms",consoleFont:"Konsolenschrift",keepAwake:"Wach halten während eines Jobs",haptics:"Haptik",on:"An",off:"Aus",motion:"Bewegung",motionSystem:"System",motionOff:"Aus",motionOn:"An",motionTestOn:"Bewegung ist an — dieser Balken ist gerade eingeblendet.",motionTestOff:"Bewegung ist aus — kein Überblenden, keine Globusdrehung.",language:"Sprache",shortcuts:"Tastaturkürzel",
 aboutBlurb:"Ein Dashboard für dieses Telefon, verbunden mit Termux.",aboutReadings:"Werte kommen vom Gerät. Befehle laufen in Termux auf diesem Telefon. Kein Konto, kein Server. Ein Schlüssel bleibt hier und wird nur gesendet, wenn du Plan drückst.",unlockedPhone:"Dieses Telefon ist freigeschaltet.",trialLeft:"Test:",freeVersion:"Dieses Telefon nutzt die kostenlose Version.",shareReport:"Hardwarebericht teilen",copyright:"Copyright 2026",
 payUnlocked:"Freigeschaltet",havePro:"Du hast Pro",thankYou:"Dieses Telefon ist freigeschaltet. Danke.",alreadyPaidRestore:"Wiederherstellen? Füge paid (die alte full.key) oder einen MERIDIAN- Schlüssel ein. Erneutes Aktivieren schadet nicht.",activateAgain:"Erneut aktivieren",meridianPro:"Meridian Pro",onePayment:"eine Zahlung",buyLicence:"Lizenz kaufen",checkoutOpens:"Der Kauf öffnet sich im Browser und sendet einen Schlüssel, der mit MERIDIAN- beginnt. Nichts über dieses Telefon wird gesendet.",alreadyPaid:"Schon bezahlt?",pastePaid:"Füge paid ein, wenn du 1.8.6 gekauft hast, oder einen MERIDIAN- Schlüssel aus der Quittung.",activate:"Aktivieren",trialLeftAll:"Test: {n} übrig. Bis dahin ist alles offen.",trialOver:"Der Test ist vorbei. Übersicht, Hardware, System, Akku, eine Konsole, Einrichtung und Diagnose bleiben frei.",restoreHintPaid:"paid stellt weiterhin einen 1.8.6-Kauf wieder her.",restoreHintFree:"Wiederherstellung akzeptiert paid, full, unlocked oder MERIDIAN- Schlüssel.",licKey:"Lizenzschlüssel",paste:"Einfügen",
@@ -511,12 +534,12 @@ shortcutsTitle:"Kürzel",shortcutsBody:"Funktioniert auf jeder Seite. Tippen in 
 back:"Zurück",trialLine:"Test: {n} übrig · ",getFull:"Vollversion holen",carrierUnknown:"—",mainNav:"Haupt"
 },
 ja: {
-navHome:"ダッシュボード",navHardware:"ハードウェア",navSystem:"システム",navBattery:"電池",navBuild:"ビルド",navPlan:"プラン",navKeys:"キー",navTermux:"Termux",
+navHome:"ダッシュボード",navHardware:"ハードウェア",navSystem:"システム",navBattery:"電池",navBuild:"ビルド",navPlan:"プラン",navKeys:"API",navTermux:"Termux",
 connect:"接続",disconnect:"切断",connected:"接続済み",allowTermux:"Termuxを許可",noTermux:"Termuxなし",notConnected:"未接続",
 settingsAria:"設定",commandPh:"コマンド",run:"実行",
-work:"作業",machine:"マシン",library:"ライブラリ",files:"ファイル",console:"コンソール",tweaks:"調整",doctor:"診断",commands:"コマンド",links:"リンク",setup:"セットアップ",meridian:"Meridian",licence:"ライセンス",fullVersion:"フル版",lookModesFoot:"見た目、モード、ライセンス",linuxPc:"Linux PC",
-titleFinder:"ファイル",titleConsole:"コンソール",titleSetup:"セットアップ",titleHardware:"ハードウェア",titleSystem:"システム",titleBattery:"電池",titleBuild:"ビルド",titlePlan:"プラン",titlePay:"フル版",titleKeys:"キー",titleSettings:"設定",titleDoctor:"診断",titleTweaks:"調整",titleCommands:"コマンド",titleLinks:"リンク",titleAbout:"情報",titleSupport:"サポート",titleTermux:"Termux",titleHome:"ダッシュボード",titleLinux:"Linux PC",
-thisPhone:"この端末",hardwareFromDevice:"この端末のハードウェア",systemStrained:"負荷が高い",systemOptimal:"正常",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"電池",heat:"温度",voltage:"電圧",ramFree:"空きRAM",memory:"メモリ",virtual:"仮想",deviceCare:"端末ケア",settings:"設定",about:"情報",liveClocks:"ライブ周波数",hold:"停止",live:"ライブ",quietCool:"静かで涼しい",heatOrRam:"温度またはRAMが高い",storage:"ストレージ",network:"ネットワーク",testSpeed:"通信速度を測定",testing:"測定中…",noRamPlus:"RAM Plusなし",usedOf:" 使用 · ",connectTermux:"Termuxに接続",connectTermuxBody:"F-Droidを入れ、PlayではなくF-DroidのTermuxを入れてください。セットアップを開いて進めてください。接続済みと出たら、セットアップはTermuxの末尾に移ります。",connectedTermux:"Termuxに接続済み",copyLine:"行をコピー",reading:"読み取り中…",
+work:"作業",machine:"マシン",library:"ライブラリ",files:"ファイル",console:"コンソール",tweaks:"調整",doctor:"診断",commands:"コマンド",links:"リンク",setup:"セットアップ",meridian:"Meridian",licence:"ライセンス",fullVersion:"プラン",lookModesFoot:"見た目、モード、ライセンス",linuxPc:"Linux PC",
+titleFinder:"ファイル",titleConsole:"コンソール",titleSetup:"セットアップ",titleHardware:"ハードウェア",titleSystem:"システム",titleBattery:"電池",titleBuild:"ビルド",titlePlan:"プラン",titlePay:"プラン",titleKeys:"API",titleSettings:"設定",titleDoctor:"診断",titleTweaks:"調整",titleCommands:"コマンド",titleLinks:"リンク",titleAbout:"情報",titleSupport:"サポート",titleTermux:"Termux",titleHome:"ダッシュボード",titleLinux:"Linux PC",
+thisPhone:"この端末",hardwareFromDevice:"この端末のハードウェア",systemStrained:"負荷が高い",systemOptimal:"正常",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"電池",heat:"電池温度",voltage:"電圧",ramFree:"空きRAM",memory:"メモリ",virtual:"仮想",deviceCare:"端末ケア",settings:"設定",about:"情報",liveClocks:"ライブ周波数",hold:"停止",live:"ライブ",quietCool:"静かで涼しい",heatOrRam:"温度またはRAMが高い",storage:"ストレージ",network:"ネットワーク",testSpeed:"通信速度を測定",testing:"測定中…",noRamPlus:"RAM Plusなし",usedOf:" 使用 · ",connectTermux:"Termuxに接続",connectTermuxBody:"F-Droidを入れ、PlayではなくF-DroidのTermuxを入れてください。セットアップを開いて進めてください。接続済みと出たら、セットアップはTermuxの末尾に移ります。",connectedTermux:"Termuxに接続済み",copyLine:"行をコピー",reading:"読み取り中…",
 look:"見た目",theme:"テーマ",themeSystem:"システム",themeDark:"ダーク",themeLight:"ライト",themeOled:"OLED",accent:"アクセント",feel:"操作感",refresh:"更新",refreshSaver:"省電力 2秒",refreshNormal:"通常 1秒",refreshLive:"ライブ 250ms",consoleFont:"コンソールフォント",keepAwake:"ジョブ中は画面をつけたまま",haptics:"振動",on:"オン",off:"オフ",motion:"モーション",motionSystem:"システム",motionOff:"オフ",motionOn:"オン",motionTestOn:"モーションはオンです。このバーがフェードインしました。",motionTestOff:"モーションはオフです。フェードも地球の回転もありません。",language:"言語",shortcuts:"キーボードショートカット",
 aboutBlurb:"この端末のダッシュボード。Termuxと接続します。",aboutReadings:"数値はこの端末から来ます。コマンドはこの端末のTermuxで実行されます。アカウントもサーバーもありません。保存したキーはここだけにあり、プランを押したときだけ送られます。",unlockedPhone:"この端末は解除済みです。",trialLeft:"試用:",freeVersion:"この端末は無料版です。",shareReport:"ハードウェア報告を共有",copyright:"Copyright 2026",
 payUnlocked:"解除済み",havePro:"Proです",thankYou:"この端末は解除済みです。ありがとうございます。",alreadyPaidRestore:"別の導入で復元しますか？ paid（古いfull.key）か MERIDIAN- キーを貼ってください。再アクティベートしても害はありません。",activateAgain:"再アクティベート",meridianPro:"Meridian Pro",onePayment:"一回払い",buyLicence:"ライセンスを買う",checkoutOpens:"決済はブラウザで開き、MERIDIAN- で始まるキーをメールします。この端末の情報は送りません。",alreadyPaid:"既に支払済み？",pastePaid:"1.8.6を買ったなら paid と貼るか、領収書の MERIDIAN- キーを貼ってください。",activate:"アクティベート",trialLeftAll:"試用: 残り{n}。それまではすべて開いています。",trialOver:"試用は終了しました。ダッシュボード、ハードウェア、システム、電池、コンソール1つ、セットアップと診断は無料のままです。",restoreHintPaid:"paid は今も1.8.6の購入を復元します。",restoreHintFree:"復元は paid、full、unlocked、MERIDIAN- キーを受け付けます。",licKey:"ライセンスキー",paste:"貼り付け",
@@ -526,12 +549,12 @@ shortcutsTitle:"ショートカット",shortcutsBody:"どのページからで�
 back:"戻る",trialLine:"試用: 残り{n} · ",getFull:"フル版を入手",carrierUnknown:"—",mainNav:"メイン"
 },
 hi: {
-navHome:"डैशबोर्ड",navHardware:"हार्डवेयर",navSystem:"सिस्टम",navBattery:"बैटरी",navBuild:"बिल्ड",navPlan:"योजना",navKeys:"कुंजियाँ",navTermux:"Termux",
+navHome:"डैशबोर्ड",navHardware:"हार्डवेयर",navSystem:"सिस्टम",navBattery:"बैटरी",navBuild:"बिल्ड",navPlan:"योजना",navKeys:"API",navTermux:"Termux",
 connect:"जोड़ें",disconnect:"काटें",connected:"जुड़ा",allowTermux:"Termux अनुमति",noTermux:"Termux नहीं",notConnected:"जुड़ा नहीं",
 settingsAria:"सेटिंग्स",commandPh:"कमांड",run:"चलाएँ",
-work:"काम",machine:"मशीन",library:"लाइब्रेरी",files:"फ़ाइलें",console:"कंसोल",tweaks:"ट्वीक",doctor:"डॉक्टर",commands:"कमांड",links:"लिंक",setup:"सेटअप",meridian:"Meridian",licence:"लाइसेंस",fullVersion:"पूरा संस्करण",lookModesFoot:"रूप, मोड और लाइसेंस",linuxPc:"Linux PC",
-titleFinder:"फ़ाइलें",titleConsole:"कंसोल",titleSetup:"सेटअप",titleHardware:"हार्डवेयर",titleSystem:"सिस्टम",titleBattery:"बैटरी",titleBuild:"बिल्ड",titlePlan:"योजना",titlePay:"पूरा संस्करण",titleKeys:"कुंजियाँ",titleSettings:"सेटिंग्स",titleDoctor:"डॉक्टर",titleTweaks:"ट्वीक",titleCommands:"कमांड",titleLinks:"लिंक",titleAbout:"परिचय",titleSupport:"सहायता",titleTermux:"Termux",titleHome:"डैशबोर्ड",titleLinux:"Linux PC",
-thisPhone:"यह फ़ोन",hardwareFromDevice:"इस डिवाइस का हार्डवेयर",systemStrained:"सिस्टम पर भार",systemOptimal:"सिस्टम ठीक",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"बैटरी",heat:"गर्मी",voltage:"वोल्टेज",ramFree:"खाली RAM",memory:"मेमोरी",virtual:"वर्चुअल",deviceCare:"डिवाइस केयर",settings:"सेटिंग्स",about:"परिचय",liveClocks:"लाइव घड़ियाँ",hold:"रोकें",live:"लाइव",quietCool:"शांत और ठंडा",heatOrRam:"गर्मी या RAM ज्यादा है",storage:"स्टोरेज",network:"नेटवर्क",testSpeed:"नेटवर्क स्पीड जाँच",testing:"जाँच…",noRamPlus:"RAM Plus नहीं",usedOf:" उपयोग · ",connectTermux:"Termux जोड़ें",connectTermuxBody:"F-Droid लगाएँ, फिर Play नहीं बल्कि F-Droid से Termux। सेटअप खोलकर चलें। जब जुड़ा दिखे, सेटअप Termux के अंत में चला जाता है।",connectedTermux:"Termux से जुड़ा",copyLine:"पंक्ति कॉपी करें",reading:"पढ़ रहा है…",
+work:"काम",machine:"मशीन",library:"लाइब्रेरी",files:"फ़ाइलें",console:"कंसोल",tweaks:"ट्वीक",doctor:"डॉक्टर",commands:"कमांड",links:"लिंक",setup:"सेटअप",meridian:"Meridian",licence:"लाइसेंस",fullVersion:"प्लान",lookModesFoot:"रूप, मोड और लाइसेंस",linuxPc:"Linux PC",
+titleFinder:"फ़ाइलें",titleConsole:"कंसोल",titleSetup:"सेटअप",titleHardware:"हार्डवेयर",titleSystem:"सिस्टम",titleBattery:"बैटरी",titleBuild:"बिल्ड",titlePlan:"योजना",titlePay:"प्लान",titleKeys:"API",titleSettings:"सेटिंग्स",titleDoctor:"डॉक्टर",titleTweaks:"ट्वीक",titleCommands:"कमांड",titleLinks:"लिंक",titleAbout:"परिचय",titleSupport:"सहायता",titleTermux:"Termux",titleHome:"डैशबोर्ड",titleLinux:"Linux PC",
+thisPhone:"यह फ़ोन",hardwareFromDevice:"इस डिवाइस का हार्डवेयर",systemStrained:"सिस्टम पर भार",systemOptimal:"सिस्टम ठीक",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"बैटरी",heat:"बैट. तापमान",voltage:"वोल्टेज",ramFree:"खाली RAM",memory:"मेमोरी",virtual:"वर्चुअल",deviceCare:"डिवाइस केयर",settings:"सेटिंग्स",about:"परिचय",liveClocks:"लाइव घड़ियाँ",hold:"रोकें",live:"लाइव",quietCool:"शांत और ठंडा",heatOrRam:"गर्मी या RAM ज्यादा है",storage:"स्टोरेज",network:"नेटवर्क",testSpeed:"नेटवर्क स्पीड जाँच",testing:"जाँच…",noRamPlus:"RAM Plus नहीं",usedOf:" उपयोग · ",connectTermux:"Termux जोड़ें",connectTermuxBody:"F-Droid लगाएँ, फिर Play नहीं बल्कि F-Droid से Termux। सेटअप खोलकर चलें। जब जुड़ा दिखे, सेटअप Termux के अंत में चला जाता है।",connectedTermux:"Termux से जुड़ा",copyLine:"पंक्ति कॉपी करें",reading:"पढ़ रहा है…",
 look:"रूप",theme:"थीम",themeSystem:"सिस्टम",themeDark:"डार्क",themeLight:"लाइट",themeOled:"OLED",accent:"रंग",feel:"अनुभव",refresh:"रिफ़्रेश",refreshSaver:"बैटरी-सेवर 2से",refreshNormal:"सामान्य 1से",refreshLive:"लाइव 250ms",consoleFont:"कंसोल फ़ॉन्ट",keepAwake:"जॉब चलते स्क्रीन जगाएँ",haptics:"कंपन",on:"चालू",off:"बंद",motion:"गति",motionSystem:"सिस्टम",motionOff:"बंद",motionOn:"चालू",motionTestOn:"गति चालू है — यह पट्टी अभी फेज़ हुई।",motionTestOff:"गति बंद है — न फेज़, न ग्लोब घूमना।",language:"भाषा",shortcuts:"कीबोर्ड शॉर्टकट",
 aboutBlurb:"इस फ़ोन का डैशबोर्ड, Termux से जुड़ा।",aboutReadings:"आँकड़े डिवाइस से आते हैं। कमांड इस फ़ोन के Termux में चलती हैं। कोई खाता या सर्वर नहीं। कुंजी यहीं रहती है और योजना दबाने पर ही भेजी जाती है।",unlockedPhone:"यह फ़ोन अनलॉक है।",trialLeft:"ट्रायल:",freeVersion:"यह फ़ोन मुफ़्त संस्करण पर है।",shareReport:"हार्डवेयर रिपोर्ट साझा करें",copyright:"कॉपीराइट 2026",
 payUnlocked:"अनलॉक",havePro:"आपके पास Pro है",thankYou:"यह फ़ोन अनलॉक है। धन्यवाद।",alreadyPaidRestore:"दूसरी इंस्टॉल पर वापस लाना है? paid (पुरानी full.key) या MERIDIAN- कुंजी चिपकाएँ। फिर से सक्रिय करना हानिकारक नहीं।",activateAgain:"फिर सक्रिय करें",meridianPro:"Meridian Pro",onePayment:"एक भुगतान",buyLicence:"लाइसेंस खरीदें",checkoutOpens:"चेकआउट ब्राउज़र में खुलता है और MERIDIAN- से शुरू कुंजी ईमेल करता है। इस फ़ोन की कोई जानकारी नहीं भेजी जाती।",alreadyPaid:"पहले से भुगतान?",pastePaid:"अगर 1.8.6 खरीदा था तो paid चिपकाएँ, या रसीद की MERIDIAN- कुंजी।",activate:"सक्रिय करें",trialLeftAll:"ट्रायल: {n} बाकी। तब तक सब खुला है।",trialOver:"ट्रायल खत्म। डैशबोर्ड, हार्डवेयर, सिस्टम, बैटरी, एक कंसोल, सेटअप और डॉक्टर मुफ़्त रहते हैं।",restoreHintPaid:"paid अब भी 1.8.6 खरीद वापस लाता है।",restoreHintFree:"पुनर्स्थापना paid, full, unlocked या MERIDIAN- कुंजी लेती है।",licKey:"लाइसेंस कुंजी",paste:"चिपकाएँ",
@@ -541,12 +564,12 @@ shortcutsTitle:"शॉर्टकट",shortcutsBody:"हर पेज से �
 back:"वापस",trialLine:"ट्रायल: {n} बाकी · ",getFull:"पूरा संस्करण लें",carrierUnknown:"—",mainNav:"मुख्य"
 },
 es: {
-navHome:"Panel",navHardware:"Hardware",navSystem:"Sistema",navBattery:"Batería",navBuild:"Construir",navPlan:"Plan",navKeys:"Claves",navTermux:"Termux",
+navHome:"Panel",navHardware:"Hardware",navSystem:"Sistema",navBattery:"Batería",navBuild:"Construir",navPlan:"Plan",navKeys:"Plataformas API",navTermux:"Termux",
 connect:"Conectar",disconnect:"Desconectar",connected:"Conectado",allowTermux:"Permitir Termux",noTermux:"Sin Termux",notConnected:"No conectado",
 settingsAria:"Ajustes",commandPh:"Comando",run:"Ejecutar",
-work:"Trabajo",machine:"Máquina",library:"Biblioteca",files:"Archivos",console:"Consola",tweaks:"Ajustes finos",doctor:"Doctor",commands:"Comandos",links:"Enlaces",setup:"Configuración",meridian:"Meridian",licence:"Licencia",fullVersion:"Versión completa",lookModesFoot:"Aspecto, modos y licencia",linuxPc:"PC Linux",
-titleFinder:"Archivos",titleConsole:"Consola",titleSetup:"Configuración",titleHardware:"Hardware",titleSystem:"Sistema",titleBattery:"Batería",titleBuild:"Construir",titlePlan:"Plan",titlePay:"Versión completa",titleKeys:"Claves",titleSettings:"Ajustes",titleDoctor:"Doctor",titleTweaks:"Ajustes finos",titleCommands:"Comandos",titleLinks:"Enlaces",titleAbout:"Acerca de",titleSupport:"Soporte",titleTermux:"Termux",titleHome:"Panel",titleLinux:"PC Linux",
-thisPhone:"Este teléfono",hardwareFromDevice:"Hardware de este dispositivo",systemStrained:"Sistema cargado",systemOptimal:"Sistema óptimo",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batería",heat:"Calor",voltage:"Voltaje",ramFree:"RAM libre",memory:"Memoria",virtual:"Virtual",deviceCare:"Cuidado del dispositivo",settings:"Ajustes",about:"Acerca de",liveClocks:"Relojes en vivo",hold:"Pausar",live:"En vivo",quietCool:"Tranquilo y fresco",heatOrRam:"El calor o la RAM están altos",storage:"Almacenamiento",network:"Red",testSpeed:"Probar velocidad de red",testing:"Probando…",noRamPlus:"Sin RAM Plus",usedOf:" usado · ",connectTermux:"Conectar Termux",connectTermuxBody:"Instala F-Droid, luego Termux desde F-Droid, no Play. Abre Configuración y síguela. Cuando diga Conectado, Configuración pasa al final de Termux.",connectedTermux:"Conectado a Termux",copyLine:"Copiar la línea",reading:"Leyendo…",
+work:"Trabajo",machine:"Máquina",library:"Biblioteca",files:"Archivos",console:"Consola",tweaks:"Ajustes finos",doctor:"Doctor",commands:"Comandos",links:"Enlaces",setup:"Configuración",meridian:"Meridian",licence:"Licencia",fullVersion:"Planes",lookModesFoot:"Aspecto, modos y licencia",linuxPc:"PC Linux",
+titleFinder:"Archivos",titleConsole:"Consola",titleSetup:"Configuración",titleHardware:"Hardware",titleSystem:"Sistema",titleBattery:"Batería",titleBuild:"Construir",titlePlan:"Plan",titlePay:"Planes",titleKeys:"Plataformas API",titleSettings:"Ajustes",titleDoctor:"Doctor",titleTweaks:"Ajustes finos",titleCommands:"Comandos",titleLinks:"Enlaces",titleAbout:"Acerca de",titleSupport:"Soporte",titleTermux:"Termux",titleHome:"Panel",titleLinux:"PC Linux",
+thisPhone:"Este teléfono",hardwareFromDevice:"Hardware de este dispositivo",systemStrained:"Sistema cargado",systemOptimal:"Sistema óptimo",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batería",heat:"Temp. bat.",voltage:"Voltaje",ramFree:"RAM libre",memory:"Memoria",virtual:"Virtual",deviceCare:"Cuidado del dispositivo",settings:"Ajustes",about:"Acerca de",liveClocks:"Relojes en vivo",hold:"Pausar",live:"En vivo",quietCool:"Tranquilo y fresco",heatOrRam:"El calor o la RAM están altos",storage:"Almacenamiento",network:"Red",testSpeed:"Probar velocidad de red",testing:"Probando…",noRamPlus:"Sin RAM Plus",usedOf:" usado · ",connectTermux:"Conectar Termux",connectTermuxBody:"Instala F-Droid, luego Termux desde F-Droid, no Play. Abre Configuración y síguela. Cuando diga Conectado, Configuración pasa al final de Termux.",connectedTermux:"Conectado a Termux",copyLine:"Copiar la línea",reading:"Leyendo…",
 look:"Aspecto",theme:"Tema",themeSystem:"Sistema",themeDark:"Oscuro",themeLight:"Claro",themeOled:"OLED",accent:"Acento",feel:"Tacto",refresh:"Actualización",refreshSaver:"Ahorro 2s",refreshNormal:"Normal 1s",refreshLive:"En vivo 250ms",consoleFont:"Fuente de consola",keepAwake:"Mantener despierto mientras corre un trabajo",haptics:"Hápticos",on:"Sí",off:"No",motion:"Movimiento",motionSystem:"Sistema",motionOff:"No",motionOn:"Sí",motionTestOn:"El movimiento está activo: esta barra acaba de aparecer.",motionTestOff:"El movimiento está apagado: sin fundido ni giro del globo.",language:"Idioma",shortcuts:"Atajos de teclado",
 aboutBlurb:"Un panel para este teléfono, unido a Termux.",aboutReadings:"Las lecturas vienen del dispositivo. Los comandos corren en Termux en este teléfono. No hay cuenta ni servidor. Una clave, si la guardas, se queda aquí y solo se envía al pulsar Plan.",unlockedPhone:"Este teléfono está desbloqueado.",trialLeft:"Prueba:",freeVersion:"Este teléfono está en la versión gratis.",shareReport:"Compartir informe de hardware",copyright:"Copyright 2026",
 payUnlocked:"Desbloqueado",havePro:"Tienes Pro",thankYou:"Este teléfono está desbloqueado. Gracias.",alreadyPaidRestore:"¿Restaurar en otra instalación? Pega paid (el antiguo full.key) o una clave MERIDIAN-. Activar de nuevo no hace daño.",activateAgain:"Activar otra vez",meridianPro:"Meridian Pro",onePayment:"un pago",buyLicence:"Comprar licencia",checkoutOpens:"El pago se abre en el navegador y envía una clave que empieza por MERIDIAN-. Nada de este teléfono se envía.",alreadyPaid:"¿Ya pagaste?",pastePaid:"Pega la palabra paid si compraste 1.8.6, o una clave MERIDIAN- del recibo.",activate:"Activar",trialLeftAll:"Prueba: {n} restantes. Todo está abierto hasta entonces.",trialOver:"La prueba terminó. Panel, Hardware, Sistema, Batería, una consola, Configuración y Doctor siguen gratis.",restoreHintPaid:"paid sigue restaurando una compra de 1.8.6.",restoreHintFree:"La restauración acepta paid, full, unlocked o claves MERIDIAN-.",licKey:"Clave de licencia",paste:"Pegar",
@@ -556,12 +579,12 @@ shortcutsTitle:"Atajos",shortcutsBody:"Funciona desde cualquier página. Escribi
 back:"Atrás",trialLine:"Prueba: {n} restantes · ",getFull:"Obtener la versión completa",carrierUnknown:"—",mainNav:"Principal"
 },
 fr: {
-navHome:"Tableau",navHardware:"Matériel",navSystem:"Système",navBattery:"Batterie",navBuild:"Construire",navPlan:"Plan",navKeys:"Clés",navTermux:"Termux",
+navHome:"Tableau",navHardware:"Matériel",navSystem:"Système",navBattery:"Batterie",navBuild:"Construire",navPlan:"Plan",navKeys:"Plateformes API",navTermux:"Termux",
 connect:"Connecter",disconnect:"Déconnecter",connected:"Connecté",allowTermux:"Autoriser Termux",noTermux:"Pas de Termux",notConnected:"Non connecté",
 settingsAria:"Réglages",commandPh:"Commande",run:"Exécuter",
-work:"Travail",machine:"Machine",library:"Bibliothèque",files:"Fichiers",console:"Console",tweaks:"Réglages",doctor:"Docteur",commands:"Commandes",links:"Liens",setup:"Installation",meridian:"Meridian",licence:"Licence",fullVersion:"Version complète",lookModesFoot:"Apparence, modes et licence",linuxPc:"PC Linux",
-titleFinder:"Fichiers",titleConsole:"Console",titleSetup:"Installation",titleHardware:"Matériel",titleSystem:"Système",titleBattery:"Batterie",titleBuild:"Construire",titlePlan:"Plan",titlePay:"Version complète",titleKeys:"Clés",titleSettings:"Réglages",titleDoctor:"Docteur",titleTweaks:"Réglages",titleCommands:"Commandes",titleLinks:"Liens",titleAbout:"À propos",titleSupport:"Support",titleTermux:"Termux",titleHome:"Tableau",titleLinux:"PC Linux",
-thisPhone:"Ce téléphone",hardwareFromDevice:"Matériel de cet appareil",systemStrained:"Système sollicité",systemOptimal:"Système optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batterie",heat:"Chaleur",voltage:"Tension",ramFree:"RAM libre",memory:"Mémoire",virtual:"Virtuel",deviceCare:"Entretien de l’appareil",settings:"Réglages",about:"À propos",liveClocks:"Horloges en direct",hold:"Pause",live:"Direct",quietCool:"Calme et frais",heatOrRam:"La chaleur ou la RAM est élevée",storage:"Stockage",network:"Réseau",testSpeed:"Tester la vitesse réseau",testing:"Test…",noRamPlus:"Pas de RAM Plus",usedOf:" utilisé · ",connectTermux:"Connecter Termux",connectTermuxBody:"Installez F-Droid, puis Termux depuis F-Droid, pas Play. Ouvrez Installation et suivez. Quand il est écrit Connecté, Installation passe à la fin de Termux.",connectedTermux:"Connecté à Termux",copyLine:"Copier la ligne",reading:"Lecture…",
+work:"Travail",machine:"Machine",library:"Bibliothèque",files:"Fichiers",console:"Console",tweaks:"Réglages",doctor:"Docteur",commands:"Commandes",links:"Liens",setup:"Installation",meridian:"Meridian",licence:"Licence",fullVersion:"Forfaits",lookModesFoot:"Apparence, modes et licence",linuxPc:"PC Linux",
+titleFinder:"Fichiers",titleConsole:"Console",titleSetup:"Installation",titleHardware:"Matériel",titleSystem:"Système",titleBattery:"Batterie",titleBuild:"Construire",titlePlan:"Plan",titlePay:"Forfaits",titleKeys:"Plateformes API",titleSettings:"Réglages",titleDoctor:"Docteur",titleTweaks:"Réglages",titleCommands:"Commandes",titleLinks:"Liens",titleAbout:"À propos",titleSupport:"Support",titleTermux:"Termux",titleHome:"Tableau",titleLinux:"PC Linux",
+thisPhone:"Ce téléphone",hardwareFromDevice:"Matériel de cet appareil",systemStrained:"Système sollicité",systemOptimal:"Système optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batterie",heat:"Temp. bat.",voltage:"Tension",ramFree:"RAM libre",memory:"Mémoire",virtual:"Virtuel",deviceCare:"Entretien de l’appareil",settings:"Réglages",about:"À propos",liveClocks:"Horloges en direct",hold:"Pause",live:"Direct",quietCool:"Calme et frais",heatOrRam:"La chaleur ou la RAM est élevée",storage:"Stockage",network:"Réseau",testSpeed:"Tester la vitesse réseau",testing:"Test…",noRamPlus:"Pas de RAM Plus",usedOf:" utilisé · ",connectTermux:"Connecter Termux",connectTermuxBody:"Installez F-Droid, puis Termux depuis F-Droid, pas Play. Ouvrez Installation et suivez. Quand il est écrit Connecté, Installation passe à la fin de Termux.",connectedTermux:"Connecté à Termux",copyLine:"Copier la ligne",reading:"Lecture…",
 look:"Apparence",theme:"Thème",themeSystem:"Système",themeDark:"Sombre",themeLight:"Clair",themeOled:"OLED",accent:"Accent",feel:"Sensation",refresh:"Rafraîchissement",refreshSaver:"Économie 2s",refreshNormal:"Normal 1s",refreshLive:"Direct 250ms",consoleFont:"Police console",keepAwake:"Rester éveillé pendant un travail",haptics:"Haptique",on:"Oui",off:"Non",motion:"Mouvement",motionSystem:"Système",motionOff:"Non",motionOn:"Oui",motionTestOn:"Le mouvement est activé — cette barre vient d’apparaître.",motionTestOff:"Le mouvement est coupé — pas de fondu ni de rotation du globe.",language:"Langue",shortcuts:"Raccourcis clavier",
 aboutBlurb:"Un tableau de bord pour ce téléphone, lié à Termux.",aboutReadings:"Les relevés viennent de l’appareil. Les commandes s’exécutent dans Termux sur ce téléphone. Pas de compte, pas de serveur. Une clé, si vous l’enregistrez, reste ici et n’est envoyée que lorsque vous appuyez sur Plan.",unlockedPhone:"Ce téléphone est déverrouillé.",trialLeft:"Essai :",freeVersion:"Ce téléphone est en version gratuite.",shareReport:"Partager le rapport matériel",copyright:"Copyright 2026",
 payUnlocked:"Déverrouillé",havePro:"Vous avez Pro",thankYou:"Ce téléphone est déverrouillé. Merci.",alreadyPaidRestore:"Restaurer sur une autre install ? Collez paid (l’ancien full.key) ou une clé MERIDIAN-. Réactiver est sans danger.",activateAgain:"Réactiver",meridianPro:"Meridian Pro",onePayment:"un paiement",buyLicence:"Acheter une licence",checkoutOpens:"Le paiement s’ouvre dans le navigateur et envoie une clé commençant par MERIDIAN-. Rien de ce téléphone n’est envoyé.",alreadyPaid:"Déjà payé ?",pastePaid:"Collez le mot paid si vous avez acheté 1.8.6, ou une clé MERIDIAN- du reçu.",activate:"Activer",trialLeftAll:"Essai : {n} restant. Tout est ouvert jusque-là.",trialOver:"L’essai est fini. Tableau, Matériel, Système, Batterie, une console, Installation et Docteur restent gratuits.",restoreHintPaid:"paid restaure encore un achat 1.8.6.",restoreHintFree:"La restauration accepte paid, full, unlocked ou les clés MERIDIAN-.",licKey:"Clé de licence",paste:"Coller",
@@ -583,8 +606,14 @@ thisPhoneIsPremium:"This phone is Premium",
 thankYouShort:"Thank you.",
 tierFree:"Free",tierPro:"Pro",tierPremium:"Premium",
 priceFree:"€0",pricePro:"€15 once",
-freeKeeps:"Dashboard, Hardware, System, Battery, one console, Setup, Doctor, Commands, Links, and read-only Files.",
-proKeeps:"Build recipes, Plan (including a local model), Tweaks, extra console sessions, file write, and Linux PC.",
+freeKeeps:"Dashboard, hardware, system, battery, network posture, one console, one saved AI platform, Setup, Doctor, Commands, Links, and read-only Files.",
+proKeeps:"Every listed AI platform, advanced readings, custom themes, build recipes, tweaks, extra consoles, file write, and Linux PC.",
+premiumKeeps:"UFS storage class, unlimited saved API platforms, batch scripts, and the desktop monitor.",
+premiumNote:"€15 and up. The Pro button is the €15 consumer checkout and emails a Pro key. A Premium key is a separate business licence.",
+pricePremium:"€15 and up",
+roleFree:"Included",
+rolePro:"Consumer",
+rolePremium:"Business",
 buyPro:"Buy Pro · €15",
 twoKeys:"€15 includes two Pro keys: one for you, and one you can give to a friend.",
 downloads:"Downloads",
@@ -793,11 +822,16 @@ function resolvedMotion() {
   return "full";
 }
 function applySkin() {
-  const theme = resolvedTheme();
+  let theme = resolvedTheme();
+  let accent = prefs.accent || "amber";
+  if (!paid()) {
+    if (theme === "oled") theme = "dark";
+    if (accent !== "amber") accent = "amber";
+  }
   document.documentElement.setAttribute("data-theme", theme);
-  document.documentElement.setAttribute("data-accent", prefs.accent);
+  document.documentElement.setAttribute("data-accent", accent);
   document.documentElement.setAttribute("data-motion", resolvedMotion());
-  const pack = ACCENTS[prefs.accent] || ACCENTS.amber;
+  const pack = ACCENTS[accent] || ACCENTS.amber;
   const pal = theme === "light" ? pack.light : pack.dark;
   const r = document.documentElement.style;
   r.setProperty("--accent", pal.accent);
@@ -1024,6 +1058,31 @@ function shortGpu(name) {
   if (m) return m[0].replace(/\s+on Vulkan.*/, "").trim();
   return String(name || "");
 }
+function uniqueParts(list) {
+  const out = [];
+  const seen = {};
+  (list || []).forEach(function (item) {
+    const text = String(item == null ? "" : item).replace(/\s+/g, " ").trim();
+    if (!text || text === "—" || text === "0") return;
+    const key = text.toLowerCase();
+    if (seen[key]) return;
+    seen[key] = 1;
+    out.push(text);
+  });
+  return out;
+}
+function hw(value) {
+  const text = String(value == null ? "" : value).replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  if (/[A-Z]/.test(text)) return text;
+  return text.replace(/(^|[\s\/_-])([a-z])/g, function (_m, sep, ch) { return sep + ch.toUpperCase(); });
+}
+function sameText(a, b) {
+  const x = String(a || "").trim().toLowerCase();
+  const y = String(b || "").trim().toLowerCase();
+  if (!y) return true;
+  return x === y || (x && (x.indexOf(y) >= 0 || y.indexOf(x) >= 0));
+}
 function row(k, v) {
   v = String(v || "").trim();
   if (!v || v === "—" || v === "0") return "";
@@ -1036,13 +1095,14 @@ function coreGrid(p) {
     return '<div class="core"><span>CPU' + c.id + '</span><b>' + c.mhz + '</b></div>';
   }).join("") + '</div>';
 }
-function gaugeHtml(id, pct, label) {
-  const n = Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
-  const shown = pct === "—" || pct === "" || pct == null || isNaN(Number(pct)) ? "—" : n + "%";
-  const p = shown === "—" ? 0 : n;
-  return '<div><div class="gauge" data-g="' + id + '" style="--p:' + p + '"><b>' + esc(shown) + '</b></div><span>' + esc(label) + '</span></div>';
+function gaugeHtml(id, pct, label, center) {
+  const missing = pct === "—" || pct === "" || pct == null || (typeof pct !== "number" && isNaN(Number(pct)));
+  const n = missing ? 0 : Math.max(0, Math.min(100, Math.round(Number(pct) || 0)));
+  const shown = center != null ? center : (missing ? "—" : n + "%");
+  return '<div><div class="gauge" data-g="' + id + '" style="--p:' + n + '"><b>' + esc(shown) + '</b></div><span>' + esc(label) + '</span></div>';
 }
 const LOGO_SVG = '<svg class="marklogo" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#14110e" stroke="currentColor" stroke-width="1.15"/><path d="M14 6.2v4.4" fill="none" stroke="#f4efe6" stroke-width="2.05" stroke-linecap="round"/><path d="M9.7 10.1a6.35 6.35 0 1 0 8.6 0" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/></svg>';
+const MERIDIAN_MARK = '<span class="meridian-pulse" aria-hidden="true"><i></i><b></b></span>';
 function termOrbHtml() {
   return '<div class="termorb" aria-hidden="true"><span class="termorb-prompt">&gt;_</span><i class="termorb-caret"></i></div>';
 }
@@ -1072,6 +1132,7 @@ function restoreNav(s) {
   editing = !!s.editing;
 }
 function goNav(patch, opts) {
+  closeSetMenu();
   const cur = captureNav();
   const next = {
     view: patch.view != null ? patch.view : view,
@@ -1123,54 +1184,55 @@ function paintChrome() {
   const cheat = document.getElementById("cheat");
   if (cheat) cheat.setAttribute("aria-label", t("shortcutsTitle"));
 }
+function diskPctN(p) {
+  const total = Number(p.diskTotal) || 0;
+  if (total <= 0) return null;
+  return Math.round(100 * (total - Number(p.diskFree || 0)) / total);
+}
+function netDial(p) {
+  const rate = (Number(p.rx) || 0) + (Number(p.tx) || 0);
+  if (p.netClosed) return { pct: 0, text: "—" };
+  const pct = Math.max(0, Math.min(100, Math.round((rate / 1048576) * 100)));
+  return { pct: pct, text: kbps(rate) };
+}
 function homePage() {
   const s = phone();
   const p = live();
   const cpu = Math.max(0, Math.min(100, Math.round(Number(p.cpuPct) || 0)));
-  const gpuN = p.gpuLoad >= 0 ? Math.max(0, Math.min(100, Math.round(Number(p.gpuLoad)))) : 0;
-  const gpuLabel = p.gpuLoad >= 0 ? String(p.gpuLoad) : "—";
-  const memPctN = (function () { const t = Number(p.memTotal) || 0; if (t <= 0) return 0; return Math.round(100 * (t - (Number(p.memFree) || 0)) / t); })();
+  const gpuN = p.gpuLoad >= 0 ? Math.max(0, Math.min(100, Math.round(Number(p.gpuLoad)))) : null;
+  const memTotal = Number(p.memTotal) || 0;
+  const memPctN = memTotal > 0 ? Math.round(100 * (memTotal - (Number(p.memFree) || 0)) / memTotal) : null;
   const memPct = pctOf(p.memTotal, p.memFree);
-  const diskPct = pctOf(p.diskTotal, p.diskFree);
+  const diskN = diskPctN(p);
   const net = netView(p);
+  const dial = netDial(p);
   const bad = sick(p, s);
   let html = '<div class="stack">';
   if (bond !== "termux") html += '<button class="btn" type="button" data-go="setup">' + esc(t("setup")) + '</button><article class="plate stack"><b>' + esc(t("connectTermux")) + '</b><p class="muted">' + esc(t("connectTermuxBody")) + '</p><pre>' + esc(BOND_LINE) + '</pre><button class="ghost" type="button" id="copybond">' + esc(t("copyLine")) + '</button></article>';
-  else html += '<div class="linkline">' + esc(t("connectedTermux")) + '</div>';
-  const freeGb = gb(p.memFree);
   html += '<article class="hero">';
-  const brand = String(p.brand || s.brand || "").trim();
-  const product = String(s.product || "").trim();
-  const heroTitle = brand || product || t("thisPhone");
-  const heroDetail = [product && product !== heroTitle ? product : "", p.soc || s.chip, s.release ? "Android " + s.release : ""].filter(Boolean).join(" · ") || t("hardwareFromDevice");
-  html += '<div class="herotop"><div class="stage compact" aria-hidden="true">' + termOrbHtml() + '</div>';
-  html += '<div class="herocopy"><p class="k">' + esc(t("thisPhone")) + '</p><h2>' + esc(heroTitle) + '</h2>';
-  html += '<p class="muted">' + esc(heroDetail) + '</p>';
-  html += '<div class="healthpill' + (bad ? " bad" : "") + '" id="healthtext">' + (bad ? t("systemStrained") : t("systemOptimal")) + '</div></div></div>';
-  html += '<div class="gaugerow">';
-  html += gaugeHtml("CPU", cpu, t("cpu"));
-  html += gaugeHtml("GPU", p.gpuLoad >= 0 ? gpuN : "—", t("gpu"));
-  html += gaugeHtml("MEM", memPctN, t("ram"));
-  html += gaugeHtml("BAT", s.battery >= 0 ? s.battery : "—", t("battery"));
-  html += '</div></article>';
-  html += '<div class="leads">';
-  html += '<div><b data-k="LeadHeat">' + Number(s.temp || 0).toFixed(1) + '°</b><span>' + esc(t("heat")) + '</span></div>';
-  html += '<div><b data-k="LeadVolt">' + (s.voltage ? Number(s.voltage).toFixed(2) + " V" : "—") + '</b><span>' + esc(t("voltage")) + '</span></div>';
-  html += '<div><b data-k="LeadRAM">' + esc(freeGb) + '</b><span>' + esc(t("ramFree")) + '</span></div>';
-  html += '<div><b data-k="LeadBAT">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b><span>' + esc(t("battery")) + '</span></div>';
+  html += '<div class="speedometers">';
+  html += gaugeHtml("STO", diskN == null ? "—" : diskN, t("storage"));
+  html += gaugeHtml("NET", dial.pct, t("network"), dial.text);
   html += '</div>';
+  html += '<div class="healthpill' + (bad ? " bad" : "") + '" id="healthtext">' + (bad ? t("systemStrained") : t("systemOptimal")) + '</div>';
+  const gauges = [gaugeHtml("CPU", cpu, t("cpu"))];
+  if (gpuN != null) gauges.push(gaugeHtml("GPU", gpuN, t("gpu")));
+  if (memPctN != null) gauges.push(gaugeHtml("MEM", memPctN, t("ram")));
+  if (s.battery >= 0) gauges.push(gaugeHtml("BAT", s.battery, t("battery")));
+  html += '<div class="gaugerow" style="grid-template-columns:repeat(' + gauges.length + ',minmax(0,1fr))">' + gauges.join("") + '</div></article>';
+  const leads = [];
+  if (s.tempKnown) leads.push('<div><b data-k="LeadHeat">' + Number(s.temp || 0).toFixed(1) + '°</b><span>' + esc(t("heat")) + '</span></div>');
+  if (s.voltage) leads.push('<div><b data-k="LeadVolt">' + Number(s.voltage).toFixed(2) + ' V</b><span>' + esc(t("voltage")) + '</span></div>');
+  leads.push('<div><b data-k="LeadRAM">' + esc(gb(p.memFree)) + '</b><span>' + esc(t("ramFree")) + '</span></div>');
+  html += '<div class="leads" style="grid-template-columns:repeat(' + leads.length + ',minmax(0,1fr))">' + leads.join("") + '</div>';
   const v = virtPool(p);
   html += '<div class="pair">';
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
-  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button><button class="ghost" type="button" data-more="about">' + esc(t("about")) + '</button></div><p class="muted" id="ramout"></p>';
-  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 52" preserveAspectRatio="none"></svg></article>';
-  html += '<div class="healthrow"><article class="tile osxtile"><div class="logo-mark lg" id="healthlogo" aria-hidden="true">' + LOGO_SVG + '</div><div class="status-text">' + (bad ? t("heatOrRam") : t("quietCool")) + '</div></article></div>';
+  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="ramout"></p>';
+  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="plate">';
-  html += '<div class="kv"><span>' + esc(t("battery")) + '</span><b data-k="Battery">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b></div>';
-  html += '<div class="kv"><span>' + esc(t("storage")) + '</span><b data-k="Storage">' + esc(diskPct) + '</b></div>';
-  html += '<div class="kv"><span>' + esc(t("network")) + '</span><b data-k="Network">' + esc(net.big) + '</b></div>';
   html += '<p class="muted" data-s="Network">' + esc(net.sub) + '</p>';
   html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><p class="muted" id="carrierline">' + esc(carrierLabel()) + '</p></div><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
   html += '</div>';
@@ -1200,11 +1262,20 @@ function sparkPath(series, h) {
   if (series.length < 2) return "";
   let max = 1;
   series.forEach(function (v) { if (v > max) max = v; });
-  return series.map(function (v, i) {
-    const x = (i / (series.length - 1)) * 300;
-    const y = (h - 4) - (v / max) * (h - 10);
-    return (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
-  }).join(" ");
+  const pts = series.map(function (v, i) {
+    return [(i / (series.length - 1)) * 300, h - (v / max) * h];
+  });
+  let d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+  for (let i = 1; i < pts.length; i++) {
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const cx = ((p0[0] + p1[0]) / 2).toFixed(1);
+    d += " C" + cx + " " + p0[1].toFixed(1) + " " + cx + " " + p1[1].toFixed(1) + " " + p1[0].toFixed(1) + " " + p1[1].toFixed(1);
+  }
+  return d;
+}
+function sparkFill(line, h) {
+  return line ? line + " L300 " + h + " L0 " + h + " Z" : "";
 }
 function sick(p, s) {
   // Health reflects the phone, not the app: a failed `pkg search` or a disconnected
@@ -1237,13 +1308,21 @@ function paintMeters() {
   const memTotal = Number(p.memTotal) || 0;
   setGauge("MEM", memTotal > 0 ? Math.round(100 * (memTotal - (Number(p.memFree) || 0)) / memTotal) : "—");
   setGauge("BAT", s.battery >= 0 ? s.battery : "—");
+  const diskN = diskPctN(p);
+  setGauge("STO", diskN == null ? "—" : diskN);
+  const dial = netDial(p);
+  const netGauge = document.querySelector("[data-g='NET']");
+  if (netGauge) {
+    netGauge.style.setProperty("--p", String(dial.pct));
+    const nb = netGauge.querySelector("b");
+    if (nb) nb.textContent = dial.text;
+  }
   const avg = hist.length ? hist[hist.length - 1] : 0;
   setCard("CPU", cpu + "%", avg ? avg + " MHz" : "cores");
   setCard("GPU", gpuLabel, gpuSub);
-  setCard("LeadHeat", Number(s.temp || 0).toFixed(1) + "°", "");
-  setCard("LeadVolt", s.voltage ? Number(s.voltage).toFixed(2) + " V" : "—", "");
+  if (s.tempKnown) setCard("LeadHeat", Number(s.temp || 0).toFixed(1) + "°", "");
+  if (s.voltage) setCard("LeadVolt", Number(s.voltage).toFixed(2) + " V", "");
   setCard("LeadRAM", gb(p.memFree), "");
-  setCard("LeadBAT", s.battery >= 0 ? s.battery + "%" : "—", "");
   const v = virtPool(p);
   setCard("SensRAM", gb(p.memFree), gb(p.memRaw) + " unused · " + gb(p.memCached) + " cached");
   setCard("SensSwap", v.total ? gb(v.total) : "—", v.total ? gb(v.free) + " free" : "No RAM Plus");
@@ -1251,7 +1330,7 @@ function paintMeters() {
   const head = document.getElementById("headmark");
   const bad = sick(p, s);
   if (mark) mark.className = "logo-mark lg" + (bad ? " bad" : "");
-  if (head && !head.querySelector("svg")) head.innerHTML = LOGO_SVG;
+  if (head && !head.querySelector(".meridian-pulse")) head.innerHTML = MERIDIAN_MARK;
   const healthText = document.getElementById("healthtext");
   if (healthText) {
     healthText.textContent = bad ? t("systemStrained") : t("systemOptimal");
@@ -1260,7 +1339,6 @@ function paintMeters() {
   const carrier = document.getElementById("carrierline");
   if (carrier) carrier.textContent = carrierLabel();
   const memPct = pctOf(p.memTotal, p.memFree);
-  const diskPct = pctOf(p.diskTotal, p.diskFree);
   const net = netView(p);
   setCard("Memory", memPct, gb((p.memTotal || 0) - (p.memFree || 0)) + " used · " + gb(p.memTotal));
   const mem = document.querySelector("[data-k='Memory']");
@@ -1268,8 +1346,6 @@ function paintMeters() {
     const fill = mem.parentElement.querySelector(".bar i");
     if (fill) fill.style.width = (parseInt(memPct, 10) || 0) + "%";
   }
-  setCard("Battery", s.battery >= 0 ? s.battery + "%" : "—", "");
-  setCard("Storage", diskPct, "");
   setCard("Network", net.big, net.sub);
   const memUsed = document.querySelector("[data-s='Memory']");
   if (memUsed) memUsed.textContent = gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal);
@@ -1289,8 +1365,8 @@ function paintHardware() {
   }
   const clock = document.querySelector("[data-k='H-GPU']");
   const load = document.querySelector("[data-k='H-LOAD']");
-  if (clock) clock.textContent = p.gpuHz > 0 ? p.gpuHz + " MHz" : "No clock file";
-  if (load) load.textContent = p.gpuLoad >= 0 ? p.gpuLoad + "%" : "No load file";
+  if (clock && p.gpuHz > 0) clock.textContent = p.gpuHz + " MHz";
+  if (load && p.gpuLoad >= 0) load.textContent = p.gpuLoad + "%";
 }
 function paintBattery() {
   if (document.hidden || view !== "battery") return;
@@ -1299,7 +1375,10 @@ function paintBattery() {
   const s = phone();
   pct.textContent = s.battery >= 0 ? s.battery + "%" : "—";
   const temp = document.querySelector("[data-k='BatTemp']");
-  if (temp) temp.textContent = Number(s.temp || 0).toFixed(1) + "°C";
+  if (temp) {
+    if (s.tempKnown) temp.textContent = Number(s.temp || 0).toFixed(1) + "°C";
+    else temp.remove();
+  }
   if (pct.parentElement) {
     const fill = pct.parentElement.querySelector(".bar i");
     if (fill) fill.style.width = Math.max(0, Math.min(100, Number(s.battery) || 0)) + "%";
@@ -1308,16 +1387,20 @@ function paintBattery() {
 function paintGraph() {
   if (document.hidden || view !== "home") return;
   const svg = document.getElementById("spark");
-  const gsvg = document.getElementById("gspark");
   if (!svg) return;
   const p = live();
   if (!held) pushCpu(p);
   pushGpu(p);
-  const path = sparkPath(hist, 52);
-  const gpath = sparkPath(ghist, 52);
-  function sparkFill(line) { return line ? line + " L300 52 L0 52 Z" : ""; }
-  svg.innerHTML = path ? '<path d="' + sparkFill(path) + '" fill="var(--accent)" fill-opacity="0.16" stroke="none"/><path d="' + path + '" fill="none" style="stroke:var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>' : "";
-  if (gsvg) gsvg.innerHTML = gpath ? '<path d="' + sparkFill(gpath) + '" fill="var(--accent2)" fill-opacity="0.14" stroke="none"/><path d="' + gpath + '" fill="none" style="stroke:var(--accent2)" stroke-width="2.2" stroke-linejoin="round"/>' : "";
+  const path = sparkPath(hist, 64);
+  const gpath = sparkPath(ghist, 64);
+  const fill = document.getElementById("sparkfill");
+  const line = document.getElementById("sparkline");
+  const gfill = document.getElementById("gsparkfill");
+  const gline = document.getElementById("gsparkline");
+  if (fill) fill.setAttribute("d", sparkFill(path, 64));
+  if (line) line.setAttribute("d", path);
+  if (gfill) gfill.setAttribute("d", sparkFill(gpath, 64));
+  if (gline) gline.setAttribute("d", gpath);
   const hz = hist.length ? hist[hist.length - 1] : 0;
   const cpu = Math.max(0, Math.min(100, Math.round(Number(p.cpuPct) || 0)));
   const gpu = p.gpuLoad >= 0 ? Number(p.gpuLoad) : -1;
@@ -1332,12 +1415,11 @@ function systemPage() {
   const s = phone();
   const p = live();
   let html = '<div class="stack"><p class="sec">Device</p><article class="plate">';
-  html += row("Phone", s.model);
-  html += row("Brand", p.brand);
-  html += row("Model", s.rawModel);
-  html += row("Device", p.device);
-  html += row("Board", p.board);
-  html += row("Maker", p.maker);
+  const identity = uniqueParts([hw(s.model), hw(p.brand), hw(s.rawModel), hw(p.device), hw(p.board), hw(p.maker)]);
+  html += row("Phone", identity[0] || "");
+  html += row("Brand", identity[1] || "");
+  html += row("Model", identity[2] || "");
+  html += row("Board", identity[3] || "");
   html += '</article><p class="sec">Operating system</p><article class="plate">';
   html += row("Android", s.release);
   html += row("API", p.sdk);
@@ -1347,12 +1429,6 @@ function systemPage() {
   html += row("Build", p.buildId);
   html += row("Built", p.built);
   html += row("Kernel", shortKernel(p.kernel));
-  html += '</article><p class="sec">Graphics</p><article class="plate">';
-  html += row("Renderer", p.renderer);
-  html += row("OpenGL", p.glVersion);
-  html += row("Vendor", p.glVendor);
-  html += row("EGL", p.egl);
-  html += row("Vulkan", p.vulkan);
   html += '</article><p class="sec">Termux</p><article class="plate"><p id="senseline">' + esc(senseText || (bond === "termux" ? "Reading the shell…" : "Connect Termux. This line is uname from that shell.")) + '</p></article>';
   if (p.fingerprint) html += '<article class="plate"><p class="muted">' + esc(p.fingerprint) + '</p></article>';
   return html + '</div>';
@@ -1361,29 +1437,33 @@ function hardwarePage() {
   const s = phone();
   const p = live();
   let html = '<div class="stack"><div class="tools"><button class="btn" type="button" id="sharereport" style="width:auto">' + esc(t("shareReport")) + '</button></div><p class="sec">Processor</p><article class="plate">';
-  html += row("SoC", p.soc || s.chip);
-  html += row("Hardware", p.hardware);
-  html += row("Platform", s.platform);
+  html += row("SoC", hw(p.soc || s.chip));
+  html += row("Hardware", hw(p.hardware));
+  html += row("Platform", hw(s.platform));
   html += row("CPU", p.cpuinfo);
   html += row("Cores", p.cores ? String(p.cores) : String((p.coresLive || []).length || ""));
   html += row("Governor", (p.clocks && p.clocks[0] && p.clocks[0].gov) || "");
   html += row("Load", p.load1 || "");
   html += coreGrid(p);
+  const renderer = hw(p.renderer || s.gpu);
+  const vendor = hw(p.glVendor);
+  const maker = hw(p.maker);
   html += '</article><p class="sec">GPU</p><article class="plate">';
-  html += row("Renderer", p.renderer || s.gpu);
-  html += row("OpenGL", p.glVersion);
-  html += row("Vendor", p.glVendor);
-  html += row("EGL", p.egl);
-  html += row("Vulkan", p.vulkan);
-  html += '<div class="kv"><span>Clock</span><b data-k="H-GPU">' + esc(p.gpuHz > 0 ? p.gpuHz + " MHz" : "No clock file") + '</b></div>';
-  html += '<div class="kv"><span>Load</span><b data-k="H-LOAD">' + esc(p.gpuLoad >= 0 ? p.gpuLoad + "%" : "No load file") + '</b></div>';
+  html += row("Renderer", renderer);
+  html += row("OpenGL ES", p.egl ? p.egl : "");
+  if (!sameText(p.glVersion, p.egl)) html += row("Driver", p.glVersion);
+  if (vendor && !sameText(vendor, maker) && !/^samsung/i.test(vendor)) html += row("Vendor", vendor);
+  const vulkan = hw(p.vulkan);
+  if (vulkan && !sameText(vulkan, renderer)) html += row("Vulkan", vulkan);
+  if (p.gpuHz > 0) html += '<div class="kv"><span>Clock</span><b data-k="H-GPU">' + esc(p.gpuHz + " MHz") + '</b></div>';
+  if (p.gpuLoad >= 0) html += '<div class="kv"><span>Load</span><b data-k="H-LOAD">' + esc(p.gpuLoad + "%") + '</b></div>';
   html += '</article><p class="sec">Display</p><article class="plate">';
   html += row("Resolution", s.width && s.height ? s.width + " × " + s.height : "");
   html += row("Refresh", s.hz ? s.hz + " Hz" : "");
   html += row("Density", s.dpi ? s.dpi + " dpi" : "");
   html += '</article><p class="sec">Memory</p><article class="plate">';
   html += row("RAM", gb(p.memTotal));
-  html += row("Type", p.ramType);
+  html += row("Type", hw(p.ramType));
   html += row("Available", gb(p.memFree));
   html += row("Cached", gb(p.memCached));
   html += row("Free", gb(p.memRaw));
@@ -1395,6 +1475,7 @@ function hardwarePage() {
   html += '</article><p class="sec">Storage</p><article class="plate">';
   html += row("Size", gb(p.diskTotal));
   html += row("Free", gb(p.diskFree));
+  if (premium() && p.ufs) html += row("UFS", hw(p.ufs));
   html += '</article></div>';
   return html;
 }
@@ -1403,7 +1484,8 @@ function batteryPage() {
   const p = live();
   let html = '<div class="stack"><article class="plate"><p class="sec">' + esc(s.state || "Battery") + '</p>';
   html += '<b style="font-size:40px;color:var(--accent)" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
-  html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>" + bar(s.battery);
+  if (s.tempKnown) html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>";
+  html += bar(s.battery);
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");
@@ -1822,14 +1904,14 @@ function askHint(text) {
   if (t.indexOf("weather") >= 0) return "You will get the answer, then one command that fetches today's weather. Press Run only if you want that number.";
   if (/\b(install|pkg\b|build|compile|setup)\b/.test(t)) return "This is a job. You will get commands. Read them, change them if you want, then press Run.";
   if (/^(what|who|why|when|where|explain|define|tell me)\b/.test(t) || t.indexOf("?") >= 0) return "This is a question. You will get the answer, not a command.";
-  return "One sentence is enough. Try: What is a star? Or: Install Python.";
+  return "Query the terminal or describe the job. Example: show disk use. Or: install Python.";
 }
 function planPage() {
   const chips = ["Python", "Local model", "GPU compute", "Format", "Remote shell", "Fastfetch"];
   let html = '<div class="stack"><article class="plate planhead"><div class="logo-mark md">' + LOGO_SVG + '</div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p></div></article>';
   html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
-  html += '</div><textarea id="goal" rows="3" placeholder="What is a star?  or  Install Python"></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
+  html += '</div><textarea id="goal" rows="3" placeholder="Query the terminal or enter a command..."></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
   return html;
 }
 function mark(name) {
@@ -1965,7 +2047,6 @@ function buildPage() {
   shop += packCard("Workstation", "Languages, compilers, and the tools you already use on a laptop.", ["Python", "Node", "Git", "Compiler"]);
   shop += packCard("Media box", "Pull a video, remux it, keep the files in Termux.", ["Media box", "yt-dlp", "FFmpeg"]);
   shop += packCard("On-device AI", "A local GGUF model. No account, no cloud round-trip.", ["On-device AI", "llama server", "Local model"]);
-  shop += packCard("Linux PC", "Debian or Ubuntu userspace in Termux via proot-distro. Not a Windows VGA emulator.", ["Debian", "Ubuntu"]);
   shop += '</div>';
   return shop + bands("All recipes", IDEAS, [
     ["Care", ["Installed", "Update", "Upgrade", "Search", "Format", "Repair", "Apt cache"]],
@@ -1992,19 +2073,19 @@ function apisPage() {
     const a = APIS[Number(openCmd)];
     if (a && a[0] === "Custom") return '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button>' + keyPage() + '</div>';
     if (a) {
-      const savedKey = localStorage.getItem("m-key") || "";
-      const current = (localStorage.getItem("m-base") || "") === a[3];
+      const savedKey = apiSecret();
+      const current = apiBase() === a[3];
       return '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button><article class="plate stack"><b>' + esc(a[0]) + (current ? '<span class="probadge" style="background:var(--chip);color:var(--accent)">IN USE</span>' : "") + '</b><p class="muted">' + esc(a[1]) + '</p><p class="muted">Address</p><pre>' + esc(a[3]) + '</pre><p class="muted">Model</p><pre>' + esc(a[4]) + '</pre><label class="muted" for="apikey">Key</label><input id="apikey" type="password" placeholder="Paste the key" autocomplete="off" value="' + esc(current ? savedKey : "") + '" /><button class="ghost" type="button" data-open="' + esc(a[2]) + '">Get a key</button><button class="btn" type="button" id="useapi">Save and open Plan</button></article></div>';
     }
   }
   const items = APIS.map(function (a) { return [a[0], a[1], a[2], ""]; });
-  const using = localStorage.getItem("m-key") ? "Plan is using " + esc(localStorage.getItem("m-base") || "") + " with " + esc(localStorage.getItem("m-model") || "") + "." : "No key is saved yet. Plan still works for the built-in recipes.";
-  return '<p class="muted">No shared key is built in. A key that is not yours dies, and it would spend someone else\'s account. Free means you create the key and they do not ask for a card.</p><p class="muted">' + using + '</p>' + bands("Keys", items, [["Free", ["Groq", "Gemini", "OpenRouter"]], ["Paid", ["OpenAI", "Anthropic", "xAI"]], ["Other", ["Custom"]]]);
+  const using = apiSecret() ? "Plan is using " + esc(apiBase()) + " with " + esc(apiModel()) + "." : "No platform is saved yet. Plan still works for the built-in recipes.";
+  return '<p class="muted">No shared key is built in. A key that is not yours dies, and it would spend someone else\'s account. Free keeps one platform. Pro keeps the list. Premium keeps every platform you add. The key stays in encrypted storage on this phone and is sent only when you press Write the steps.</p><p class="muted">' + using + '</p>' + bands("API Platforms", items, [["Free", ["Groq", "Gemini", "OpenRouter"]], ["Paid", ["OpenAI", "Anthropic", "xAI"]], ["Other", ["Custom"]]]);
 }
 function keyPage() {
-  const key = localStorage.getItem("m-key") || "";
-  const base = localStorage.getItem("m-base") || "https://api.x.ai/v1";
-  const model = localStorage.getItem("m-model") || "grok-3";
+  const key = apiSecret();
+  const base = apiBase() || "https://api.x.ai/v1";
+  const model = apiModel() || "grok-3";
   const providers = [
     ["xAI", "https://api.x.ai/v1", "grok-3"],
     ["OpenAI", "https://api.openai.com/v1", "gpt-4o-mini"],
@@ -2103,7 +2184,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.2.2"; } catch (e) { return "2.2.2"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.0"; } catch (e) { return "2.3.0"; }
 }
 function savedDownloads() {
   try {
@@ -2111,6 +2192,33 @@ function savedDownloads() {
     if (n && /^\d+$/.test(n)) return n;
   } catch (e) {}
   return "";
+}
+function securityPage() {
+  let raw = "{}";
+  try { raw = MeridianPhone.networkPosture(); } catch (e) { raw = "{}"; }
+  let n = {};
+  try { n = JSON.parse(raw) || {}; } catch (e) { n = {}; }
+  const p = live();
+  const net = netView(p);
+  const transport = uniqueParts([n.wifi ? "Wi-Fi" : "", n.cell ? "Cellular" : "", n.vpn ? "VPN" : ""]).join(" · ");
+  let html = '<div class="stack"><article class="plate stack"><b>Network posture</b><p class="muted">This page reads this phone only. It is for the person who holds the handset. Meridian does not scan other machines and does not capture packets.</p></article><article class="plate">';
+  html += row("Transport", transport);
+  html += row("Interface", n.iface || "");
+  html += row("Down link", n.downKbps > 0 ? n.downKbps + " kbps" : "");
+  html += row("Up link", n.upKbps > 0 ? n.upKbps + " kbps" : "");
+  html += row("Throughput", net.big === "—" ? "" : net.big + " · " + net.sub);
+  const dns = uniqueParts(n.dns || []);
+  if (dns.length) html += row("DNS", dns.join(", "));
+  const addrs = uniqueParts(n.addrs || []);
+  if (addrs.length) html += row("Addresses", addrs.join(", "));
+  html += "</article>";
+  const listeners = uniqueParts(n.listeners || []);
+  if (listeners.length) {
+    html += '<p class="sec">Listening on this phone</p><article class="plate">';
+    html += row("Sockets", listeners.join(", "));
+    html += "</article>";
+  }
+  return html + "</div>";
 }
 function aboutPage() {
   const days = trialDays();
@@ -2188,8 +2296,8 @@ function toolsPage() {
     + '<button class="ico" type="button" data-more="links">' + mark("Links") + '<em>' + esc(t("links")) + '</em></button>'
     + (linked ? setup : "")
     + '</div><div class="bend"></div><p class="sec">' + esc(t("meridian")) + '</p><div class="grid">'
-    + '<button class="ico" type="button" data-more="about">' + mark("report") + '<em>' + esc(t("about")) + '</em></button>'
     + '<button class="ico" type="button" data-go="pay">' + mark("key") + '<em>' + esc(licensed() ? t("licence") : t("fullVersion")) + '</em></button>'
+    + '<button class="ico" type="button" data-more="about">' + mark("report") + '<em>' + esc(t("about")) + '</em></button>'
     + '</div><div class="bend"></div>' + schedulerCard() + '<div class="deskfoot">' + esc(t("lookModesFoot")) + '</div></div>';
 }
 function windowTitle() {
@@ -2199,6 +2307,7 @@ function windowTitle() {
   if (view === "hardware") return t("titleHardware");
   if (view === "system") return t("titleSystem");
   if (view === "battery") return t("titleBattery");
+  if (view === "security") return t("titleSecurity");
   if (view === "build") {
     if (openCmd !== "" && Number(openCmd) < IDEAS.length) return IDEAS[Number(openCmd)][0];
     return t("titleBuild");
@@ -2254,11 +2363,11 @@ function trialDays() {
 }
 // Pro is unlocked by a licence key, or for the length of the trial.
 function paid() { return licensed() || trialDays() > 0; }
-// What the free version keeps: Dashboard, Hardware, System, Battery, one console session,
-// Setup, Doctor, Commands, Links and read-only Files. Pro adds Build recipes, Plan, Tweaks,
-// extra sessions, and writing files.
-const PRO = { build: 1, plan: 1, tweaks: 1, "files-write": 1, pc: 1 };
-// Premium is designed in this file and stays off until Pro has paying users.
+// Free keeps Dashboard, Hardware, System, Battery, Security, Plan, one console,
+// one API platform, Setup, Doctor, Commands, Links, and read-only Files.
+// Pro adds Build, Tweaks, extra sessions, file write, Linux PC, the platform list, and themes.
+const PRO = { build: 1, tweaks: 1, "files-write": 1, pc: 1 };
+// The constant stays false. Batch scripts and UFS follow premium(), not this flag.
 const PREMIUM_ON = false;
 function payNote() {
   if (licMsg) return licMsg;
@@ -2271,16 +2380,18 @@ function priceCard(kicker, title, price, body, extra) {
 }
 function payPage() {
   if (licensed()) {
-    return '<div class="stack"><article class="plate stack pricecard"><h2>' + esc(t("thisPhoneIsPro")) + '</h2><p>' + esc(t("thankYouShort")) + '</p></article></div>';
+    const title = premium() ? t("thisPhoneIsPremium") : t("thisPhoneIsPro");
+    return '<div class="stack"><article class="plate stack pricecard"><div class="logo-mark md">' + LOGO_SVG + '</div><h2>' + esc(title) + '</h2><p>' + esc(t("thankYouShort")) + '</p></article></div>';
   }
-  let html = '<div class="stack">';
+  let html = '<div class="stack"><div class="logo-mark md">' + LOGO_SVG + '</div>';
   const days = trialDays();
-  html += priceCard(t("tierFree"), t("tierFree"), t("priceFree"), t("freeKeeps"), "");
+  html += priceCard(t("roleFree"), t("tierFree"), t("priceFree"), t("freeKeeps"), "");
   let proExtra = "";
   if (days > 0) proExtra += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
   else proExtra += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
   proExtra += '<button class="btn pay" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("twoKeys")) + '</p><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
-  html += priceCard(t("tierPro"), t("tierPro"), t("pricePro"), t("proKeeps"), proExtra);
+  html += priceCard(t("rolePro"), t("tierPro"), t("pricePro"), t("proKeeps"), proExtra);
+  html += priceCard(t("rolePremium"), t("tierPremium"), t("pricePremium"), t("premiumKeeps"), '<p class="muted">' + esc(t("premiumNote")) + '</p>');
   const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
   html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote()) + '</p></article>';
   return html + '</div>';
@@ -2288,8 +2399,7 @@ function payPage() {
 window.onPaid = function () { paidAt = 0; goNav({ view: "build", more: "menu", openCmd: "" }); };
 function render() {
   const main = document.getElementById("main");
-  const map = { home: homePage, hardware: hardwarePage, system: systemPage, battery: batteryPage, build: buildPage, plan: planPage, key: keyPage, apis: apisPage, tools: toolsPage, console: consoleView, files: filesPage, setup: setupPage, pay: payPage, settings: settingsPage };
-  const about = (view === "tools" && more === "menu") ? '<div class="aboutrow"><button class="aboutbtn" data-more="about" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg>' + esc(t("about")) + '</button><button class="aboutbtn" data-go="pay" type="button">' + esc(licensed() ? t("licence") : t("fullVersion")) + '</button></div>' : '';
+  const map = { home: homePage, hardware: hardwarePage, system: systemPage, battery: batteryPage, security: securityPage, build: buildPage, plan: planPage, key: keyPage, apis: apisPage, tools: toolsPage, console: consoleView, files: filesPage, setup: setupPage, pay: payPage, settings: settingsPage };
   const place = [view, more, openCmd, editing ? "1" : "0", cwd || "", String(sessionIx), selectMode ? "1" : "0"].join(":");
   const same = place === window.__place;
   const prevBody = document.querySelector(".winbody");
@@ -2302,9 +2412,9 @@ function render() {
     const d = trialDays();
     trial = '<p class="trialline">' + esc(tN("trialLine", d)) + '<button type="button" data-go="pay">' + esc(t("getFull")) + '</button></p>';
   }
-  main.innerHTML = '<section class="win"><div class="wintop"><button class="logo-slot' + (logoPressed ? " pressed" : "") + '" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '">' + LOGO_SVG + '</button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + about + '</div></div></section>';
+  main.innerHTML = '<section class="win"><div class="wintop"><button class="logo-slot' + (logoPressed ? " pressed" : "") + '" id="winlogo" type="button" aria-label="' + esc(t("titleHome")) + '">' + MERIDIAN_MARK + '</button><b>' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + '</div></div></section>';
   const headmark = document.getElementById("headmark");
-  if (headmark) headmark.innerHTML = LOGO_SVG;
+  if (headmark) headmark.innerHTML = MERIDIAN_MARK;
   document.body.className = view === "console" ? "term" : "";
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
@@ -2373,7 +2483,15 @@ function gate(name) {
   return false;
 }
 // The hardware back button. Returns "true" when the page consumed it.
+function closeSetMenu() {
+  const menu = document.getElementById("setmenu");
+  const btn = document.getElementById("openset");
+  if (menu) menu.hidden = true;
+  if (btn) btn.setAttribute("aria-expanded", "false");
+}
 window.meridianBack = function () {
+  const menu = document.getElementById("setmenu");
+  if (menu && !menu.hidden) { closeSetMenu(); return "true"; }
   const cheat = document.getElementById("cheat");
   if (cheat && !cheat.hidden) { cheat.hidden = true; return "true"; }
   if (selectMode) { selectMode = false; selected = {}; render(); return "true"; }
@@ -2382,21 +2500,34 @@ window.meridianBack = function () {
 function hardwareFacts() {
   const s = phone();
   const p = live();
-  return [
-    ["Phone", s.product || s.model || "—"],
-    ["Brand", p.brand || "—"],
-    ["SoC", p.soc || s.chip || "—"],
-    ["CPU", p.cpuinfo || "—"],
-    ["Cores", String(p.cores || (p.coresLive || []).length || "—")],
-    ["Load", p.load1 || "—"],
+  const rows = [
+    ["Phone", hw(s.product || s.model)],
+    ["Brand", hw(p.brand)],
+    ["SoC", hw(p.soc || s.chip)],
+    ["CPU", p.cpuinfo || ""],
+    ["Cores", String(p.cores || (p.coresLive || []).length || "")],
+    ["Load", p.load1 || ""],
     ["RAM", gb(p.memTotal) + "  (" + gb(p.memFree) + " free)"],
+    ["RAM type", hw(p.ramType)],
     ["Storage", gb(p.diskTotal) + "  (" + gb(p.diskFree) + " free)"],
-    ["Battery", (s.battery >= 0 ? s.battery + "%" : "—") + (s.temp ? "  " + Number(s.temp).toFixed(1) + "°C" : "")],
-    ["Android", (s.release || "—") + (p.sdk ? "  API " + p.sdk : "")],
-    ["GPU", p.renderer || s.gpu || "—"],
-    ["OpenGL", p.glVersion || "—"],
-    ["Vulkan", p.vulkan || "—"]
+    ["Battery", (s.battery >= 0 ? s.battery + "%" : "") + (s.tempKnown ? "  " + Number(s.temp).toFixed(1) + "°C" : "")],
+    ["Android", (s.release || "") + (p.sdk ? "  API " + p.sdk : "")],
+    ["GPU", hw(p.renderer || s.gpu)],
+    ["OpenGL ES", p.egl || ""]
   ];
+  if (p.glVersion && !sameText(p.glVersion, p.egl)) rows.push(["Driver", p.glVersion]);
+  if (p.glVendor && !sameText(hw(p.glVendor), hw(p.maker)) && !/^samsung/i.test(String(p.glVendor))) rows.push(["Vendor", hw(p.glVendor)]);
+  if (p.vulkan && !sameText(p.vulkan, p.renderer || s.gpu)) rows.push(["Vulkan", hw(p.vulkan)]);
+  if (premium() && p.ufs) rows.push(["UFS", hw(p.ufs)]);
+  const seen = {};
+  return rows.filter(function (row) {
+    const value = String(row[1] || "").trim();
+    if (!value || value === "—") return false;
+    const key = row[0] + "\n" + value.toLowerCase();
+    if (seen[key]) return false;
+    seen[key] = 1;
+    return true;
+  });
 }
 function hardwareReport(opts) {
   const footer = !opts || opts.footer !== false;
@@ -2445,6 +2576,13 @@ function selectedList() {
   return Object.keys(selected).filter(Boolean);
 }
 function applyPref(key, raw) {
+  if ((key === "accent" && raw !== "amber") || (key === "theme" && raw === "oled")) {
+    if (!paid()) {
+      toast("Custom themes are part of Pro.");
+      goNav({ view: "pay", more: "menu", openCmd: "" });
+      return;
+    }
+  }
   if (key === "theme") prefs.theme = raw;
   else if (key === "accent") prefs.accent = raw;
   else if (key === "refresh") prefs.refresh = raw;
@@ -2473,7 +2611,7 @@ function typingInField(e) {
   const tag = t && t.tagName;
   return tag === "INPUT" || tag === "TEXTAREA" || (t && t.isContentEditable);
 }
-const NAV_TABS = ["home", "hardware", "system", "battery", "build", "plan", "apis", "tools"];
+const NAV_TABS = ["home", "hardware", "system", "battery", "security", "build", "plan", "apis", "tools"];
 function onKeys(e) {
   if (e.key === "Escape") {
     const cheat = document.getElementById("cheat");
@@ -2507,7 +2645,7 @@ function onKeys(e) {
     try { MeridianPhone.cancelJob(); } catch (err) {}
     return;
   }
-  if (e.ctrlKey && !e.metaKey && e.key >= "1" && e.key <= "8") {
+  if (e.ctrlKey && !e.metaKey && e.key >= "1" && e.key <= "9") {
     e.preventDefault();
     const next = NAV_TABS[Number(e.key) - 1];
     if (!next) return;
@@ -2536,6 +2674,19 @@ function startRefresh() {
   graphTimer = setInterval(paintGraph, graph);
 }
 function bind() {
+  const openset = document.getElementById("openset");
+  const setmenu = document.getElementById("setmenu");
+  if (openset && setmenu) openset.onclick = function (ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    setmenu.hidden = !setmenu.hidden;
+    openset.setAttribute("aria-expanded", setmenu.hidden ? "false" : "true");
+  };
+  document.querySelectorAll("[data-device]").forEach(function (b) {
+    b.onclick = function () {
+      closeSetMenu();
+      try { MeridianPhone.openDeviceSettings(b.getAttribute("data-device")); } catch (e) {}
+    };
+  });
   document.querySelectorAll("[data-open]").forEach(function (b) { b.onclick = function () { try { MeridianPhone.open(b.getAttribute("data-open")); } catch (e) {} }; });
   const fixerr = document.getElementById("fixerr");
   if (fixerr) fixerr.onclick = function () {
@@ -2800,16 +2951,18 @@ function bind() {
   if (savekey) savekey.onclick = function () {
     const base = document.getElementById("k-base").value.trim();
     if (base && !/^https:\/\//i.test(base)) { toast("The address must start with https://"); return; }
-    localStorage.setItem("m-base", base);
-    localStorage.setItem("m-model", document.getElementById("k-model").value.trim());
-    localStorage.setItem("m-key", document.getElementById("k-key").value.trim());
+    const result = rememberPlatform(base, document.getElementById("k-model").value.trim(), document.getElementById("k-key").value.trim());
+    if (result !== "ok") return;
     savekey.textContent = "Saved";
     toast("Saved on this phone.");
   };
   const forgetkey = document.getElementById("forgetkey");
   if (forgetkey) forgetkey.onclick = function () {
     if (!confirm("Forget the saved API key?")) return;
-    localStorage.removeItem("m-key");
+    platforms.active = { base: "", model: "", key: "" };
+    platforms.items = [];
+    const result = persistPlatforms();
+    if (result !== "ok") return;
     toast("The key is gone.");
     render();
   };
@@ -2825,16 +2978,14 @@ function bind() {
   if (useapi) useapi.onclick = function () {
     const a = APIS[Number(openCmd)];
     if (!a) return;
-    localStorage.setItem("m-base", a[3]);
-    localStorage.setItem("m-model", a[4]);
     const typed = document.getElementById("apikey");
     const key = typed ? typed.value.trim() : "";
     if (!key) {
       useapi.textContent = "Paste the key first.";
       return;
     }
-    localStorage.setItem("m-key", key);
-    if (gate("plan")) return;
+    const result = rememberPlatform(a[3], a[4], key);
+    if (result !== "ok") return;
     goNav({ view: "plan", more: "menu", openCmd: "" });
   };
   const goalBox = document.getElementById("goal");
@@ -3329,14 +3480,14 @@ function nextAgent() {
   });
 }
 function startAgent() {
-  if (!PREMIUM_ON || !premium()) return;
+  if (!premium()) return;
   const cmds = planCommands();
   if (!cmds.length) { toast(t("noSteps")); return; }
   agentLeft = cmds.slice();
   nextAgent();
 }
 function agentBar() {
-  if (!PREMIUM_ON || !premium()) return "";
+  if (!premium()) return "";
   return '<button class="btn" type="button" id="runplan">' + esc(t("runThePlan")) + '</button>';
 }
 function showSteps(steps) {
@@ -3380,15 +3531,15 @@ function paintScheduler() {
   if (pre) pre.textContent = schedulerCommand();
 }
 function schedulerCard() {
-  if (!PREMIUM_ON) return "";
   if (!premium()) return "";
   let options = "";
   IDEAS.forEach(function (idea) { options += '<option value="' + esc(idea[0]) + '">' + esc(idea[0]) + '</option>'; });
   const last = localStorage.getItem("m-sched-status") || "—";
   return '<article class="plate stack" id="schedcard"><b>' + esc(t("scheduler")) + '</b><p class="muted">' + esc(t("schedulerBlurb")) + '</p><label class="muted" for="schedrecipe">' + esc(t("commands")) + '</label><select id="schedrecipe">' + options + '</select><label class="muted" for="schedevery">' + esc(t("interval")) + '</label><select id="schedevery"><option value="15">' + esc(t("every15")) + '</option><option value="60" selected>' + esc(t("everyHour")) + '</option><option value="360">' + esc(t("every6")) + '</option><option value="1440">' + esc(t("everyDay")) + '</option></select><pre id="schedcmd"></pre><div class="tools"><button class="ghost" type="button" id="schedcopy">' + esc(t("copyCommand")) + '</button><button class="ghost" type="button" id="schedrun">' + esc(t("runScheduler")) + '</button><button class="ghost" type="button" id="schedcheck">' + esc(t("checkJobs")) + '</button></div><p class="muted" id="schedstatus">' + esc(t("lastStatus")) + ": " + esc(last) + '</p></article>';
 }
-function apiBase() {
-  let base = (localStorage.getItem("m-base") || "https://api.x.ai/v1").trim();
+let platforms = { active: { base: "", model: "", key: "" }, items: [] };
+function normalizeBase(base) {
+  base = String(base || "").trim();
   if (!/^https:\/\//i.test(base)) return base;
   base = base.replace(/\/+$/, "").replace(/\/chat\/completions$/i, "").replace(/\/messages$/i, "");
   if (/^https:\/\/api\.x\.ai$/i.test(base)) return "https://api.x.ai/v1";
@@ -3399,25 +3550,81 @@ function apiBase() {
   if (/^https:\/\/generativelanguage\.googleapis\.com$/i.test(base)) return "https://generativelanguage.googleapis.com/v1beta";
   return base;
 }
+function apiBase() {
+  return normalizeBase(platforms.active && platforms.active.base);
+}
+function apiModel() {
+  return String((platforms.active && platforms.active.model) || "");
+}
+function apiSecret() {
+  return String((platforms.active && platforms.active.key) || "");
+}
+function persistPlatforms() {
+  let result = "ok";
+  try {
+    result = String(MeridianPhone.savePlatforms(JSON.stringify(platforms)) || "ok");
+  } catch (e) {
+    result = "Could not save the platform.";
+  }
+  if (result !== "ok") toast(result);
+  return result;
+}
+function rememberPlatform(base, model, key) {
+  const item = { base: normalizeBase(base), model: String(model || "").trim(), key: String(key || "").trim() };
+  const cap = premium() ? 32 : (paid() ? 8 : 1);
+  const items = (platforms.items || []).filter(function (it) {
+    return !(it && normalizeBase(it.base) === item.base && String(it.model || "") === item.model);
+  });
+  items.unshift(item);
+  platforms.active = item;
+  platforms.items = items.slice(0, cap);
+  return persistPlatforms();
+}
+function bootPlatforms() {
+  let raw = "{}";
+  try { if (typeof MeridianPhone !== "undefined" && MeridianPhone.loadPlatforms) raw = MeridianPhone.loadPlatforms() || "{}"; } catch (e) { raw = "{}"; }
+  let parsed = null;
+  try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+  platforms = parsed && typeof parsed === "object" ? parsed : { active: { base: "", model: "", key: "" }, items: [] };
+  if (!platforms.active || typeof platforms.active !== "object") platforms.active = { base: "", model: "", key: "" };
+  if (!Array.isArray(platforms.items)) platforms.items = [];
+  let oldKey = "", oldBase = "", oldModel = "";
+  try {
+    oldKey = localStorage.getItem("m-key") || "";
+    oldBase = localStorage.getItem("m-base") || "";
+    oldModel = localStorage.getItem("m-model") || "";
+  } catch (e) {}
+  if ((oldKey || oldBase || oldModel) && !apiSecret()) {
+    const result = rememberPlatform(oldBase || "https://api.x.ai/v1", oldModel || "grok-3", oldKey);
+    if (result === "ok") {
+      try {
+        localStorage.removeItem("m-key");
+        localStorage.removeItem("m-base");
+        localStorage.removeItem("m-model");
+      } catch (e) {}
+    }
+  }
+}
 function planGoal() {
   const goal = document.getElementById("goal").value.trim();
   if (!goal) return;
   const box = document.getElementById("steps");
-  const key = localStorage.getItem("m-key") || "";
+  const key = apiSecret();
   const known = localPlan(goal);
   if (known) {
     showSteps(known);
     return;
   }
   if (!key) {
-    if (box) box.innerHTML = "<p class='muted'>No API key on this phone, and there is no saved recipe for that. Open Key, paste yours, and save it. Plan will not invent a command.</p>";
+    if (box) box.innerHTML = "<p class='muted'>No API platform is saved on this phone, and there is no saved recipe for that. Open API Platforms, paste yours, and save it. Plan will not invent a command.</p>";
     return;
   }
   const base = apiBase();
-  let model = localStorage.getItem("m-model") || "grok-3";
+  let model = apiModel() || "grok-3";
   if (/api\.groq\.com/.test(base) && (model === "llama-3.3-70b-versatile" || model === "llama-3.1-8b-instant")) {
     model = "openai/gpt-oss-20b";
-    localStorage.setItem("m-model", model);
+    if (platforms.active) platforms.active.model = model;
+    persistPlatforms();
   }
   if (box) box.innerHTML = "<p class='muted'>Sending to " + esc(base) + "…</p>";
   const planBtn = document.getElementById("plan");
@@ -3474,6 +3681,7 @@ sessions.forEach(function (s) {
   if (s.length && /^Connecting to Termux/.test(s[s.length - 1].out || "")) s[s.length - 1].out = "The app was closed while this ran. Termux may still have finished it.\nexit 0";
 });
 readPrefs();
+bootPlatforms();
 applySkin();
 if (window.matchMedia) {
   try {
@@ -3488,6 +3696,13 @@ if (window.matchMedia) {
   } catch (e) {}
 }
 document.addEventListener("keydown", onKeys);
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("setmenu");
+  if (!menu || menu.hidden) return;
+  const t = e.target;
+  if (t && t.closest && (t.closest("#setmenu") || t.closest("#openset"))) return;
+  closeSetMenu();
+});
 const cheatclose = document.getElementById("cheatclose");
 if (cheatclose) cheatclose.onclick = function () { showCheat(false); };
 const cheatbox = document.getElementById("cheat");
