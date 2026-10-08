@@ -10,8 +10,8 @@ android {
         applicationId = "com.meridian.shell"
         minSdk = 26
         targetSdk = 35
-        versionCode = 43
-        versionName = "2.3.0"
+        versionCode = 44
+        versionName = "2.3.1"
     }
 
     buildTypes {

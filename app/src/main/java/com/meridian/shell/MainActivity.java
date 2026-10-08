@@ -25,6 +25,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -108,9 +111,19 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        web.setFocusable(true);
+        web.setFocusableInTouchMode(true);
+        web.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP && !v.hasFocus()) v.requestFocus();
+                return false;
+            }
+        });
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
+        web.requestFocus();
         adoptLegacyUnlock();
     }
 
@@ -985,6 +998,90 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** Shows the soft keyboard for the WebView. The page calls this when a text field is touched. */
+        @JavascriptInterface
+        public void showKeyboard() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (web == null) return;
+                    web.setFocusable(true);
+                    web.setFocusableInTouchMode(true);
+                    web.requestFocus();
+                    web.post(new Runnable() {
+                        public void run() {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                            if (imm != null) imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+                }
+            });
+        }
+
+        /**
+         * Debug builds only. Writes files/dev.unlock so this handset can open Pro and Premium
+         * without a payment token. Release builds ignore that file. It does not accept the words
+         * paid, full, or unlocked, and it does not write files/full.key.
+         */
+        @JavascriptInterface
+        public String devUnlock() {
+            if (!debuggable()) return "no";
+            try {
+                writeText(new File(getFilesDir(), "dev.unlock"), "premium");
+                return "yes";
+            } catch (Exception ex) {
+                return "no";
+            }
+        }
+
+        @JavascriptInterface
+        public String workspace() {
+            try {
+                JSONObject o = new JSONObject();
+                o.put("personal", claimsSku(readSmallText(slotFile("personal"), 12000)));
+                o.put("enterprise", claimsSku(readSmallText(slotFile("enterprise"), 12000)));
+                String active = readSmallText(new File(getFilesDir(), "slot-active"), 32);
+                if (!knownSlot(active)) active = "personal";
+                o.put("active", active);
+                return o.toString();
+            } catch (Exception ex) {
+                return "{\"personal\":\"\",\"enterprise\":\"\",\"active\":\"personal\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String saveWorkspace(String slot, String key) {
+            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
+            String result = activate(key);
+            try {
+                JSONObject o = new JSONObject(result);
+                if (!o.optBoolean("ok")) return result;
+                String normalized = key == null ? "" : key.trim().replace("\r", "").replace("\n", "").replace(" ", "");
+                writeText(slotFile(slot), normalized);
+                writeText(new File(getFilesDir(), "slot-active"), slot);
+                markTier(o.optString("sku", "pro"));
+                return result;
+            } catch (Exception ex) {
+                return "{\"ok\":false,\"error\":\"The workspace could not be saved.\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String useWorkspace(String slot) {
+            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
+            String key = readSmallText(slotFile(slot), 12000);
+            if (key.length() == 0) return "{\"ok\":false,\"error\":\"That workspace has no key yet.\"}";
+            String result = activate(key);
+            try {
+                JSONObject o = new JSONObject(result);
+                if (!o.optBoolean("ok")) return result;
+                writeText(new File(getFilesDir(), "slot-active"), slot);
+                markTier(o.optString("sku", "pro"));
+                return result;
+            } catch (Exception ex) {
+                return "{\"ok\":false,\"error\":\"The workspace could not be opened.\"}";
+            }
+        }
+
         @JavascriptInterface
         public void haptic() {
             runOnUiThread(new Runnable() {
@@ -1068,12 +1165,22 @@ public class MainActivity extends Activity {
                 if (!licence.isFile() || licence.length() == 0) markPaid("pro");
                 return "yes";
             }
-            return licence.isFile() && licence.length() > 0 ? "yes" : "no";
+            if (licence.isFile() && licence.length() > 0) return "yes";
+            if (debuggable()) {
+                String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
+                if ("pro".equals(dev) || "premium".equals(dev)) return "yes";
+            }
+            return "no";
         }
 
         /** free, pro, or premium. An existing full.key from this install stays pro unless it says premium. */
         @JavascriptInterface
         public String tier() {
+            if (debuggable()) {
+                String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
+                if ("premium".equals(dev)) return "premium";
+                if ("pro".equals(dev)) return "pro";
+            }
             File licence = new File(getFilesDir(), "full.key");
             if (!licence.isFile() || licence.length() == 0) return "free";
             if ("premium".equals(readSmallText(licence, 32))) return "premium";
@@ -1594,10 +1701,54 @@ public class MainActivity extends Activity {
             java.io.File out = new java.io.File(getFilesDir(), "full.key");
             String current = readSmallText(out, 32);
             String next = ("premium".equals(sku) || "premium".equals(current)) ? "premium" : "pro";
-            java.io.FileOutputStream stream = new java.io.FileOutputStream(out);
-            stream.write(next.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            stream.close();
+            writeText(out, next);
+            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
         } catch (Exception ignored) {}
+    }
+
+    /** Writes the exact sku. Used when a verified workspace is selected, including a step down from Premium to Pro. */
+    private void markTier(String sku) {
+        try {
+            String next = "premium".equals(sku) ? "premium" : "pro";
+            writeText(new File(getFilesDir(), "full.key"), next);
+            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
+        } catch (Exception ignored) {}
+    }
+
+    private boolean debuggable() {
+        return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
+    private boolean knownSlot(String slot) {
+        return "personal".equals(slot) || "enterprise".equals(slot);
+    }
+
+    private File slotFile(String slot) {
+        return new File(getFilesDir(), "slot-" + slot + ".key");
+    }
+
+    private void writeText(File file, String text) throws Exception {
+        FileOutputStream stream = new FileOutputStream(file);
+        try {
+            stream.write((text == null ? "" : text).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            stream.flush();
+        } finally {
+            stream.close();
+        }
+    }
+
+    /** Display-only sku from a stored key. Unlocking still goes through activate(). */
+    private String claimsSku(String key) {
+        try {
+            String k = key == null ? "" : key.trim();
+            if (k.startsWith("MERIDIAN-")) k = k.substring(9);
+            int dot = k.indexOf('.');
+            if (dot <= 0) return "";
+            byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
+            String sku = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8)).optString("sku", "");
+            if ("pro".equals(sku) || "premium".equals(sku)) return sku;
+        } catch (Exception ignored) {}
+        return "";
     }
 
     private String readSmallText(File file, int max) {
