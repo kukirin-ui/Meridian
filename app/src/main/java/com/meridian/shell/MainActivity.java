@@ -25,8 +25,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -113,17 +111,9 @@ public class MainActivity extends Activity {
         });
         web.setFocusable(true);
         web.setFocusableInTouchMode(true);
-        web.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP && !v.hasFocus()) v.requestFocus();
-                return false;
-            }
-        });
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
-        web.requestFocus();
         adoptLegacyUnlock();
     }
 
@@ -1004,15 +994,23 @@ public class MainActivity extends Activity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (web == null) return;
-                    web.setFocusable(true);
-                    web.setFocusableInTouchMode(true);
-                    web.requestFocus();
                     web.post(new Runnable() {
                         public void run() {
                             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                             if (imm != null) imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT);
                         }
                     });
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void hideKeyboard() {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (web == null) return;
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm != null) imm.hideSoftInputFromWindow(web.getWindowToken(), 0);
                 }
             });
         }
