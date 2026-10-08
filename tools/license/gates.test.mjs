@@ -52,8 +52,8 @@ for (const word of ["paid", "full", "unlocked", "PAID", "Full", "Unlocked"]) {
 
 const logos = html.match(/const LOGO_SVG = /g) || [];
 assert.equal(logos.length, 1, "LOGO_SVG must be defined once");
-const uses = html.match(/LOGO_SVG/g) || [];
-assert.ok(uses.length >= 5, "LOGO_SVG should be reused on every chrome");
+assert.equal((html.match(/LOGO_SVG/g) || []).length, 1, "the power mark stays out of the page chrome");
+assert.match(html, /class="termbit"/);
 assert.equal(/class="land"|globe-map|globeHtml/.test(html), false, "planet globe is still in the UI");
 assert.match(html, /class="termorb"/);
 assert.match(html, /const PREMIUM_ON = false/);
