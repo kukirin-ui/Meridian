@@ -1,22 +1,22 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.2.2**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.0**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
-The public page at [meridian0.grok.me](https://meridian0.grok.me) still hands out the 1.8.6 APK until you upload a 2.0 build. **This repository is 2.0.** The UI, the Gradle project, and the licence-key paywall live at the root. The unchanged 1.8.6 source is kept in `original/` for comparison.
+The public page at [meridian0.grok.me](https://meridian0.grok.me) still hands out the 1.8.6 APK until you upload a 2.3.0 build. **This repository is the current app.** The UI, the Gradle project, and the licence-key paywall live at the root. The old 1.8.6 tree (`original/` and `meridian-source.zip`) was removed so the repo is not carrying two copies of the app.
 
 Prices are in [PRICES.md](PRICES.md).
 
 | Path | Role |
 |---|---|
-| `app/` | The 2.0 app: WebView host, Termux bridge, UI (`app/src/main/assets/www/index.html`) |
+| `app/` | The app: WebView host, Termux bridge, UI (`app/src/main/assets/www/index.html`) |
+| `desktop/` | Local desktop companion: readings, a loopback metrics page, and a stdio shell |
 | `tools/license/` | Generate / sign / verify Pro and Premium licence keys |
-| `original/` | Shipped 1.8.6 source, extracted verbatim from `meridian-source.zip` |
-| `AUDIT.md` | Full A-to-Z audit of 1.8.6, what 2.0 already fixed, and the backlog |
-| `docs/ROADMAP.md` | Earlier 1.8.6-only roadmap. Prefer `AUDIT.md` |
-| `meridian-source.zip` | Untouched 1.8.6 archive |
-| `PRICES.md` | Free, Pro, and Premium prices |
+| `tools/qa/` | Static UI audit (symmetry, duplicates, graph updates) |
+| `AUDIT.md` | Historical audit of 1.8.6. The `original/` tree it cites is gone |
+| `docs/ROADMAP.md` | Earlier 1.8.6-only roadmap. Prefer the app in `app/` |
+| `PRICES.md` | Free, Pro, and Premium |
 
 ## Install the app (APK)
 
@@ -26,20 +26,23 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.2.2 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.0 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
-2. Open the latest green run for this branch (`cursor/meridian-2-2-logo-premium-ce79`).
-3. Download the artifact **Meridian-2.2.2-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in Settings / About is **2.2.2** (versionCode 42). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+2. Open the latest green run for this branch.
+3. Download the artifact **Meridian-2.3.0-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.0** (versionCode 43). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 ### Language, carrier, Linux PC, terminal mark
 
 - **Language:** Settings → Language only. English, Hrvatski, Deutsch, 日本語, हिन्दी, Español, Français. Stored as `m-lang`. Recipes stay in English (they are shell). About does not have a language picker.
-- **Settings:** the gear in the top bar is the only way in. Dashboard and About do not add another Settings button.
+- **Settings:** the gear opens Device settings, Developer options, or App preferences. App preferences is the only in-app settings page.
 - **Carrier:** on the dashboard, next to **Test network speed**. Wi‑Fi or the SIM operator when Android already allows it. Shows **—** if unknown. No extra dangerous permissions.
-- **Window mark:** one logo in the window header on every page. It does not spin or change when you change pages. A tap can press it or go home; the glyph stays the same.
+- **Window mark:** a meridian ring in the header and in the window. It pulses every 2 seconds. A tap goes home.
 - **Dashboard orb:** a terminal prompt (`>_`) with a caret. Settings → Motion **On** blinks the caret. Motion **Off** freezes it. It is not a globe.
-- **Linux PC:** Termux shelf → **Linux PC**, or Build → **Linux PC** pack. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
+- **Linux PC:** Termux shelf → **Linux PC**. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
+- **API platforms:** keys are stored with the Android Keystore in `files/api-platforms.bin`, so an update of the same signing cert keeps them. Free stores one platform. Pro stores eight. Premium stores 32.
+- **Network Security:** this phone's link, DNS, and its own listening sockets. It does not scan other machines and does not capture packets.
+- **Desktop:** `node desktop/meridian-desktop.mjs` prints local readings. `--serve` publishes JSON on `127.0.0.1` only. `--tty` opens the local shell on standard input. There is no command endpoint on the HTTP port.
 
 You need Termux installed, and in Termux: `echo "allow-external-apps=true" >> ~/.termux/termux.properties` then `termux-reload-settings`. Then open Meridian and run Setup / Doctor.
 
@@ -64,22 +67,24 @@ signingConfigs {
 buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
 ```
 
-## Free and Pro
+## Free, Pro, and Premium
 
-The price is **Pro €15 once**. Each purchase includes two Pro keys: one for the buyer, and one they can give to a friend. An earlier draft used a pay-what-you-want span of €1–€1,000,000. That is not the price.
+The consumer price is **Pro €15 once**. Each purchase includes two Pro keys: one for the buyer, and one they can give to a friend. An earlier draft used a pay-what-you-want span of €1–€1,000,000. That is not the price.
 
-| Free | Pro (€15 once) |
-|---|---|
-| Dashboard, Hardware, System, Battery | Build recipes, including Linux PC install/open |
-| One console session, Setup, Doctor, Commands, Links | Plan (your API key or a local model). You press Run on each step |
-| Files (read-only browse and view) | Tweaks, extra console sessions, file create / edit / rename / delete / zip |
-| Hardware report with a small “Made with Meridian” footer | |
+| Free | Pro (€15 once) | Premium (€15 and up) |
+|---|---|---|
+| Dashboard, Hardware, System, Battery, Network Security | Build recipes and Linux PC | UFS storage class on Hardware |
+| Plan with one saved API platform | The platform list (eight), custom themes | Up to 32 API platforms |
+| One console, Setup, Doctor, Commands, Links | Tweaks, extra consoles, file write | Batch “run the plan” and the scheduler |
+| Read-only Files | | Desktop monitor companion |
 
-Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). After that the Pro tabs show a `PRO` badge and route to the purchase page.
+Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). After that the Pro tabs show a `PRO` badge and route to Plans.
 
-A phone that already has Pro sees a short thank-you on the Full version page. The paste field is only there when the phone is not unlocked.
+Plans has one buy button, **Buy Pro · €15**. Premium is described on that page and unlocked by a separate `sku: premium` key. It does not reuse the Pro checkout.
 
-Premium is designed and **not for sale**. The app has no Premium buy button. See [PRICES.md](PRICES.md).
+A phone that already has a licence sees a short thank-you. The paste field is only there when the phone is not unlocked.
+
+Premium is a business key at €15 and up. The app does not sell it through the Pro button. See [PRICES.md](PRICES.md).
 
 ## Turning on payments
 
@@ -103,9 +108,9 @@ Premium is designed and **not for sale**. The app has no Premium buy button. See
 
    Omit `--copies` when you only need one key. The default is 1.
 
-   `sign.mjs` still accepts `--sku premium` for a later release. Do not sell that SKU yet.
+   `sign.mjs` accepts `--sku premium` for the business key. Do not point that key at the €15 Pro checkout.
 
-4. The customer pastes the `MERIDIAN-` key on **Full version** while the phone is still locked.
+4. The customer pastes the `MERIDIAN-` key on **Plans** while the phone is still locked.
 
 Typing `paid`, `full`, or `unlocked` does not unlock. A file in Downloads that only contains those words is ignored. If this install already has `files/full.key` from a real activation, that unlock stays. A new sideload with a different signing cert does not keep the old file, and the word `paid` will not replace it.
 

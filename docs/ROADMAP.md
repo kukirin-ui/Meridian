@@ -1,6 +1,6 @@
 # Meridian 1.8.6 — audit and roadmap
 
-Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by `AUDIT.md` and the 2.0 app at the repo root.** The 1.8.6 UI was one WebView page, `original/assets/www/index.html`. The 1.8.6 phone bridge was `original/src/com/meridian/shell/MainActivity.java` plus `TermuxResult.java`. 2.0 lives in `app/`.
+Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by the app in `app/`.** The 1.8.6 copy that used to live in `original/` and `meridian-source.zip` was removed in 2.3.0. The current phone UI is `app/src/main/assets/www/index.html` and the bridge is `app/src/main/java/com/meridian/shell/MainActivity.java`.
 
 This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account. A Revolut WebView is the only checkout.
 
@@ -461,4 +461,4 @@ and set `healthtext.textContent` in `paintMeters`.
 4. **Receipts, reattach, Test key.** Then Relay if own-key usage shows people actually press Plan.
 5. **LAN snapshot and the sshd warning.** Not an iOS port.
 
-1.8.6 as shipped lives in `original/`. The 2.0 app is at the repo root. This document is the older 1.8.6-only list; prefer `AUDIT.md`. Do not start with a new theme.
+The 1.8.6 tree was removed in 2.3.0. The current app is at the repo root. This document is the older 1.8.6-only list. Do not start with a new theme.

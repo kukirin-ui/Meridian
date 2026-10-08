@@ -1,6 +1,6 @@
 # Meridian — A-to-Z audit, enhancement roadmap and monetization plan
 
-Scope: the shipped 1.8.6 source (`original/`), evaluated as product manager, UX designer and QA lead.
+Scope: the shipped 1.8.6 source, evaluated as product manager, UX designer and QA lead. That tree (`original/` and `meridian-source.zip`) was removed in 2.3.0. The current app is `app/`.
 Every finding below is paired with the exact fix. Findings marked **[fixed in 2.0]** are already
 implemented at the repo root (`app/`); the rest are specified so they can be built next.
 
@@ -378,9 +378,9 @@ attach on the paid base adds a slow but recurring floor. The real upside is the 
 
 ---
 
-## 6. Choosing between `original/` (1.8.6) and the root app (2.0)
+## 6. Choosing between 1.8.6 and the root app
 
-The 2.0 app **is** the repository root (`app/`). `original/` is the 1.8.6 archive.
+The current app **is** the repository root (`app/`). The 1.8.6 archive was removed in 2.3.0. The table below is the comparison that justified that removal.
 
 | | `original/` 1.8.6 | root `app/` 2.0.0 |
 |---|---|---|
@@ -394,8 +394,7 @@ The 2.0 app **is** the repository root (`app/`). `original/` is the 1.8.6 archiv
 | Tablet | phone layout only | side rail ≥ 720 px |
 | A11y | none | focus, labels, live regions, reduced motion |
 
-Recommendation: ship 2.0 from the root. Keep `original/` as the reference for behaviour questions and
-delete it once 2.0 has been in users' hands for a release cycle.
+Recommendation: ship from the root. The duplicate 1.8.6 tree is gone.
 
 The download page at [meridian0.grok.me](https://meridian0.grok.me) still serves 1.8.6 until you
 upload a 2.0 APK and checksum. This repo does not host that site.
