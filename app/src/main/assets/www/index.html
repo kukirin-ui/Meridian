@@ -6,30 +6,31 @@
 <title>Meridian</title>
 <style>
   :root {
-    --bg:#12100c; --fg:#f3ead7; --muted:#a89884; --line:rgba(196,164,106,.18);
-    --accent:#c4a46a; --card:#1a1612; --plate:#1a1612; --field:#161310; --navbg:#100e0c;
-    --btn:#c4a46a; --btnfg:#1a140c; --header:rgba(18,15,12,.96); --win:#14110e;
-    --grid:rgba(196,164,106,.16); --ico:#f3ead7; --chip:#241c14; --top:#241c16;
-    --ink:#1a140c; --termbg:#0c0a08; --termfg:#f3ead7; --track:#2a2e2a; --gaugetrack:#1a1612;
-    --paper:#14110e; --bad:#ef4444; --accent2:#e4d2ae;
-    --accent-border:rgba(196,164,106,.55); --accent-strong:rgba(196,164,106,.75);
-    --accent-glow:rgba(196,164,106,.28); --term-size:12px;
+    --bg:#050507; --fg:#EAEAEA; --muted:#8A8D93; --line:rgba(255,255,255,.08);
+    --accent:#00D4FF; --card:#0D0D12; --plate:#0D0D12; --field:#0D0D12; --navbg:#0D0D12;
+    --btn:#00FFC4; --btnfg:#050507; --header:rgba(5,5,7,.96); --win:#0D0D12;
+    --gold:#D4AF37; --ico:#EAEAEA; --chip:#0D0D12; --top:#0D0D12;
+    --ink:#050507; --termbg:#050507; --termfg:#EAEAEA; --track:#1a1c22; --gaugetrack:#0D0D12;
+    --paper:#0D0D12; --bad:#ef4444; --accent2:#7AEEFF;
+    --accent-border:rgba(0,212,255,.55); --accent-strong:rgba(0,212,255,.75);
+    --accent-glow:rgba(0,212,255,.28); --term-size:13px;
+    --ease:cubic-bezier(0.25, 1, 0.5, 1);
     color-scheme: dark;
   }
   html[data-theme="dark"] {
-    --bg:#12100c; --fg:#f3ead7; --muted:#a89884;
-    --card:#1a1612; --plate:#1a1612; --field:#161310; --navbg:#100e0c;
-    --header:rgba(18,15,12,.96); --win:#14110e; --ico:#f3ead7; --chip:#241c14; --top:#241c16;
-    --ink:#1a140c; --termbg:#0c0a08; --termfg:#f3ead7; --track:#2a2e2a; --gaugetrack:#1a1612;
-    --paper:#14110e; --bad:#ef4444;
+    --bg:#050507; --fg:#EAEAEA; --muted:#8A8D93;
+    --card:#0D0D12; --plate:#0D0D12; --field:#0D0D12; --navbg:#0D0D12;
+    --header:rgba(5,5,7,.96); --win:#0D0D12; --ico:#EAEAEA; --chip:#0D0D12; --top:#0D0D12;
+    --ink:#050507; --termbg:#050507; --termfg:#EAEAEA; --track:#1a1c22; --gaugetrack:#0D0D12;
+    --paper:#0D0D12; --bad:#ef4444;
     color-scheme: dark;
   }
   html[data-theme="oled"] {
-    --bg:#000; --fg:#f3ead7; --muted:#a09080;
-    --card:#0a0a0a; --plate:#0a0a0a; --field:#050505; --navbg:#000;
-    --header:rgba(0,0,0,.94); --win:#000; --ico:#f3ead7; --chip:#111; --top:#111;
-    --ink:#000; --termbg:#000; --termfg:#f3ead7; --track:#1a1a1a; --gaugetrack:#111;
-    --paper:#000; --bad:#ef4444;
+    --bg:#050507; --fg:#EAEAEA; --muted:#8A8D93;
+    --card:#0D0D12; --plate:#0D0D12; --field:#050507; --navbg:#050507;
+    --header:rgba(5,5,7,.96); --win:#0D0D12; --ico:#EAEAEA; --chip:#0D0D12; --top:#0D0D12;
+    --ink:#050507; --termbg:#050507; --termfg:#EAEAEA; --track:#1a1c22; --gaugetrack:#0D0D12;
+    --paper:#0D0D12; --bad:#ef4444;
     color-scheme: dark;
   }
   html[data-theme="light"] {
@@ -41,7 +42,7 @@
     color-scheme: light;
   }
   * { box-sizing: border-box; font-synthesis: none; -webkit-font-smoothing: antialiased; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--fg); font: 1rem/1.45 system-ui, "Segoe UI", Roboto, sans-serif; font-synthesis: none; }
+  html, body { margin: 0; height: 100%; overflow: hidden; overflow-x: hidden; background: var(--bg); color: var(--fg); font: 16px/1.45 system-ui, "Segoe UI", Roboto, sans-serif; font-synthesis: none; }
   body { display: flex; flex-direction: column; min-height: 100dvh; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -55,8 +56,8 @@
   .setmenu[hidden] { display: none !important; }
   .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
   .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; }
-  .meridian-pulse i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); display: block; animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-  .meridian-pulse b { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  .meridian-pulse i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); display: block; animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
+  .meridian-pulse b { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
   .logo-slot .meridian-pulse { width: 28px; height: 28px; }
   .logo-slot .meridian-pulse i { width: 22px; height: 22px; }
@@ -136,7 +137,7 @@
   .modes .ghost.on { background: var(--accent); color: var(--btnfg); }
   button:disabled { opacity: .55; cursor: default; }
   .btn { background: var(--field); color: var(--fg); border: 1px solid var(--accent-strong); font-weight: 650; width: 100%; border-radius: 16px; box-shadow: inset 0 1px 0 rgba(243,234,215,.14); }
-  .btn.pay { background: var(--accent); color: var(--btnfg); border-color: var(--accent); }
+  .btn.pay { background: var(--btn); color: var(--btnfg); border-color: var(--btn); }
   #moreback, #shelfback { align-self: flex-start; width: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px; }
   #moreback::before, #shelfback::before { content: ""; width: 8px; height: 8px; border-left: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg); margin-left: 2px; }
   .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
@@ -145,8 +146,8 @@
   .gauge b { width: 58px; height: 58px; border-radius: 50%; background: var(--plate); display: grid; place-items: center; color: var(--accent); font-size: 0.9375rem; }
   .tile span { display: block; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile span.fit { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
-  .plate.freq { padding: 14px 14px 0; }
-  .spark { width: calc(100% + 28px); height: 64px; margin: 8px -14px 0; display: block; }
+  .plate.freq { padding: 16px 16px 0; }
+  .spark { width: calc(100% + 32px); height: 64px; margin: 8px -16px 0; display: block; }
   .corebars { height: 92px; display: flex; align-items: flex-end; gap: 3px; }
   .corebars span { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
   .corebars i { width: 100%; display: block; border-radius: 3px 3px 0 0; background: linear-gradient(var(--fg), var(--accent)); box-shadow: 0 0 8px var(--accent-glow); }
@@ -194,18 +195,18 @@
   .speedometers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; text-align: center; }
   .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
   .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
-  #main { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 8px 10px calc(84px + env(safe-area-inset-bottom)); }
-  body.term #main { padding-bottom: calc(148px + env(safe-area-inset-bottom)); }
-  .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--accent); box-shadow: none; background: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px), var(--win); background-size: 18px 18px, 18px 18px, auto; background-attachment: local; }
-  .winbody { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px; overscroll-behavior: contain; }
+  #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(64px + env(safe-area-inset-bottom)); }
+  body.term #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1); background: var(--win); }
+  .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px; overscroll-behavior: contain; display: flex; flex-direction: column; }
   .pair.sens .tile { height: auto; min-height: 86px; }
-  .wintop { position: relative; display: flex; align-items: center; height: 44px; padding: 0 12px; background: linear-gradient(var(--top), var(--plate)); border-bottom: 1px solid var(--line); }
-  .wintop > b { position: absolute; left: 0; right: 0; text-align: center; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0; -webkit-text-stroke: 0; text-shadow: none; font-synthesis: none; pointer-events: none; }
+  .wintop { position: relative; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 16px; background: var(--plate); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+  .wintop > b { position: absolute; left: 48px; right: 16px; text-align: center; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; -webkit-text-stroke: 0; text-shadow: none; font-synthesis: none; pointer-events: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .desk .sec { padding: 10px 12px 0; }
   .sec.mach { color: var(--accent); }
   .sec.lib { color: var(--muted); }
-  .bend { height: 22px; margin: 6px 14px 8px 18px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); border-radius: 0 0 0 28px; box-shadow: 0 0 12px var(--accent-glow); opacity: 1; }
-  .page { display: flex; flex-direction: column; min-height: 0; }
+  .bend { height: 0; margin: 16px 0; padding: 0; border: 0; border-bottom: 4px solid #D4AF37; border-radius: 0; width: calc(100% + 16px); transform: translateX(-16px); box-shadow: 0px 4px 12px rgba(212, 175, 55, 0.15); opacity: 1; }
+  .page { display: flex; flex-direction: column; min-height: 100%; flex: 1; }
   .brandfill { flex: 1; min-height: 140px; display: flex; align-items: center; justify-content: center; padding: 36px 0 48px; }
   .logo { width: 104px; height: 104px; position: relative; }
   .logo i, .logo b, .logo s { position: absolute; border-radius: 50%; }
@@ -235,16 +236,16 @@
   .core b::after { content: " MHz"; font-size: 10px; font-weight: 550; color: var(--muted); }
   .bar { display: block; height: 7px; margin-top: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); transition: width 400ms ease-out; }
-  .sec { color: var(--accent); font-weight: 500; margin: 0 0 6px; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; filter: none; }
+  .sec { color: var(--muted); font-size: 14px; font-weight: 500; margin: 0 0 8px; letter-spacing: 0; text-transform: uppercase; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; filter: none; }
   .kv { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 8px 0; border-top: 2px solid var(--line); }
   .kv span { color: var(--muted); flex: none; }
-  .kv b { min-width: 0; flex: 1; font-weight: 650; text-align: right; font-size: 0.875rem; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
+  .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: ui-monospace, "Roboto Mono", "Fira Code", monospace; overflow-wrap: anywhere; word-break: break-word; }
   .stack { display: flex; flex-direction: column; gap: 10px; }
-  h2 { margin: 0; font-size: 1.375rem; }
+  h2, .wintop > b { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
   .muted { color: var(--muted); }
   .plate p, .muted { overflow-wrap: anywhere; }
-  pre { margin: 0; white-space: pre; overflow: auto; word-break: normal; overflow-wrap: normal; font: 0.75rem/1.45 ui-monospace, monospace; background: var(--field); color: var(--fg); border: 1px solid var(--accent-border); border-radius: 12px; padding: 10px 12px; }
-  .term { max-height: 62vh; overflow: auto; background: var(--termbg); color: var(--termfg); border: 1px solid var(--accent-border); border-radius: 12px; padding: 12px 10px; font: var(--term-size)/1.45 ui-monospace, monospace; }
+  pre { margin: 0; white-space: pre; overflow: auto; word-break: normal; overflow-wrap: normal; font: 400 13px/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; background: var(--field); color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 16px; }
+  .term { max-height: 62vh; overflow: auto; background: var(--termbg); color: var(--termfg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 16px; font: 400 var(--term-size)/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; }
   .term .line, .term .out { white-space: pre; width: max-content; min-width: 100%; font: inherit; }
   .term.wrap .line, .term.wrap .out { white-space: pre-wrap; overflow-wrap: anywhere; width: auto; }
   .term .line { margin: 0 0 2px; }
@@ -259,10 +260,10 @@
   textarea.cmd { display: block; padding: 10px 12px; line-height: 1.45; font: 0.8125rem/1.45 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; resize: vertical; min-height: 72px; }
   select, textarea, input { width: 100%; background: var(--field); color: var(--fg); border: 2px solid var(--accent-strong); border-radius: 12px; padding: 12px; }
   select { min-height: 44px; }
-  nav { position: fixed; left: 10px; right: 10px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid var(--line); border-radius: 22px; z-index: 5; padding: 6px 10px 4px; box-shadow: 0 12px 28px rgba(0,0,0,.28); overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+  nav { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; z-index: 5; padding: 0 8px; box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1); overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
   nav::-webkit-scrollbar { display: none; }
-  nav button { position: relative; flex: 1 0 72px; min-width: 72px; min-height: 56px; border: 0; background: transparent; color: var(--muted); font-size: 0.75rem; font-weight: 400; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
-  nav button svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  nav button { position: relative; flex: 1 0 64px; min-width: 48px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
+  nav button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   nav button.on { color: var(--accent); }
   nav button.on::before { content: ""; position: absolute; top: 2px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
   nav button.lock::after { content: "PRO"; position: absolute; top: 4px; right: 6px; font-size: 7px; font-weight: 800; letter-spacing: .08em; padding: 1px 4px; border-radius: 6px; background: var(--accent); color: var(--btnfg); line-height: 1.2; }
@@ -271,7 +272,7 @@
   .trialline button { background: none; border: 0; padding: 0; min-height: 0; color: var(--accent); font: inherit; text-decoration: underline; }
   @media (min-width: 720px) {
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
-    nav button { flex: 0 0 64px; }
+    nav button { flex: 0 0 48px; min-height: 48px; }
     #main { padding: 8px 10px 10px 116px; }
     body.term #main { padding-bottom: 70px; }
     #dock { left: 116px; bottom: 12px; }
@@ -284,7 +285,7 @@
   .freqhead .ghost { width: auto; min-height: 40px; border-radius: 999px; }
   .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .modes .ghost { min-height: 46px; padding: 0 6px; font-size: 0.8125rem; }
-  #dock { position: fixed; left: 10px; right: 10px; bottom: calc(78px + env(safe-area-inset-bottom)); display: none; gap: 8px; z-index: 6; }
+  #dock { position: fixed; left: 8px; right: 8px; bottom: calc(64px + env(safe-area-inset-bottom)); display: none; gap: 8px; z-index: 6; }
   #dock.on { display: flex; align-items: center; }
   #dock input { flex: 1; font-size: var(--term-size); }
   #dock .btn { width: auto; flex: none; height: 44px; min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--btn); color: var(--btnfg); box-shadow: none; }
@@ -303,8 +304,7 @@
   .ico.own { border-color: var(--accent); background: var(--field); box-shadow: 0 0 18px var(--accent-glow); }
   .ico.own em { color: var(--fg); }
   .ico.own .glyph.file { border-color: var(--accent); box-shadow: none; }
-  @keyframes gridshift { to { background-position: 18px 18px, 18px 18px, 0 0; } }
-  .ico { border: 1px solid var(--accent-border); border-radius: 12px; min-height: 0; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ico); background: var(--field); box-shadow: none; }
+  .ico { border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ico); background: var(--field); box-shadow: 0px 4px 12px rgba(0, 212, 255, 0.15); }
   .ico .mark { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .grid.big .ico .mark { width: 36px; height: 36px; }
   .ico.on { border-color: var(--accent); box-shadow: 0 0 18px var(--accent-glow); }
@@ -323,7 +323,8 @@
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
   .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
-  #devicecare { align-self: center; width: auto; min-height: 44px; }
+  .care-row { display: flex; align-items: center; justify-content: center; width: 100%; margin: 16px 0; }
+  #devicecare { align-self: center; width: auto; min-height: 48px; padding: 12px 24px; border-radius: 999px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { width: auto; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--chip); color: var(--fg); font-size: 0.8125rem; }
   .planhead { display: flex; align-items: center; gap: 12px; }
@@ -336,21 +337,42 @@
   .sessions button.on { background: var(--accent); color: var(--btnfg); border-color: var(--accent); }
   .tools { display: flex; gap: 8px; flex-wrap: wrap; }
   .tools .ghost { width: auto; }
-  .tile, .plate, .ico {
-    box-shadow: inset 0 1px 0 rgba(243,234,215,.14);
+  .tile, .plate, .pack, .hero {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1);
   }
-  .ico, .btn, .ghost, nav button, .chip, .swatch, .aboutbtn {
-    transition: border-color 150ms ease-out, background-color 150ms ease-out, opacity 150ms ease-out;
+  .ico, .btn, .ghost, nav button, .chip, .swatch, .aboutbtn, .win, .bend {
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .ico:active, .btn:active, .ghost:active, nav button:active, .chip:active, .swatch:active, .aboutbtn:active {
     opacity: 0.72;
+    box-shadow: 0px 0px 24px rgba(0, 212, 255, 0.4);
   }
+  @keyframes meridian-cascade {
+    0%, 72%, 100% { box-shadow: 0px 4px 12px rgba(0, 212, 255, 0.15); }
+    36% { box-shadow: 0px 0px 24px rgba(0, 212, 255, 0.4); }
+  }
+  .cascade-item { animation: meridian-cascade 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
+  .export-row { display: flex; justify-content: flex-start; align-items: center; width: 100%; }
+  #sharereport { width: 50%; max-width: 50%; min-height: 48px; padding: 12px 24px; }
+  .accordion { width: 100%; display: flex; align-items: center; justify-content: space-between; min-height: 48px; background: transparent; border: 0; border-top: 2px solid var(--line); color: var(--fg); padding: 8px 0; font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: uppercase; }
+  .accordion .chev { width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+  .accordion[aria-expanded="true"] .chev { transform: rotate(225deg); }
+  .accordion-body { padding: 8px 0 16px; }
+  .hwmono { margin: 0 0 8px; font: 400 13px/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; color: var(--fg); }
+  .about-screen { flex: 1; display: flex; flex-direction: column; min-height: 100%; }
+  .copyfoot { margin-top: auto; padding: 24px 0 8px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 500; }
+  #appversion { min-height: 48px; display: flex; align-items: center; justify-content: center; }
+  .desk { margin: 0 -16px; overflow-x: hidden; }
+  .desk .sec { padding: 16px 16px 0; }
+  .desk .grid { padding: 16px; }
+  .desk > .plate, .desk > article { margin: 0 16px 16px; }
   .winbody > * { animation: rise 280ms ease-out; }
   @keyframes rise {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translate(-50%, 8px); z-index: 9; max-width: calc(100% - 40px); padding: 10px 16px; border-radius: 12px; background: var(--plate); color: var(--fg); border: 1px solid var(--accent); box-shadow: 0 12px 28px rgba(0,0,0,.3); font-size: 0.8125rem; opacity: 0; pointer-events: none; transition: opacity 180ms ease-out, transform 180ms ease-out; }
+  .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translate(-50%, 8px); z-index: 9; max-width: calc(100% - 32px); padding: 8px 16px; border-radius: 8px; background: var(--plate); color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1); font-size: 14px; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
   .keyrow { display: flex; gap: 8px; align-items: stretch; }
   .keyrow input { flex: 1; min-width: 0; }
@@ -360,7 +382,7 @@
   .pricecard .priceem { display: block; font-size: 0.75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
   .pricecard ul { margin: 8px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 0.875rem; line-height: 1.7; }
   .pricecard li::before { content: "▸ "; color: var(--accent); }
-  .hero { padding: 14px; border-radius: 18px; background: var(--plate); border: 1px solid var(--accent); box-shadow: 0 16px 40px var(--accent-glow); }
+  .hero { padding: 16px; border-radius: 16px; background: var(--plate); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1); }
   .herotop { display: flex; gap: 14px; align-items: center; }
   .herocopy { min-width: 0; flex: 1; }
   .herocopy h2 { font-size: 1.25rem; letter-spacing: -.02em; }
@@ -371,7 +393,7 @@
   .gaugerow .gauge b { width: 40px; height: 40px; font-size: 0.6875rem; }
   .gaugerow span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.6875rem; letter-spacing: .04em; }
   .packs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-  .pack { padding: 14px; border: 1px solid var(--accent); border-radius: 16px; background: var(--plate); box-shadow: 0 10px 28px var(--accent-glow); }
+  .pack { padding: 16px; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; background: var(--plate); box-shadow: 0px 8px 32px rgba(0, 212, 255, 0.1); }
   .packhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .packhead b { font-size: 1rem; }
   .pack .chips { margin-top: 8px; }
@@ -413,7 +435,7 @@
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
   html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
   html[data-motion="full"] .meridian-pulse i,
-  html[data-motion="full"] .meridian-pulse b { animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important; }
+  html[data-motion="full"] .meridian-pulse b { animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
   html[data-motion="full"] .marklogo,
@@ -477,8 +499,9 @@ let sessionIx = 0;
 let blocks = sessions[0];
 let selectMode = false;
 let selected = {};
-const prefs = { theme: "system", accent: "amber", refresh: "normal", termFont: 12, keepAwake: true, haptics: true, motion: "system", lang: "en" };
+const prefs = { theme: "system", accent: "cyan", refresh: "normal", termFont: 13, keepAwake: true, haptics: true, motion: "system", lang: "en" };
 const ACCENTS = {
+  cyan: { dark: { accent: "#00D4FF", accent2: "#7AEEFF", btnfg: "#050507" }, light: { accent: "#007EA7", accent2: "#075985", btnfg: "#F3ECDF" } },
   mint: { dark: { accent: "#34d399", accent2: "#a7f3d0", btnfg: "#022c22" }, light: { accent: "#0f766e", accent2: "#115e59", btnfg: "#f0fdfa" } },
   amber: { dark: { accent: "#c4a46a", accent2: "#e4d2ae", btnfg: "#1a140c" }, light: { accent: "#8a6a3e", accent2: "#5a4426", btnfg: "#fffaf3" } },
   violet: { dark: { accent: "#a78bfa", accent2: "#ddd6fe", btnfg: "#1e1b4b" }, light: { accent: "#6d28d9", accent2: "#4c1d95", btnfg: "#f5f3ff" } },
@@ -492,7 +515,7 @@ navHome:"Dashboard",navHardware:"Hardware",navSystem:"System",navBattery:"Batter
 connect:"Connect",disconnect:"Disconnect",connected:"Connected",allowTermux:"Allow Termux",noTermux:"No Termux",notConnected:"Not connected",
 settingsAria:"Settings",commandPh:"Query the terminal or enter a command...",run:"Run",
 work:"Work",machine:"Machine",library:"Library",files:"Files",console:"Console",tweaks:"Tweaks",doctor:"Doctor",commands:"Commands",links:"Links",setup:"Setup",meridian:"Meridian",licence:"Licence",fullVersion:"Plans",lookModesFoot:"Look, modes, and the licence",linuxPc:"Linux PC",
-titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleSecurity:"Security",titleBuild:"Build",titlePlan:"Plan",titlePay:"Plans",titleKeys:"API Platforms",titleSettings:"App preferences",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleHome:"Dashboard",titleLinux:"Linux PC",
+titleFinder:"Finder",titleConsole:"Console",titleSetup:"Setup",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Battery",titleSecurity:"Security",titleBuild:"Build",titlePlan:"Plan",titlePay:"Plans",titleKeys:"API Platforms",titleSettings:"App preferences",titleDoctor:"Doctor",titleTweaks:"Tweaks",titleCommands:"Commands",titleLinks:"Links",titleAbout:"About",titleSupport:"Support",titleTermux:"Termux",titleEnvironment:"Environment",titleHome:"Dashboard",titleLinux:"Linux PC",contactSupport:"Contact Support",aboutLicense:"MIT / open source. Licence texts ship with the app.",aboutCredits:"Developer: Kukirin",
 thisPhone:"This phone",hardwareFromDevice:"Hardware from this device",systemStrained:"System strained",systemOptimal:"System optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Battery",heat:"Bat. Temp.",voltage:"Voltage",ramFree:"RAM free",memory:"Memory",virtual:"Virtual",deviceCare:"Device care",settings:"Settings",about:"About",liveClocks:"Live clocks",hold:"Hold",live:"Live",quietCool:"Quiet and cool",heatOrRam:"Heat or RAM is high",storage:"Storage",network:"Network",testSpeed:"Test network speed",testing:"Testing…",noRamPlus:"No RAM Plus",usedOf:" used · ",connectTermux:"Connect Termux",connectTermuxBody:"Install F-Droid, then Termux from F-Droid, not Play. Open Setup and follow it. When this line says Connected, Setup moves to the end of Termux.",connectedTermux:"Connected to Termux",copyLine:"Copy the line",reading:"Reading…",
 look:"Look",theme:"Theme",themeSystem:"System",themeDark:"Dark",themeLight:"Light",themeOled:"OLED",accent:"Accent",feel:"Feel",refresh:"Refresh",refreshSaver:"Battery-saver 2s",refreshNormal:"Normal 1s",refreshLive:"Live 250ms",consoleFont:"Console font",keepAwake:"Keep awake while a job runs",haptics:"Haptics",on:"On",off:"Off",motion:"Motion",motionSystem:"System",motionOff:"Off",motionOn:"On",motionTestOn:"Motion is on — this bar just faded in.",motionTestOff:"Motion is off — no fade, no globe spin.",language:"Language",shortcuts:"Keyboard shortcuts",
 aboutBlurb:"A dashboard for this phone, bonded to Termux.",aboutReadings:"Readings come from the device. Commands run in Termux on this phone. There is no account and no server. A key, if you save one, stays here and is sent only when you press Plan.",unlockedPhone:"This phone is unlocked.",trialLeft:"Trial:",freeVersion:"This phone is on the free version.",shareReport:"Share hardware report",copyright:"Copyright 2026",
@@ -826,20 +849,19 @@ function applySkin() {
   let accent = prefs.accent || "amber";
   if (!paid()) {
     if (theme === "oled") theme = "dark";
-    if (accent !== "amber") accent = "amber";
+    accent = "cyan";
   }
   document.documentElement.setAttribute("data-theme", theme);
   document.documentElement.setAttribute("data-accent", accent);
   document.documentElement.setAttribute("data-motion", resolvedMotion());
-  const pack = ACCENTS[accent] || ACCENTS.amber;
+  const pack = ACCENTS[accent] || ACCENTS.cyan;
   const pal = theme === "light" ? pack.light : pack.dark;
   const r = document.documentElement.style;
   r.setProperty("--accent", pal.accent);
   r.setProperty("--accent2", pal.accent2);
-  r.setProperty("--btn", pal.accent);
-  r.setProperty("--btnfg", pal.btnfg);
+  r.setProperty("--btn", theme === "light" ? "#0F766E" : "#00FFC4");
+  r.setProperty("--btnfg", theme === "light" ? "#F3ECDF" : "#050507");
   r.setProperty("--line", rgbaHex(pal.accent, theme === "light" ? 0.22 : 0.18));
-  r.setProperty("--grid", rgbaHex(pal.accent, 0.16));
   r.setProperty("--accent-border", rgbaHex(pal.accent, 0.55));
   r.setProperty("--accent-strong", rgbaHex(pal.accent, 0.75));
   r.setProperty("--accent-glow", rgbaHex(pal.accent, 0.28));
@@ -1230,7 +1252,7 @@ function homePage() {
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
-  html += '<div class="aboutrow"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="ramout"></p>';
+  html += '<div class="care-row"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="ramout"></p>';
   html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="plate">';
   html += '<p class="muted" data-s="Network">' + esc(net.sub) + '</p>';
@@ -1436,7 +1458,7 @@ function systemPage() {
 function hardwarePage() {
   const s = phone();
   const p = live();
-  let html = '<div class="stack"><div class="tools"><button class="btn" type="button" id="sharereport" style="width:auto">' + esc(t("shareReport")) + '</button></div><p class="sec">Processor</p><article class="plate">';
+  let html = '<div class="stack"><div class="export-row"><button class="btn" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p class="sec">Processor</p><article class="plate">';
   html += row("SoC", hw(p.soc || s.chip));
   html += row("Hardware", hw(p.hardware));
   html += row("Platform", hw(s.platform));
@@ -1469,9 +1491,8 @@ function hardwarePage() {
   html += row("Free", gb(p.memRaw));
   html += row("Virtual", p.swapTotal ? gb(p.swapFree) + " free of " + gb(p.swapTotal) : "");
   const ratio = p.zramOrig > 0 && p.zramComp > 0 ? (p.zramOrig / p.zramComp).toFixed(1) + "×" : "";
-  html += row("ZRAM", p.zramTotal ? gb(p.zramOrig) + " of " + gb(p.zramTotal) : "");
-  html += row("Compression", ratio);
-  html += '<p class="muted">ZRAM is RAM that Android compresses and uses as virtual memory. The size is chosen by the phone, not by Termux. Quiet pages are squeezed into that pool instead of being written to storage. The ratio is how much smaller those pages became. A model that does not fit in physical RAM can still sit in this pool. Changing the size needs root, which this app does not use.</p>';
+  const zramLine = p.zramTotal ? gb(p.zramOrig) + " of " + gb(p.zramTotal) + (ratio ? " · " + ratio : "") : "No ZRAM reading on this phone.";
+  html += '<button class="accordion" type="button" id="zramtoggle" aria-expanded="false"><span>ZRAM</span><i class="chev" aria-hidden="true"></i></button><div class="accordion-body" id="zrambody" hidden><p class="hwmono">' + esc(zramLine) + '</p><p class="muted">ZRAM is RAM that Android compresses and uses as virtual memory. The size is chosen by the phone, not by Termux. Quiet pages are squeezed into that pool instead of being written to storage. The ratio is how much smaller those pages became. A model that does not fit in physical RAM can still sit in this pool. Changing the size needs root, which this app does not use.</p></div>';
   html += '</article><p class="sec">Storage</p><article class="plate">';
   html += row("Size", gb(p.diskTotal));
   html += row("Free", gb(p.diskFree));
@@ -1885,7 +1906,13 @@ const IDEAS = [
   ["Media box", "yt-dlp and ffmpeg so this phone can pull a video and remux it. Files land in ~/media.", ["pkg update -y", "pkg install -y python ffmpeg", "pip install -U yt-dlp", "mkdir -p ~/media && yt-dlp --version && ffmpeg -version | head -n 1 && echo 'Example: yt-dlp -o ~/media/%(title)s.%(ext)s URL'"]],
   ["yt-dlp", "Download a video or audio file. Change the URL before you run it.", ["pkg install -y python ffmpeg", "pip install -U yt-dlp", "yt-dlp --version"]],
   ["On-device AI", "llama.cpp on this phone. Put a small .gguf in ~/models, then run it here. No cloud.", ["pkg update && pkg upgrade -y", "pkg install -y git clang cmake llama-cpp", "mkdir -p ~/models ~/projects", "echo 'Copy a small .gguf into ~/models, then: llama-cli -m ~/models/MODEL.gguf -t $(nproc) -c 2048 -ngl 0'"]],
-  ["llama server", "An HTTP server for a local GGUF model on this phone.", ["pkg install -y llama-cpp", "echo 'llama-server -m ~/models/MODEL.gguf --host 127.0.0.1 --port 8080 -t $(nproc) -c 2048'"]]
+  ["llama server", "An HTTP server for a local GGUF model on this phone.", ["pkg install -y llama-cpp", "echo 'llama-server -m ~/models/MODEL.gguf --host 127.0.0.1 --port 8080 -t $(nproc) -c 2048'"]],
+  ["Python+Pip", "Python and pip on this phone.", ["pkg install -y python", "python -V", "pip install --upgrade pip"]],
+  ["Node.js+NPM", "Node.js and npm.", ["pkg install -y nodejs", "node -v", "npm -v"]],
+  ["Git+Curl", "Git and curl.", ["pkg install -y git curl", "git --version", "curl --version"]],
+  ["Docker CLI", "The Docker command-line client, if this Termux catalog has it. Meridian does not start a root daemon on the phone.", ["pkg install -y docker || pkg install -y docker-cli || { echo 'This Termux catalog has no Docker client. Meridian does not start a Docker engine.'; exit 1; }", "docker --version || true"]],
+  ["Java JDK", "OpenJDK 21.", ["pkg install -y openjdk-21", "java -version"]],
+  ["C/C++ build-essential", "clang, cmake, make, and the headers a C or C++ build expects in Termux.", ["pkg install -y clang cmake make pkg-config binutils git", "clang --version", "make --version"]]
 ];
 function ideaIndex(name) {
   for (let i = 0; i < IDEAS.length; i++) if (IDEAS[i][0] === name) return i;
@@ -1911,7 +1938,7 @@ function planPage() {
   let html = '<div class="stack"><article class="plate planhead"><div class="logo-mark md">' + LOGO_SVG + '</div><div><b>How to ask</b><p class="hint" id="askhint">' + esc(askHint("")) + '</p></div></article>';
   html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
-  html += '</div><textarea id="goal" rows="3" placeholder="Query the terminal or enter a command..."></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
+  html += '</div><textarea id="goal" rows="3" placeholder="Query the terminal or enter a command..." enterkeyhint="send"></textarea><button class="btn" type="button" id="plan">Write the steps</button><div id="steps"></div>' + termLog() + '</div>';
   return html;
 }
 function mark(name) {
@@ -2044,6 +2071,7 @@ function buildPage() {
     return '<article class="pack"><div class="packhead"><b>' + esc(title) + '</b><span class="probadge">PRO</span></div><p class="muted">' + esc(blurb) + '</p>' + chips + '</article>';
   }
   let shop = '<div class="packs">';
+  shop += packCard("Top 10", "The environments worth installing first.", ["Python+Pip", "Node.js+NPM", "Git+Curl", "Docker CLI", "Go", "Rust", "Ruby", "Java JDK", "C/C++ build-essential", "PHP"]);
   shop += packCard("Workstation", "Languages, compilers, and the tools you already use on a laptop.", ["Python", "Node", "Git", "Compiler"]);
   shop += packCard("Media box", "Pull a video, remux it, keep the files in Termux.", ["Media box", "yt-dlp", "FFmpeg"]);
   shop += packCard("On-device AI", "A local GGUF model. No account, no cloud round-trip.", ["On-device AI", "llama server", "Local model"]);
@@ -2075,12 +2103,12 @@ function apisPage() {
     if (a) {
       const savedKey = apiSecret();
       const current = apiBase() === a[3];
-      return '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button><article class="plate stack"><b>' + esc(a[0]) + (current ? '<span class="probadge" style="background:var(--chip);color:var(--accent)">IN USE</span>' : "") + '</b><p class="muted">' + esc(a[1]) + '</p><p class="muted">Address</p><pre>' + esc(a[3]) + '</pre><p class="muted">Model</p><pre>' + esc(a[4]) + '</pre><label class="muted" for="apikey">Key</label><input id="apikey" type="password" placeholder="Paste the key" autocomplete="off" value="' + esc(current ? savedKey : "") + '" /><button class="ghost" type="button" data-open="' + esc(a[2]) + '">Get a key</button><button class="btn" type="button" id="useapi">Save and open Plan</button></article></div>';
+      return '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button><article class="plate stack"><b>' + esc(a[0]) + (current ? '<span class="probadge" style="background:var(--chip);color:var(--accent)">IN USE</span>' : "") + '</b><p class="muted">' + esc(a[1]) + '</p><p class="muted">Address</p><pre>' + esc(a[3]) + '</pre><p class="muted">Model</p><pre>' + esc(a[4]) + '</pre><label class="muted" for="apikey">Key</label><input id="apikey" type="password" inputmode="text" placeholder="Paste the key" autocomplete="off" value="' + esc(current ? savedKey : "") + '" /><button class="ghost" type="button" data-open="' + esc(a[2]) + '">Get a key</button><button class="btn" type="button" id="useapi">Save and open Plan</button><p class="muted" id="keystatus"></p></article></div>';
     }
   }
   const items = APIS.map(function (a) { return [a[0], a[1], a[2], ""]; });
   const using = apiSecret() ? "Plan is using " + esc(apiBase()) + " with " + esc(apiModel()) + "." : "No platform is saved yet. Plan still works for the built-in recipes.";
-  return '<p class="muted">No shared key is built in. A key that is not yours dies, and it would spend someone else\'s account. Free keeps one platform. Pro keeps the list. Premium keeps every platform you add. The key stays in encrypted storage on this phone and is sent only when you press Write the steps.</p><p class="muted">' + using + '</p>' + bands("API Platforms", items, [["Free", ["Groq", "Gemini", "OpenRouter"]], ["Paid", ["OpenAI", "Anthropic", "xAI"]], ["Other", ["Custom"]]]);
+  return '<p class="muted">No shared key is built in. A key that is not yours dies, and it would spend someone else\'s account. Free keeps one platform. Pro keeps eight. Premium keeps 32. The key is encrypted with the Android Keystore (AES-GCM) into the private file api-platforms.bin. It is not written to SharedPreferences. It survives an update only when the signing certificate stays the same. The address must start with https://. If Save fails, the message on this page is the reason. Fix that and save again. The key is sent only when you press Write the steps.</p><p class="muted">' + using + '</p>' + bands("API Platforms", items, [["Free", ["Groq", "Gemini", "OpenRouter"]], ["Paid", ["OpenAI", "Anthropic", "xAI"]], ["Other", ["Custom"]]]);
 }
 function keyPage() {
   const key = apiSecret();
@@ -2099,7 +2127,7 @@ function keyPage() {
     chips += '<button class="ghost" type="button" data-prov="' + esc(p[1]) + '" data-mod="' + esc(p[2]) + '">' + esc(p[0]) + '</button>';
   });
   chips += "</div>";
-  return '<div class="stack"><h2>Custom key</h2><p class="muted">Your key, from whoever you bought it. It stays on this phone and is sent only when you press Write the steps. Pick the company, paste the key, then Save. Any other https address that speaks the OpenAI chat API works too.</p>' + chips + '<input id="k-base" value="' + esc(base) + '" placeholder="API address" aria-label="API address" autocapitalize="off" /><input id="k-model" value="' + esc(model) + '" placeholder="model name" aria-label="Model name" autocapitalize="off" /><input id="k-key" type="password" value="' + esc(key) + '" placeholder="API key" aria-label="API key" autocomplete="off" /><button class="btn" type="button" id="savekey">Save on this phone</button><button class="ghost danger" type="button" id="forgetkey">Forget the key</button></div>';
+  return '<div class="stack"><h2>Custom key</h2><p class="muted">Your key, from whoever you bought it. It is encrypted with the Android Keystore into api-platforms.bin on this phone, not SharedPreferences. Same signing certificate keeps it after an update. The address must start with https://. It is sent only when you press Write the steps.</p>' + chips + '<input id="k-base" value="' + esc(base) + '" placeholder="API address" aria-label="API address" autocapitalize="off" /><input id="k-model" value="' + esc(model) + '" placeholder="model name" aria-label="Model name" autocapitalize="off" /><input id="k-key" type="password" value="' + esc(key) + '" placeholder="API key" aria-label="API key" autocomplete="off" /><button class="btn" type="button" id="savekey">Save on this phone</button><button class="ghost danger" type="button" id="forgetkey">Forget the key</button><p class="muted" id="keystatus"></p></div>';
 }
 function linksPage() {
   const groups = [
@@ -2184,7 +2212,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.0"; } catch (e) { return "2.3.0"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.1"; } catch (e) { return "2.3.1"; }
 }
 function savedDownloads() {
   try {
@@ -2221,10 +2249,8 @@ function securityPage() {
   return html + "</div>";
 }
 function aboutPage() {
-  const days = trialDays();
-  const state = licensed() ? t("thisPhoneIsPro") : days > 0 ? t("trialLeft") + " " + days + " " + (days === 1 ? "day" : "days") + "." : t("freeVersion");
   const shown = savedDownloads() || "—";
-  return '<article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p>' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(state) + '</p><div class="aboutrow"><button class="ghost" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><p>' + esc(t("copyright")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">Pozun.alen96@gmail.com</button></article>';
+  return '<div class="about-screen"><article class="plate stack about"><div class="logo-mark lg">' + LOGO_SVG + '</div><h2>Meridian</h2><p id="appversion">' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(t("aboutLicense")) + '</p><p>' + esc(t("aboutCredits")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">' + esc(t("contactSupport")) + '</button></article><p class="copyfoot">' + esc(t("copyright")) + '</p></div>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -2237,7 +2263,7 @@ function settingsPage() {
   let html = '<div class="stack"><article class="plate stack"><b>' + esc(t("look")) + '</b>';
   html += '<div class="setrow"><div class="k">' + esc(t("theme")) + '</div>' + seg("theme", [["system", t("themeSystem")], ["dark", t("themeDark")], ["light", t("themeLight")], ["oled", t("themeOled")]]) + '</div>';
   html += '<div class="setrow"><div class="k">' + esc(t("accent")) + '</div><div class="seg">';
-  [["mint", "#34d399"], ["amber", "#c4a46a"], ["violet", "#a78bfa"], ["rose", "#fb7185"], ["ice", "#38bdf8"]].forEach(function (a) {
+  [["cyan", "#00D4FF"], ["mint", "#34d399"], ["amber", "#c4a46a"], ["violet", "#a78bfa"], ["rose", "#fb7185"], ["ice", "#38bdf8"]].forEach(function (a) {
     html += '<button class="swatch' + (prefs.accent === a[0] ? " on" : "") + '" type="button" data-accent="' + a[0] + '" style="--sw:' + a[1] + '" aria-label="' + a[0] + '"></button>';
   });
   html += '</div></div>';
@@ -2282,7 +2308,7 @@ function toolsPage() {
   }
   const linked = bond === "termux";
   const setup = '<button class="ico" type="button" data-go="setup">' + mark("Setup") + '<em>' + esc(t("setup")) + '</em></button>';
-  return '<div class="desk"><div class="deskbar"><b style="font-size:13px">' + esc(t("navTermux")) + '</b></div>'
+  return '<div class="desk">'
     + '<p class="sec work">' + esc(t("work")) + '</p><div class="grid">'
     + (linked ? "" : setup)
     + '<button class="ico" type="button" data-go="files">' + mark("Files") + '<em>' + esc(t("files")) + '</em></button>'
@@ -2298,7 +2324,7 @@ function toolsPage() {
     + '</div><div class="bend"></div><p class="sec">' + esc(t("meridian")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-go="pay">' + mark("key") + '<em>' + esc(licensed() ? t("licence") : t("fullVersion")) + '</em></button>'
     + '<button class="ico" type="button" data-more="about">' + mark("report") + '<em>' + esc(t("about")) + '</em></button>'
-    + '</div><div class="bend"></div>' + schedulerCard() + '<div class="deskfoot">' + esc(t("lookModesFoot")) + '</div></div>';
+    + '</div><div class="bend"></div>' + schedulerCard() + '</div>';
 }
 function windowTitle() {
   if (view === "files") return t("titleFinder");
@@ -2327,7 +2353,7 @@ function windowTitle() {
     if (more === "about") return t("titleAbout");
     if (more === "support") return t("titleSupport");
     if (more === "pc") return t("titleLinux");
-    return t("titleTermux");
+    return t("titleEnvironment");
   }
   return t("titleHome");
 }
@@ -2378,10 +2404,22 @@ function priceCard(kicker, title, price, body, extra) {
   const bodyHtml = body ? '<p class="muted">' + esc(body) + '</p>' : "";
   return '<article class="plate stack pricecard"><p class="priceem">' + esc(kicker) + '</p><h2>' + esc(title) + '</h2>' + priceHtml + bodyHtml + (extra || "") + '</article>';
 }
+let slotChoice = "";
+function workspaceCard() {
+  let info = { personal: "", enterprise: "", active: "personal" };
+  try { info = JSON.parse(MeridianPhone.workspace()) || info; } catch (e) {}
+  const chosen = slotChoice || info.active || "personal";
+  function one(slot, sku) {
+    const name = slot === "enterprise" ? "Premium Enterprise" : "Pro / Personal";
+    const state = sku === "premium" ? "Premium" : sku === "pro" ? "Pro" : "Empty";
+    return '<button class="ghost' + (chosen === slot ? " on" : "") + '" type="button" data-slot="' + slot + '">' + esc(name + " · " + state) + '</button>';
+  }
+  return '<article class="plate stack" id="workspaces"><b>Workspaces</b><p class="muted">Link a Premium Enterprise key and a Pro personal key on this phone. Switching checks the saved key again.</p><div class="tools">' + one("personal", info.personal) + one("enterprise", info.enterprise) + '</div><label class="muted" for="slotkey">Key for the selected workspace</label><input id="slotkey" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="btn" type="button" id="saveslot">Save into this workspace</button><p class="muted" id="slotnote"></p></article>';
+}
 function payPage() {
   if (licensed()) {
     const title = premium() ? t("thisPhoneIsPremium") : t("thisPhoneIsPro");
-    return '<div class="stack"><article class="plate stack pricecard"><div class="logo-mark md">' + LOGO_SVG + '</div><h2>' + esc(title) + '</h2><p>' + esc(t("thankYouShort")) + '</p></article></div>';
+    return '<div class="stack"><article class="plate stack pricecard"><div class="logo-mark md">' + LOGO_SVG + '</div><h2>' + esc(title) + '</h2><p>' + esc(t("thankYouShort")) + '</p></article>' + workspaceCard() + '</div>';
   }
   let html = '<div class="stack"><div class="logo-mark md">' + LOGO_SVG + '</div>';
   const days = trialDays();
@@ -2394,6 +2432,7 @@ function payPage() {
   html += priceCard(t("rolePremium"), t("tierPremium"), t("pricePremium"), t("premiumKeeps"), '<p class="muted">' + esc(t("premiumNote")) + '</p>');
   const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
   html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote()) + '</p></article>';
+  html += workspaceCard();
   return html + '</div>';
 }
 window.onPaid = function () { paidAt = 0; goNav({ view: "build", more: "menu", openCmd: "" }); };
@@ -2450,6 +2489,13 @@ function render() {
   }
   if (focused) { const input = document.getElementById("line"); if (input) input.focus(); }
   if (document.getElementById("dlcount")) refreshDownloads();
+  if (!same && resolvedMotion() !== "reduce") {
+    const nodes = document.querySelectorAll(".page .ico, .page .chip, .page .tile, .page .pack, .page .aboutbtn");
+    nodes.forEach(function (node, i) {
+      node.classList.add("cascade-item");
+      node.style.animationDelay = (i * 0.12) + "s";
+    });
+  }
 }
 let dlFlight = false;
 function refreshDownloads() {
@@ -2672,6 +2718,28 @@ function startRefresh() {
   meterTimer = setInterval(function () { paintMeters(); paintBattery(); }, meters);
   hwTimer = setInterval(paintHardware, meters);
   graphTimer = setInterval(paintGraph, graph);
+}
+function focusField(node) {
+  if (node && node.focus) {
+    try { node.focus(); } catch (e) {}
+  }
+  try { MeridianPhone.showKeyboard(); } catch (e) {}
+}
+function armKeyboard() {
+  ["goal", "line", "apikey", "k-key", "k-base", "k-model", "lickey", "slotkey"].forEach(function (id) {
+    const node = document.getElementById(id);
+    if (!node || node.dataset.ime) return;
+    node.dataset.ime = "1";
+    node.addEventListener("touchend", function () { focusField(node); });
+    node.addEventListener("focus", function () {
+      try { MeridianPhone.showKeyboard(); } catch (e) {}
+    });
+  });
+  const term = document.querySelector(".term");
+  if (term && !term.dataset.ime) {
+    term.dataset.ime = "1";
+    term.addEventListener("touchend", function () { focusField(document.getElementById("line") || term); });
+  }
 }
 function bind() {
   const openset = document.getElementById("openset");
@@ -2950,10 +3018,20 @@ function bind() {
   const savekey = document.getElementById("savekey");
   if (savekey) savekey.onclick = function () {
     const base = document.getElementById("k-base").value.trim();
-    if (base && !/^https:\/\//i.test(base)) { toast("The address must start with https://"); return; }
+    const note = document.getElementById("keystatus");
+    if (base && !/^https:\/\//i.test(base)) {
+      const msg = "The address must start with https://";
+      if (note) note.textContent = msg;
+      toast(msg);
+      return;
+    }
     const result = rememberPlatform(base, document.getElementById("k-model").value.trim(), document.getElementById("k-key").value.trim());
-    if (result !== "ok") return;
+    if (result !== "ok") {
+      if (note) note.textContent = result + " Keys live in the Android Keystore file api-platforms.bin. Keep the same signing certificate, use an https:// address, and stay inside the plan limit (Free 1, Pro 8, Premium 32). Then save again.";
+      return;
+    }
     savekey.textContent = "Saved";
+    if (note) note.textContent = "Saved on this phone.";
     toast("Saved on this phone.");
   };
   const forgetkey = document.getElementById("forgetkey");
@@ -2985,13 +3063,97 @@ function bind() {
       return;
     }
     const result = rememberPlatform(a[3], a[4], key);
-    if (result !== "ok") return;
+    if (result !== "ok") {
+      const note = document.getElementById("keystatus");
+      if (note) note.textContent = result + " Keys live in the Android Keystore file api-platforms.bin. Keep the same signing certificate, use an https:// address, and stay inside the plan limit (Free 1, Pro 8, Premium 32). Then save again.";
+      return;
+    }
     goNav({ view: "plan", more: "menu", openCmd: "" });
   };
   const goalBox = document.getElementById("goal");
   if (goalBox) goalBox.oninput = function () {
     const el = document.getElementById("askhint");
     if (el) el.textContent = askHint(goalBox.value);
+  };
+  armKeyboard();
+  const zram = document.getElementById("zramtoggle");
+  if (zram) zram.onclick = function () {
+    const open = zram.getAttribute("aria-expanded") === "true";
+    zram.setAttribute("aria-expanded", open ? "false" : "true");
+    const body = document.getElementById("zrambody");
+    if (body) body.hidden = open;
+  };
+  const versionHold = document.getElementById("appversion");
+  if (versionHold) {
+    let holdTimer = 0;
+    const startHold = function (ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function () {
+        let answer = "no";
+        try { answer = String(MeridianPhone.devUnlock() || "no"); } catch (e) { answer = "no"; }
+        if (answer === "yes") {
+          paidAt = 0;
+          tierAt = 0;
+          toast("Debug build: Pro, Premium, and enterprise are open on this phone.");
+          render();
+        }
+      }, 5000);
+    };
+    const stopHold = function () { clearTimeout(holdTimer); };
+    versionHold.addEventListener("pointerdown", startHold);
+    versionHold.addEventListener("pointerup", stopHold);
+    versionHold.addEventListener("pointerleave", stopHold);
+    versionHold.addEventListener("pointercancel", stopHold);
+  }
+  document.querySelectorAll("[data-slot]").forEach(function (b) {
+    b.onclick = function () {
+      const slot = b.getAttribute("data-slot");
+      slotChoice = slot;
+      let raw = "";
+      try { raw = MeridianPhone.useWorkspace(slot); } catch (e) { raw = ""; }
+      let parsed = null;
+      try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+      if (parsed && parsed.ok) {
+        slotChoice = "";
+        paidAt = 0;
+        tierAt = 0;
+        tierCache = parsed.sku === "premium" ? "premium" : "pro";
+        toast(parsed.sku === "premium" ? "Premium Enterprise is on." : "Pro personal is on.");
+        render();
+        return;
+      }
+      const note = document.getElementById("slotnote");
+      const msg = parsed && parsed.error ? String(parsed.error) : "That workspace could not be opened.";
+      if (note) note.textContent = msg;
+      document.querySelectorAll("[data-slot]").forEach(function (other) {
+        other.classList.toggle("on", other.getAttribute("data-slot") === slot);
+      });
+    };
+  });
+  const saveslot = document.getElementById("saveslot");
+  if (saveslot) saveslot.onclick = function () {
+    const box = document.getElementById("slotkey");
+    const note = document.getElementById("slotnote");
+    const key = box ? box.value.trim() : "";
+    const chosen = document.querySelector("[data-slot].on");
+    const slot = slotChoice || (chosen ? chosen.getAttribute("data-slot") : "personal");
+    if (!key) {
+      if (note) note.textContent = "Paste a MERIDIAN- key first.";
+      return;
+    }
+    let parsed = null;
+    try { parsed = JSON.parse(MeridianPhone.saveWorkspace(slot, key)); } catch (e) { parsed = null; }
+    if (parsed && parsed.ok) {
+      slotChoice = "";
+      paidAt = 0;
+      tierAt = 0;
+      tierCache = parsed.sku === "premium" ? "premium" : "pro";
+      toast("Workspace saved.");
+      render();
+      return;
+    }
+    if (note) note.textContent = parsed && parsed.error ? String(parsed.error) : "The key could not be checked.";
   };
   const plan = document.getElementById("plan");
   if (plan) plan.onclick = planGoal;

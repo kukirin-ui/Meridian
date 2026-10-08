@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.0**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.1**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,15 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.0 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.1 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.0-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.0** (versionCode 43). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.1-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.1** (versionCode 44). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+
+Hold the version number on About for 5 seconds. On a **debug** build that opens Pro, Premium, and enterprise on this phone without a payment token. A release build ignores that switch. Do not publish the debug APK as the public download if that hold should stay private. The words paid, full, and unlocked are still not keys.
+
+Plans can store two verified keys at once: **Pro / Personal** and **Premium Enterprise**. Switching runs the same signature check as a new key.
 
 ### Language, carrier, Linux PC, terminal mark
 
@@ -40,7 +44,7 @@ or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 - **Window mark:** a meridian ring in the header and in the window. It pulses every 2 seconds. A tap goes home.
 - **Dashboard orb:** a terminal prompt (`>_`) with a caret. Settings → Motion **On** blinks the caret. Motion **Off** freezes it. It is not a globe.
 - **Linux PC:** Termux shelf → **Linux PC**. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
-- **API platforms:** keys are stored with the Android Keystore in `files/api-platforms.bin`, so an update of the same signing cert keeps them. Free stores one platform. Pro stores eight. Premium stores 32.
+- **API platforms:** keys are encrypted with the Android Keystore (AES-GCM) into `files/api-platforms.bin`. They are not stored in SharedPreferences. An update keeps them only when the signing certificate stays the same. The address must start with `https://`. Free stores one platform, Pro stores eight, Premium stores 32. If Save fails, the line under the button is the reason (plan limit, address, or keystore). Fix that and save again. A reinstall with a different certificate starts empty.
 - **Network Security:** this phone's link, DNS, and its own listening sockets. It does not scan other machines and does not capture packets.
 - **Desktop:** `node desktop/meridian-desktop.mjs` prints local readings. `--serve` publishes JSON on `127.0.0.1` only. `--tty` opens the local shell on standard input. There is no command endpoint on the HTTP port.
 

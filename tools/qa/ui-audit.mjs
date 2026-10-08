@@ -38,8 +38,8 @@ assert.match(paint, /setAttribute\("d"/);
 
 assert.match(html, /function uniqueParts/);
 assert.match(html, /commandPh:"Query the terminal or enter a command\.\.\."/);
-assert.match(html, /animation: pulse-ring 2s cubic-bezier\(0\.4, 0, 0\.6, 1\) infinite/);
-assert.match(html, /\.spark \{ width: calc\(100% \+ 28px\); height: 64px; margin: 8px -14px 0;/);
+assert.match(html, /animation: pulse-ring 2s cubic-bezier\(0\.25, 1, 0\.5, 1\) infinite/);
+assert.match(html, /\.spark \{ width: calc\(100% \+ 32px\); height: 64px; margin: 8px -16px 0;/);
 assert.match(html, /\.speedometers \{ display: grid; grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
 assert.equal(/What is a star/i.test(html), false);
 assert.equal(/packCard\("Linux PC"/.test(html), false);
@@ -63,7 +63,24 @@ assert.match(html, /function apiSecret/);
 assert.match(html, /savePlatforms/);
 assert.equal(/localStorage\.setItem\("m-key"/.test(html), false);
 
-const plate = html.match(/\.plate\.freq \{[^}]*padding:\s*14px 14px 0/);
-assert.ok(plate, "frequency plate horizontal padding is 14px, cancelled by the spark margin");
+const plate = html.match(/\.plate\.freq \{[^}]*padding:\s*16px 16px 0/);
+assert.ok(plate, "frequency plate horizontal padding is 16px, cancelled by the spark margin");
+assert.equal(/linear-gradient\(var\(--grid\)/.test(html), false, "square grid background must be gone");
+assert.match(html, /#D4AF37/);
+assert.match(html, /translateX\(-16px\)/);
+assert.match(html, /width: calc\(100% \+ 16px\)/);
+assert.match(html, /Contact Support/);
+assert.match(html, /Top 10/);
+assert.match(html, /Python\+Pip/);
+assert.match(html, /Docker CLI/);
+assert.equal(/id="sharereport"/.test(sliceFn("aboutPage()")), false, "About must not export hardware");
+assert.equal(/thisPhoneIsPro|trialLeft|freeVersion/.test(sliceFn("aboutPage()")), false, "About must not show a subscription");
+const java = readFileSync(join(root, "app/src/main/java/com/meridian/shell/MainActivity.java"), "utf8");
+const manifest = readFileSync(join(root, "app/src/main/AndroidManifest.xml"), "utf8");
+assert.match(manifest, /android:hardwareAccelerated="true"/);
+assert.match(manifest, /android:windowSoftInputMode="adjustResize"/);
+assert.match(java, /FLAG_DEBUGGABLE/);
+assert.match(java, /showSoftInput/);
+assert.match(java, /dev\.unlock/);
 
 console.log("ui audit ok");
