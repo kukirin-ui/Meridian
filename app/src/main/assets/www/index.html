@@ -46,19 +46,20 @@
   body { display: flex; flex-direction: column; min-height: 100dvh; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: flex-end; gap: 8px; min-height: 56px; height: 56px; padding: 0 8px 6px 0; background: var(--header); border-bottom: 1px solid var(--line); }
+  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: 64px; height: 64px; padding: 0 8px; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
-  header h1 { margin: 0; padding: 0 0 0 2px; line-height: 1; font-size: 0.9375rem; font-weight: 650; letter-spacing: 0.08em; -webkit-text-stroke: 0; font-synthesis: none; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 14px var(--accent-glow); white-space: nowrap; align-self: flex-end; }
+  .brandlogo { width: 52px; height: 52px; flex: none; display: block; object-fit: contain; border-radius: 12px; background: #12141a; }
+  .clockstack { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; max-width: 42vw; pointer-events: none; text-align: center; }
   header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #bondline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .grow { flex: 1; min-width: 0; }
-  .setmenu { position: absolute; top: 52px; right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
+  .setmenu { position: absolute; top: 60px; right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
   .setmenu[hidden] { display: none !important; }
   .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
   .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; color: var(--accent); }
   .meridian-pulse svg { width: 22px; height: 22px; display: block; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transform-origin: center; animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
-  #clock { align-self: center; color: var(--fg); font-size: 0.75rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+  #clock { align-self: center; color: var(--fg); font-size: 1.05rem; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
   .leads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .leads div { min-width: 0; text-align: center; padding: 8px 2px; border-radius: 12px; background: var(--plate); border: 1px solid var(--line); }
   .leads b { display: block; color: var(--accent); font-size: 0.9375rem; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -236,10 +237,10 @@
   .core b::after { content: " MHz"; font-size: 10px; font-weight: 550; color: var(--muted); }
   .bar { display: block; height: 7px; margin-top: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); transition: width 400ms ease-out; }
-  .xtal { display: flex; align-items: center; height: 72px; margin: 14px 0 4px; }
-  .xtal-orb { width: 72px; height: 72px; border-radius: 50%; flex: none; z-index: 2; display: grid; place-items: center; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%), radial-gradient(circle at 50% 60%, #eaff6a 0%, #8dff3c 26%, #1c9a52 56%, rgba(6, 28, 20, .4) 80%); box-shadow: inset 0 0 0 3px rgba(186, 255, 255, .95), inset 0 0 0 8px rgba(0, 190, 230, .28), inset 0 -12px 18px rgba(0, 30, 16, .5), 0 0 22px rgba(0, 230, 255, .55); }
-  .xtal-orb svg { width: 26px; height: 26px; display: block; fill: #0b3a22; }
-  .xtal-track { position: relative; flex: 1; height: 44px; margin-left: -16px; border-radius: 8px 26px 10px 8px; transform: skewX(-18deg); overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 36%, rgba(0, 16, 32, .55)), repeating-linear-gradient(105deg, rgba(90, 160, 180, .16) 0 8px, rgba(8, 24, 36, .35) 8px 15px); border: 2px solid rgba(140, 248, 255, .95); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -12px 16px rgba(0, 50, 80, .5), 0 0 16px rgba(0, 210, 255, .45); }
+  .xtal { display: flex; align-items: center; height: 36px; margin: 8px 0 2px; }
+  .xtal-orb { width: 36px; height: 36px; border-radius: 50%; flex: none; z-index: 2; display: grid; place-items: center; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%), radial-gradient(circle at 50% 60%, #eaff6a 0%, #8dff3c 26%, #1c9a52 56%, rgba(6, 28, 20, .4) 80%); box-shadow: inset 0 0 0 2px rgba(186, 255, 255, .95), inset 0 0 0 4px rgba(0, 190, 230, .28), inset 0 -6px 8px rgba(0, 30, 16, .5), 0 0 10px rgba(0, 230, 255, .4); }
+  .xtal-orb svg { width: 14px; height: 14px; display: block; fill: #0b3a22; }
+  .xtal-track { position: relative; flex: 1; height: 22px; margin-left: -8px; border-radius: 6px 14px 7px 6px; transform: skewX(-18deg); overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 36%, rgba(0, 16, 32, .55)), repeating-linear-gradient(105deg, rgba(90, 160, 180, .16) 0 8px, rgba(8, 24, 36, .35) 8px 15px); border: 1.5px solid rgba(140, 248, 255, .95); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -6px 8px rgba(0, 50, 80, .5), 0 0 8px rgba(0, 210, 255, .35); }
   .xtal-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%, rgba(0, 70, 30, .22)), repeating-linear-gradient(105deg, rgba(210, 255, 60, .2) 0 6px, #f3ff78 6px 11px, rgba(90, 210, 20, .35) 11px 16px); box-shadow: inset 0 0 14px rgba(255,255,255,.3); }
   .xtal-track::after { content: ""; position: absolute; left: 10px; right: 22px; top: 5px; height: 7px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(255,255,255,.08)); pointer-events: none; }
   .sec { color: var(--accent); font-size: 13px; font-weight: 650; margin: 0 0 8px; letter-spacing: 0.14em; text-transform: uppercase; -webkit-text-stroke: 0; -webkit-text-fill-color: var(--accent); text-shadow: 0 0 12px var(--accent-glow); font-synthesis: none; filter: none; }
@@ -333,7 +334,7 @@
   .speedrow #devicecare { margin-left: auto; width: auto; flex: none; }
   #ramout:empty { display: none; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .planpage .chips { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: column; gap: 8px; align-items: stretch; }
+  .planpage .chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: row; gap: 8px; align-items: stretch; }
   .planpage .chip { width: 100%; }
   .chip { width: auto; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--accent-border); background: var(--chip); color: var(--fg); font-size: 0.8125rem; }
   .planhead { display: flex; align-items: center; gap: 12px; }
@@ -363,14 +364,14 @@
   .cascade-item { animation: meridian-cascade 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   .hwhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
   .hwhead .sec { margin: 0; }
-  #sharereport { width: auto; max-width: 62%; min-height: 0; height: auto; margin: 0 0 0 auto; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--accent); -webkit-text-fill-color: var(--accent); font-size: 13px; font-weight: 650; letter-spacing: 0.14em; text-transform: uppercase; text-shadow: 0 0 12px var(--accent-glow); white-space: nowrap; }
+  #sharereport { width: auto; max-width: 46%; flex: 0 1 46%; min-width: 0; min-height: 32px; height: auto; margin: 0 0 0 auto; padding: 6px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--accent); -webkit-text-fill-color: var(--accent); font-size: 10px; font-weight: 650; letter-spacing: 0.04em; line-height: 1.25; text-align: right; text-transform: uppercase; text-shadow: 0 0 12px var(--accent-glow); white-space: normal; overflow-wrap: break-word; }
   .accordion { width: auto; display: flex; align-items: center; justify-content: space-between; min-height: 44px; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--fg); margin: 0 -16px; padding: 8px 16px; font-size: 13px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; touch-action: manipulation; }
   .accordion-body[hidden] { display: none !important; }
   .page:has(.planpage) { height: 100%; }
   .planpage { display: flex; flex-direction: column; flex: 1; min-height: 0; height: 100%; gap: 10px; }
   .planask { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
   .winbody > .typing { animation: none; opacity: 1; }
-  .planask textarea, #goal { display: block; flex: none; width: 100%; min-height: 220px; height: 240px; resize: none; color: var(--fg); -webkit-text-fill-color: var(--fg); caret-color: var(--accent); background: var(--field); opacity: 1; font: 16px/1.45 system-ui, sans-serif; -webkit-user-select: text; user-select: text; touch-action: manipulation; pointer-events: auto; position: relative; z-index: 1; }
+  .planask textarea, #goal { display: block; flex: none; width: 100%; min-height: 120px; height: 132px; resize: none; color: var(--fg); -webkit-text-fill-color: var(--fg); caret-color: var(--accent); background: var(--field); opacity: 1; font: 16px/1.45 system-ui, sans-serif; -webkit-user-select: text; user-select: text; touch-action: manipulation; pointer-events: auto; position: relative; z-index: 1; }
   #goal::placeholder { color: var(--muted); -webkit-text-fill-color: var(--muted); opacity: 1; }
   .answer p { margin: 0; color: var(--fg); }
   html[data-density="compact"], html[data-density="compact"] body { font-size: 14px; }
@@ -455,7 +456,7 @@
   html[data-theme="oled"] .win { box-shadow: none; }
   .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 8px; }
   .speedrow .ghost { width: auto; flex: none; }
-  #carrierline { margin: 8px 0 0; min-width: 0; }
+  #carrierline { margin: 0; min-width: 0; max-width: 100%; color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.14em; line-height: 1.15; text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
     display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 0.8125rem; letter-spacing: 0; text-shadow: none; font-synthesis: none;
@@ -485,14 +486,60 @@
   html[data-motion="full"] .logo i:nth-child(2),
   html[data-motion="full"] .logo i:nth-child(3),
   html[data-motion="full"] .logo s { animation-name: spin !important; }
+  .aboutlogo { width: min(220px, 72%); height: auto; display: block; margin: 4px auto 0; border-radius: 18px; }
+  .verpill { align-self: center; margin: 10px auto 12px; padding: 3px 12px; border-radius: 999px; background: var(--field); color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
+  .studio-card, .policycard, .docrow, .tiercard {
+    border: 1px solid var(--accent-border);
+    border-radius: 18px;
+    background: transparent;
+    box-shadow: 0 0 18px var(--accent-glow);
+  }
+  .studio-card { padding: 16px 16px 18px; text-align: left; }
+  .studio-card h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 1.2rem; }
+  .studio-card h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; font-size: 1rem; }
+  .studio-card p { margin: 0; }
+  .studio-ico { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; border: 1px solid var(--accent-border); color: var(--accent); font-size: 0.75rem; font-weight: 700; flex: none; }
+  .studio-ico svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .localpill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: var(--field); color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.04em; }
+  .about-screen .aboutbtn { margin-top: 16px; }
+  .policyhead { margin: 0 0 4px; font-size: 1.55rem; letter-spacing: -0.03em; text-align: center; }
+  .policycard { padding: 14px 16px; }
+  .policycard h3 { margin: 0 0 6px; font-size: 1rem; }
+  .policycard p { margin: 0; color: var(--muted); }
+  .doclist { display: flex; flex-direction: column; gap: 10px; }
+  .docrow summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 28px minmax(0, 1fr) 12px; gap: 10px; align-items: center; padding: 12px 14px; }
+  .docrow summary::-webkit-details-marker { display: none; }
+  .docrow summary .mark { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .docrow summary b { display: block; font-size: 1rem; }
+  .docrow summary span { display: block; color: var(--muted); font-size: 0.8125rem; font-weight: 400; }
+  .docrow .chev { justify-self: end; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
+  .docrow[open] .chev { transform: rotate(225deg); }
+  .docbody { padding: 0 14px 14px 52px; color: var(--muted); }
+  .docbody p { margin: 0 0 8px; }
+  .plansub { margin: 0; text-align: center; color: var(--muted); }
+  .tiercard { padding: 14px 16px 16px; }
+  .tierhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .tierhead h2 { margin: 0; font-size: 1.35rem; }
+  .tierhead .priceem { margin: 0 0 2px; }
+  .tierprice { margin: 0; font-size: 1.2rem; font-weight: 700; text-align: right; white-space: nowrap; }
+  .checks { margin: 10px 0 12px; padding: 0; list-style: none; }
+  .checks li { display: flex; gap: 8px; align-items: flex-start; margin: 3px 0; font-size: 0.9rem; }
+  .checks li::before { content: "✓"; color: var(--accent); font-weight: 700; flex: none; }
+  .tierbtn { width: 100%; border-radius: 999px; }
+  .planpage .chip { font-size: 0.75rem; padding: 0 6px; }
+  .planhead b { display: block; }
+  .planhead p { margin: 2px 0 0; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Meridian</h1>
+  <img class="brandlogo" src="meridian-logo.jpg" alt="Meridian" />
   <p id="bondline" class="sr-only" role="status">Not connected</p>
+  <div class="clockstack">
+    <b id="clock" aria-hidden="true"></b>
+    <span id="carrierline"></span>
+  </div>
   <div class="grow"></div>
-  <b id="clock" aria-hidden="true"></b>
   <button class="ghost iconbtn" id="openset" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" data-i18n-aria="settingsAria"><span class="meridian-pulse" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></button>
   <div id="setmenu" class="setmenu" hidden role="menu">
     <button type="button" role="menuitem" data-device="settings">Device settings</button>
@@ -710,7 +757,8 @@ tierFree:"Free",tierPro:"Pro",tierPremium:"Premium",
 priceFree:"€0",pricePro:"€15 once",
 freeKeeps:"Dashboard, hardware, system, battery, network posture, one console, one saved AI platform, Setup, Doctor, Commands, Links, and read-only Files.",
 proKeeps:"Every listed AI platform, advanced readings, custom themes, build recipes, tweaks, extra consoles, file write, and Linux PC.",
-premiumKeeps:"UFS storage class, unlimited saved API platforms, batch scripts, and the desktop monitor.",
+premiumKeeps:"UFS storage class, up to 32 saved API platforms, batch scripts, the scheduler, and the desktop monitor.",
+currentPlan:"Current plan",
 premiumNote:"€15 and up. The Pro button is the €15 consumer checkout and emails a Pro key. A Premium key is a separate business licence.",
 pricePremium:"€15 and up",
 roleFree:"Included",
@@ -1380,7 +1428,7 @@ function homePage() {
   html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="plate">';
   html += '<p class="muted" data-s="Network">' + esc(net.sub) + '</p>';
-  html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="carrierline">' + esc(carrierLabel()) + '</p><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
+  html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
   html += '</div>';
   return html;
 }
@@ -1578,7 +1626,7 @@ function systemPage() {
 function hardwarePage() {
   const s = phone();
   const p = live();
-  let html = '<div class="stack"><div class="hwhead"><p class="sec">Processor</p><button class="btn" type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><article class="plate">';
+  let html = '<div class="stack"><div class="hwhead"><p class="sec">Processor</p><button type="button" id="sharereport">' + esc(t("shareReport")) + '</button></div><article class="plate">';
   html += row("SoC", hw(p.soc || s.chip));
   html += row("Hardware", hw(p.hardware));
   html += row("Platform", hw(s.platform));
@@ -1624,7 +1672,7 @@ function batteryPage() {
   const s = phone();
   const p = live();
   let html = '<div class="stack"><article class="plate"><p class="sec">' + esc(s.state || "Battery") + '</p>';
-  html += '<b style="font-size:40px;color:var(--accent)" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
+  html += '<b style="font-size:32px;color:var(--accent)" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
   if (s.tempKnown) html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>";
   html += crystalBat(s.battery);
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
@@ -2054,12 +2102,12 @@ function askHint(text) {
   return "Query the terminal or describe the job. Example: show disk use. Or: install Python.";
 }
 function planPage() {
-  let chips = ["Install Python", "Local model", "GPU on this phone", "Show disk use", "Update packages", "Fastfetch", "Debian", "Node service", "Repair Termux", "Memory", "Git status", "Web page"];
-  if (chips.length % 2) chips = chips.slice(0, chips.length - 1);
-  const rows = Math.max(1, chips.length / 2);
-  let html = '<div class="planpage"><div class="chips" style="grid-template-rows:repeat(' + rows + ',auto)">';
+  const chips = ["Python", "Local model", "GPU compute", "Format", "Remote shell", "Fastfetch"];
+  let html = '<div class="planpage">';
+  html += '<article class="planhead hero"><div class="osx" aria-hidden="true"><b></b></div><div><b>How to ask</b><p class="muted" id="askhint">' + esc(askHint(goalDraft)) + '</p></div></article>';
+  html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
-  html += '</div><div id="steps"></div><div class="planask"><textarea id="goal" placeholder="Query the terminal or enter a command..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" inputmode="text">' + esc(goalDraft) + '</textarea><button class="btn" type="button" id="plan">Write the steps</button></div>' + termLog() + '</div>';
+  html += '</div><div class="planask"><textarea id="goal" placeholder="Query the terminal or enter a command..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" inputmode="text">' + esc(goalDraft) + '</textarea><button class="btn" type="button" id="plan">Write the steps</button></div><div id="steps"></div>' + termLog() + '</div>';
   return html;
 }
 function mark(name) {
@@ -2333,7 +2381,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.7"; } catch (e) { return "2.3.7"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.8"; } catch (e) { return "2.3.8"; }
 }
 function savedDownloads() {
   try {
@@ -2369,9 +2417,34 @@ function securityPage() {
   }
   return html + "</div>";
 }
+function docsPage() {
+  function row(icon, title, sub, body, action) {
+    return '<details class="docrow"><summary>' + mark(icon) + '<span><b>' + esc(title) + '</b><span>' + esc(sub) + '</span></span><i class="chev" aria-hidden="true"></i></summary><div class="docbody"><p>' + esc(body) + '</p>' + (action || "") + '</div></details>';
+  }
+  function jump(attr, value, label) {
+    return '<button class="ghost" type="button" ' + attr + '="' + value + '">' + esc(label) + '</button>';
+  }
+  return '<div class="doclist">'
+    + row("setup", "Getting Started", "How to bond with Termux", "Install F-Droid, then Termux from F-Droid, not Play. Come back and press Connect. If Android says permission denied, it is asking for the Termux command permission. Allow it. That is not a ban. When the line says Connected, Setup moves to the end of Termux.", jump("data-go", "setup", "Open Setup"))
+    + row("doctor", "Troubleshooting", "Reading logs and solving errors", "Doctor reads this phone and the Termux shell. Permission denied is the Termux command permission. A stuck package installer can be released from the console. If the network gauge looks stuck, the phone closed its counters and the gauge shows the link speed.", jump("data-more", "doctor", "Open Doctor"))
+    + row("key", "API configuration", "Keys stay on this phone", "Free stores one platform. Pro stores eight. Premium stores 32. A key is encrypted with the Android Keystore into files/api-platforms.bin. It is not kept in SharedPreferences. It is sent only when you press Plan. The address must start with https://.", jump("data-go", "apis", "Open API Platforms"))
+    + row("command", "Termux setup guide", "Prerequisites and commands", "Termux comes from F-Droid. Setup copies the bond line and walks the first packages. Commands run in Termux on this phone. Nothing runs until you press Run.", jump("data-go", "setup", "Open Setup"))
+    + '</div>';
+}
+function privacyPage() {
+  function card(n, title, body) {
+    return '<article class="policycard"><h3>' + n + '. ' + esc(title) + '</h3><p>' + esc(body) + '</p></article>';
+  }
+  return '<div class="stack"><h2 class="policyhead">Your data is your own</h2>'
+    + card("1", "Zero servers and accounts", "Meridian has no account and no server of its own. Readings stay on this handset. We cannot view, store, or access what this phone measures.")
+    + card("2", "Termux bonding", "Commands run in Termux on this phone. There is no relay. You read a command before it runs.")
+    + card("3", "Encrypted keys", "API keys stay on this phone, encrypted with the Android Keystore into files/api-platforms.bin. They are not stored in SharedPreferences. A key is sent only when you press Plan. The licence check is offline and uses a MERIDIAN- key.")
+    + card("4", "Support mail", "Support mail is manual. The message contains only what you choose to write. The About page can also ask GitHub for the public download count of release files. That request sends no identifier from this phone.")
+    + '</div>';
+}
 function aboutPage() {
   const shown = savedDownloads() || "—";
-  return '<div class="about-screen"><article class="plate stack about"><h2>Meridian</h2><p id="appversion">' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(t("aboutLicense")) + '</p><p>' + esc(t("aboutCredits")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">' + esc(t("contactSupport")) + '</button></article><hr class="copyrule"><p class="copyfoot">' + esc(t("copyright")) + '</p></div>';
+  return '<div class="about-screen"><img class="aboutlogo" src="meridian-logo.jpg" alt="" /><p class="verpill" id="appversion">' + esc(appVersion()) + '</p><article class="studio-card"><h2><span class="studio-ico" aria-hidden="true">i</span> About Meridian</h2><h3>Deep Termux integration</h3><p>' + esc(t("aboutBlurb")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span> Offline on this phone <span class="localpill">Local only</span></h3><p>' + esc(t("aboutReadings")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="14" r="3"/><path d="M11 14h10M17 14v3M20 14v2"/></svg></span> Local key security</h3><p>A key you save is encrypted with the Android Keystore on this phone. It is sent only when you press Plan.</p><p class="muted" style="margin-top:10px">' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><div class="aboutrow"><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>' + esc(t("contactSupport")) + '</button></div></article><hr class="copyrule"><p class="copyfoot">© 2026 Kukirin. All rights reserved.</p><p class="copyfoot">' + esc(t("aboutCredits")) + ' · ' + esc(t("aboutLicense")) + '</p></div>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -2424,6 +2497,8 @@ function toolsPage() {
     else if (more === "doctor") inner = doctorPage();
     else if (more === "links") inner = linksPage();
     else if (more === "about") inner = aboutPage();
+    else if (more === "docs") inner = docsPage();
+    else if (more === "privacy") inner = privacyPage();
     else if (more === "support") inner = supportPage();
     else if (more === "pc") inner = pcPage();
     if (openCmd !== "") return inner;
@@ -2447,6 +2522,8 @@ function toolsPage() {
     + '</div><div class="bend"></div><p class="sec">' + esc(t("meridian")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-go="pay">' + mark("key") + '<em>' + esc(licensed() ? t("licence") : t("fullVersion")) + '</em></button>'
     + '<button class="ico" type="button" data-more="about">' + mark("report") + '<em>' + esc(t("about")) + '</em></button>'
+    + '<button class="ico" type="button" data-more="docs">' + mark("command") + '<em>Documentation</em></button>'
+    + '<button class="ico" type="button" data-more="privacy">' + mark("certificate") + '<em>Privacy</em></button>'
     + '</div><div class="bend"></div>' + schedulerCard() + '</div>';
 }
 function windowTitle() {
@@ -2474,6 +2551,8 @@ function windowTitle() {
     if (more === "commands") return t("titleCommands");
     if (more === "links") return t("titleLinks");
     if (more === "about") return t("titleAbout");
+    if (more === "docs") return "Documentation";
+    if (more === "privacy") return "Privacy";
     if (more === "support") return t("titleSupport");
     if (more === "pc") return t("titleLinux");
     return t("titleEnvironment");
@@ -2522,10 +2601,19 @@ function payNote() {
   if (licMsg) return licMsg;
   return t("restoreHintFree");
 }
-function priceCard(kicker, title, price, body, extra) {
-  const priceHtml = price ? '<span class="price">' + esc(price) + '</span>' : "";
-  const bodyHtml = body ? '<p class="muted">' + esc(body) + '</p>' : "";
-  return '<article class="plate stack pricecard"><p class="priceem">' + esc(kicker) + '</p><h2>' + esc(title) + '</h2>' + priceHtml + bodyHtml + (extra || "") + '</article>';
+function checkList(text) {
+  const bits = String(text || "").replace(/\.$/, "").split(",");
+  let html = '<ul class="checks">';
+  bits.forEach(function (raw) {
+    let item = raw.trim().replace(/^and\s+/i, "");
+    if (!item) return;
+    item = item.charAt(0).toUpperCase() + item.slice(1);
+    html += '<li>' + esc(item) + '</li>';
+  });
+  return html + '</ul>';
+}
+function tierCard(role, name, price, keeps, action, klass) {
+  return '<article class="tiercard' + (klass ? " " + klass : "") + '"><div class="tierhead"><div><p class="priceem">' + esc(role) + '</p><h2>' + esc(name) + '</h2></div><p class="tierprice">' + esc(price) + '</p></div>' + checkList(keeps) + (action || "") + '</article>';
 }
 let slotChoice = "";
 function workspaceCard() {
@@ -2542,22 +2630,29 @@ function workspaceCard() {
 function payPage() {
   const currentName = premium() ? t("thisPhoneIsPremium") : (licensed() ? t("thisPhoneIsPro") : t("tierFree"));
   const thanksLine = licensed() ? t("thankYouShort") : t("freeVersion");
-  let html = '<div class="stack">';
-  html += '<article class="plate stack pricecard" id="plancard"><p class="priceem">Current plan</p><h2>' + esc(currentName) + '</h2><p>' + esc(thanksLine) + '</p><div class="tools">';
-  html += '<button class="btn" type="button" id="stepup">Upgrade to Premium</button>';
-  html += '<button class="ghost" type="button" id="stepdown">Switch to Pro</button>';
-  html += '<button class="ghost" type="button" id="stepfree">Use the free plan</button></div>';
-  html += '<p class="muted">Pro is one payment. There is no subscription to cancel. Upgrade to Premium uses a Premium key. Switch to Pro keeps a Pro key. Use the free plan turns the licence off on this phone until you paste a key again.</p></article>';
-  const days = trialDays();
-  html += priceCard(t("roleFree"), t("tierFree"), t("priceFree"), t("freeKeeps"), "");
-  let proExtra = "";
+  const now = tier();
+  let html = '<div class="stack plans">';
+  html += '<p class="plansub">' + esc(currentName) + '. ' + esc(thanksLine) + ' Pro is one payment. There is no subscription to cancel.</p>';
+  const freeAction = now === "free"
+    ? '<button class="ghost tierbtn" type="button" disabled>' + esc(t("currentPlan")) + '</button>'
+    : '<button class="ghost tierbtn" type="button" id="stepfree">' + esc(t("useFreePlan")) + '</button>';
+  html += tierCard(t("roleFree"), t("tierFree"), t("priceFree"), t("freeKeeps"), freeAction, "");
+  let proAction = "";
   if (!licensed()) {
-    if (days > 0) proExtra += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
-    else proExtra += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
-    proExtra += '<button class="btn pay" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("twoKeys")) + '</p><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
-  } else proExtra += '<p class="muted">Current: ' + esc(currentName) + '</p>';
-  html += priceCard(t("rolePro"), t("tierPro"), t("pricePro"), t("proKeeps"), proExtra);
-  html += priceCard(t("rolePremium"), t("tierPremium"), t("pricePremium"), t("premiumKeeps"), '<p class="muted">' + esc(t("premiumNote")) + '</p>');
+    const days = trialDays();
+    if (days > 0) proAction += '<p class="trialline">' + esc(tN("trialLeftAll", days)) + '</p>';
+    else proAction += '<p class="trialline">' + esc(t("trialOver")) + '</p>';
+    proAction += '<button class="btn pay tierbtn" id="pay" type="button">' + esc(t("buyPro")) + '</button><p class="muted">' + esc(t("twoKeys")) + '</p><p class="muted">' + esc(t("checkoutOpens")) + '</p>';
+  } else if (now === "premium") {
+    proAction += '<button class="ghost tierbtn" type="button" id="stepdown">' + esc(t("switchToPro")) + '</button>';
+  } else {
+    proAction += '<button class="ghost tierbtn" type="button" disabled>' + esc(t("currentPlan")) + '</button>';
+  }
+  html += tierCard(t("rolePro"), t("tierPro"), t("pricePro"), t("proKeeps"), proAction, "pro");
+  const premAction = now === "premium"
+    ? '<button class="ghost tierbtn" type="button" disabled>' + esc(t("currentPlan")) + '</button>'
+    : '<button class="btn tierbtn" type="button" id="stepup">' + esc(t("upgradePremium")) + '</button>';
+  html += tierCard(t("rolePremium"), t("tierPremium"), t("pricePremium"), t("premiumKeeps"), premAction + '<p class="muted">' + esc(t("premiumNote")) + '</p>', "biz");
   const keyField = '<label class="muted" for="lickey">' + esc(t("licKey")) + '</label><div class="keyrow"><input id="lickey" value="' + esc(licDraft) + '" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="ghost" type="button" id="pastekey">' + esc(t("paste")) + '</button></div>';
   html += '<article class="plate stack"><b>' + esc(t("alreadyPaid")) + '</b><p class="muted">' + esc(t("pastePaid")) + '</p>' + keyField + '<button class="btn" type="button" id="activate">' + esc(t("activate")) + '</button><p class="muted" id="licnote">' + esc(payNote()) + '</p></article>';
   html += workspaceCard();
@@ -3282,7 +3377,8 @@ function bind() {
     b.onclick = function () {
       const goal = document.getElementById("goal");
       if (goal) { goalDraft = b.getAttribute("data-chip") || ""; goal.value = goalDraft; }
-      planGoal();
+      const hint = document.getElementById("askhint");
+      if (hint) hint.textContent = askHint(goalDraft);
     };
   });
   const speed = document.getElementById("speed");
@@ -4204,9 +4300,12 @@ document.addEventListener("visibilitychange", function () {
 });
 function tickClock() {
   const el = document.getElementById("clock");
-  if (!el) return;
-  const d = new Date();
-  el.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (el) {
+    const d = new Date();
+    el.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  const carrier = document.getElementById("carrierline");
+  if (carrier) carrier.textContent = carrierLabel();
 }
 tickClock();
 setInterval(tickClock, 10000);
