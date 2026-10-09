@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="system">
+<html lang="en" data-theme="oled" data-accent="pink">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -7,13 +7,13 @@
 <style>
   :root {
     --bg:#14161c; --fg:#F2F3F5; --muted:#9AA0AB; --line:rgba(255,255,255,.10);
-    --accent:#7DD3FC; --card:#1E212B; --plate:#1E212B; --field:#12141A; --navbg:#12141A;
-    --btn:#7DD3FC; --btnfg:#141418; --header:rgba(20,22,28,.96); --win:#181B24;
+    --accent:#ff4d9a; --card:#1E212B; --plate:#1E212B; --field:#12141A; --navbg:#12141A;
+    --btn:#ff4d9a; --btnfg:#141418; --header:rgba(20,22,28,.96); --win:#181B24;
     --ico:#F2F3F5; --chip:#1E212B; --top:#1E212B;
     --ink:#141418; --termbg:#101218; --termfg:#F2F3F5; --track:#2A2E3A; --gaugetrack:#12141A;
     --paper:#1E212B; --bad:#ef4444; --accent2:#BAE6FD; --icon:#F4F6F8; --icon-soft:rgba(244,246,248,.18);
-    --accent-border:rgba(125,211,252,.55); --accent-strong:rgba(125,211,252,.75);
-    --accent-glow:rgba(125,211,252,.28); --term-size:13px;
+    --accent-border:rgba(255,77,154,.55); --accent-strong:rgba(255,77,154,.75);
+    --accent-glow:rgba(255,77,154,.28); --term-size:13px;
     --ease:cubic-bezier(0.25, 1, 0.5, 1);
     color-scheme: dark;
   }
@@ -75,8 +75,7 @@
   .setmenu[hidden] { display: none !important; }
   .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
   .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; color: var(--accent); }
-  .meridian-pulse svg { width: 22px; height: 22px; display: block; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transform-origin: center; animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
-  @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
+  .meridian-pulse svg { width: 22px; height: 22px; display: block; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transform-origin: center; animation: latpulse 2.8s var(--ease) infinite; }
   #clock { align-self: center; color: var(--fg); font-size: 1.05rem; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
   .leads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .leads div { min-width: 0; text-align: center; padding: 8px 2px; border-radius: 12px; background: var(--plate); border: 1px solid var(--line); }
@@ -211,12 +210,16 @@
   .speedometers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; text-align: center; }
   .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
   .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
-  #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(96px + env(safe-area-inset-bottom)); }
-  body.term #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
-  .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--line); box-shadow: 0 8px 28px var(--accent-glow); background: var(--win); }
-  .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px; overscroll-behavior: contain; display: flex; flex-direction: column; }
+  #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(80px + env(safe-area-inset-bottom)); }
+  body.term #main { padding-bottom: calc(128px + env(safe-area-inset-bottom)); }
+  body.ime #main { padding-bottom: calc(20px + var(--kb, 0px)); }
+  body.ime nav { visibility: hidden; }
+  .win { display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--line); box-shadow: 0 8px 28px var(--accent-glow); background: var(--win); }
+  .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px 16px 32px; overscroll-behavior: contain; display: flex; flex-direction: column; }
+  body.ime .winbody { padding-bottom: calc(28px + var(--kb, 0px)); }
   .pair.sens .tile { height: auto; min-height: 86px; }
-  .wintop { position: relative; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 12px; background: transparent; border-bottom: 1px solid var(--line); }
+  .wintop { position: relative; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 12px; background: transparent; border-bottom: 0; }
+  .wintop::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); opacity: 0.45; animation: latpulse 2.8s var(--ease) infinite; pointer-events: none; }
   .wintop .termbit { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); }
   .wintop > b { position: relative; display: block; width: 100%; margin: 0; padding: 0 40px; text-align: center; pointer-events: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
   .desk .sec { padding: 10px 12px 0; }
@@ -263,6 +266,12 @@
   .xtal-track::after { content: ""; position: absolute; left: 10px; right: 22px; top: 5px; height: 7px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(255,255,255,.08)); pointer-events: none; }
   .sec { color: var(--accent); font-size: 13px; font-weight: 650; margin: 0 0 8px; letter-spacing: 0.14em; text-transform: uppercase; -webkit-text-stroke: 0; -webkit-text-fill-color: var(--accent); text-shadow: 0 0 12px var(--accent-glow); font-synthesis: none; filter: none; }
   .kv { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 0 -16px; padding: 10px 16px; border-top: 1px solid var(--line); }
+  .page.readings .kv { position: relative; border-top-color: transparent; }
+  .page.readings .kv::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); opacity: 0.45; animation: latpulse 2.8s var(--ease) infinite; pointer-events: none; }
+  .page.readings .plate > .kv:first-child::before { display: none; }
+  .page.readings .stack > .sec { position: relative; }
+  .page.readings .stack > .sec::before { content: ""; display: block; height: 1px; margin: 4px 0 12px; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); opacity: 0.45; animation: latpulse 2.8s var(--ease) infinite; }
+  .page.readings .stack > .sec:first-child::before { display: none; }
   .plate > .kv:first-child { border-top: 0; }
   .kv span { color: var(--muted); flex: none; }
   .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: ui-monospace, "Roboto Mono", "Fira Code", monospace; overflow-wrap: anywhere; word-break: break-word; }
@@ -409,7 +418,7 @@
   .copyfoot { margin: 20px auto 4px; max-width: 36em; padding: 0 8px 18px; text-align: center; color: var(--muted); font-size: 12.5px; font-weight: 500; line-height: 1.5; }
   .pref-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; padding-bottom: 6px; }
   #appversion { min-height: 48px; display: flex; align-items: center; justify-content: center; }
-  .desk { margin: 0 -16px; overflow-x: hidden; }
+  .desk { margin: 0 -16px; overflow: visible; min-height: min-content; }
   .desk .sec { padding: 16px 16px 0; color: var(--fg); -webkit-text-fill-color: var(--fg); text-shadow: 0 0 12px var(--accent-glow); }
   .deskbar b { color: var(--fg); -webkit-text-fill-color: var(--fg); }
   .intro { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--bg); color: var(--fg); overflow: hidden; }
@@ -417,6 +426,11 @@
   .introtrack { flex: 1; display: flex; width: 100%; min-width: 0; height: 100%; overflow: visible; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
   .introslide { flex: 0 0 100%; width: 100%; min-width: 0; max-width: 100%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: calc(24px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); overflow: auto; }
   .introslide h2 { font-size: 28px; }
+  .introtitle { display: flex; align-items: center; gap: 12px; min-height: 52px; }
+  .introtitle h2 { margin: 0; }
+  .intromark { width: auto; height: 44px; max-width: 96px; object-fit: contain; object-position: left center; background: transparent; flex: none; display: block; }
+  body.typing-focus .planhead, body.ime .planhead,
+  body.typing-focus .page.typing .chips, body.ime .page.typing .chips { display: none; }
   .introprivacy { margin: 0; color: var(--fg); font-size: 1.05rem; line-height: 1.45; }
   .introslide .rowline { border: 1px solid var(--accent); border-radius: 14px; margin: 0; min-height: 48px; }
   .introslide .rowline span { color: var(--accent); }
@@ -427,7 +441,7 @@
   .introdots { display: flex; justify-content: center; gap: 6px; }
   .introdots i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); display: block; }
   .introdots i.on { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-  .sheet { position: fixed; inset: 0; z-index: 28; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); overflow: auto; }
+  .sheet { position: fixed; inset: 0; z-index: 40; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + var(--kb, 0px) + env(safe-area-inset-bottom)); overflow: auto; }
   .sheet[hidden] { display: none !important; }
   .sheet h2 { margin: 8px 0; }
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
@@ -503,7 +517,11 @@
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
   html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
-  html[data-motion="full"] .meridian-pulse svg { animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite !important; }
+  html[data-motion="full"] .meridian-pulse svg,
+  html[data-motion="full"] .wintop::after,
+  html[data-motion="full"] .bend,
+  html[data-motion="full"] .page.readings .kv::before,
+  html[data-motion="full"] .page.readings .stack > .sec::before { animation: latpulse 2.8s var(--ease) infinite !important; }
   html[data-motion="full"] .planmark { animation: planmark 3.2s ease-in-out infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
@@ -515,8 +533,8 @@
   .aboutlogo { width: min(100%, 340px); max-width: 100%; height: auto; display: block; margin: 2px auto 0; background: transparent; border-radius: 0; object-fit: contain; }
   .planmark { width: min(100%, 280px); height: auto; margin: 0 auto; object-fit: contain; object-position: center; background: transparent; flex: none; display: block; animation: planmark 3.2s ease-in-out infinite; }
   @keyframes planmark {
-    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(90, 255, 180, .22)); }
-    50% { transform: translateY(-4px) scale(1.035); filter: drop-shadow(0 0 16px rgba(90, 255, 180, .55)); }
+    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(255, 77, 154, .28)); }
+    50% { transform: translateY(-4px) scale(1.035); filter: drop-shadow(0 0 16px rgba(180, 210, 230, .55)); }
   }
   .verpill { align-self: center; margin: 10px auto 12px; padding: 3px 12px; border-radius: 999px; background: var(--field); color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
   .studio-card, .policycard, .docrow, .tiercard {
@@ -609,7 +627,7 @@
 <div id="intro" class="intro" hidden>
   <div class="introtrack" id="introtrack">
     <section class="introslide">
-      <h2>Meridian</h2>
+      <div class="introtitle"><img class="intromark" src="meridian-mark.png" alt="" /><h2>Meridian</h2></div>
       <p class="introprivacy">Commands run in Termux on this phone. There is no account and no server.</p>
       <p class="muted">Readings stay on this handset. A saved key stays here too, and leaves only when you press Plan.</p>
       <div class="introdots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -653,7 +671,7 @@ let sessionIx = 0;
 let blocks = sessions[0];
 let selectMode = false;
 let selected = {};
-const prefs = { theme: "system", accent: "cyan", refresh: "normal", termFont: 13, keepAwake: true, haptics: true, motion: "system", lang: "en", notices: true };
+const prefs = { theme: "oled", accent: "pink", refresh: "normal", termFont: 13, keepAwake: true, haptics: true, motion: "system", lang: "en", notices: true };
 const ACCENTS = {
   cyan: { dark: { accent: "#00D4FF", accent2: "#7AEEFF", btnfg: "#050507" }, light: { accent: "#007EA7", accent2: "#075985", btnfg: "#F3ECDF" } },
   mint: { dark: { accent: "#34d399", accent2: "#a7f3d0", btnfg: "#022c22" }, light: { accent: "#0f766e", accent2: "#115e59", btnfg: "#f0fdfa" } },
@@ -963,6 +981,15 @@ function tN(key, n) {
 }
 
 function readPrefs() {
+  let skin = "";
+  try { skin = localStorage.getItem("m-skin") || ""; } catch (e) { skin = ""; }
+  if (skin !== "2") {
+    prefs.theme = "oled";
+    prefs.accent = "pink";
+    savePref("m-theme", "oled");
+    savePref("m-accent", "pink");
+    savePref("m-skin", "2");
+  }
   const theme = localStorage.getItem("m-theme");
   if (theme === "system" || theme === "dark" || theme === "light" || theme === "oled") prefs.theme = theme;
   const accent = localStorage.getItem("m-accent");
@@ -1026,14 +1053,10 @@ function applyDensity() {
   document.documentElement.setAttribute("data-density", dp >= 600 ? "roomy" : "compact");
 }
 function applySkin() {
-  let chosen = prefs.theme || "system";
-  if (chosen !== "system" && chosen !== "dark" && chosen !== "light" && chosen !== "oled") chosen = "system";
-  let accent = prefs.accent || "cyan";
-  if (!ACCENTS[accent]) accent = "cyan";
-  if (!paid()) {
-    if (chosen === "oled") chosen = "dark";
-    accent = "cyan";
-  }
+  let chosen = prefs.theme || "oled";
+  if (chosen !== "system" && chosen !== "dark" && chosen !== "light" && chosen !== "oled") chosen = "oled";
+  let accent = prefs.accent || "pink";
+  if (!ACCENTS[accent]) accent = "pink";
   const visual = chosen === "system" ? resolvedTheme() : chosen;
   const light = visual === "light";
   document.documentElement.setAttribute("data-theme", chosen);
@@ -2416,7 +2439,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.10"; } catch (e) { return "2.3.10"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.11"; } catch (e) { return "2.3.11"; }
 }
 function savedDownloads() {
   try {
@@ -2709,8 +2732,12 @@ function render() {
     const d = trialDays();
     trial = '<p class="trialline">' + esc(tN("trialLine", d)) + '<button type="button" data-go="pay">' + esc(t("getFull")) + '</button></p>';
   }
-  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + '">' + trial + (map[view] || homePage)() + '</div></div></section>';
-  document.body.className = view === "console" ? "term" : "";
+  const pageBody = (map[view] || homePage)();
+  const readings = /<button\b/i.test(trial + pageBody) ? "" : " readings";
+  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + trial + pageBody + '</div></div></section>';
+  const imeOn = document.body.classList.contains("ime");
+  const typingOn = document.body.classList.contains("typing-focus");
+  document.body.className = (view === "console" ? "term" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "");
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
   const unlocked = paid();
@@ -2878,13 +2905,6 @@ function selectedList() {
   return Object.keys(selected).filter(Boolean);
 }
 function applyPref(key, raw) {
-  if ((key === "accent" && raw !== "amber") || (key === "theme" && raw === "oled")) {
-    if (!paid()) {
-      toast("Custom themes are part of Pro.");
-      goNav({ view: "pay", more: "menu", openCmd: "" });
-      return;
-    }
-  }
   if (key === "theme") prefs.theme = raw;
   else if (key === "accent") prefs.accent = raw;
   else if (key === "refresh") prefs.refresh = raw;
@@ -2983,10 +3003,93 @@ function textField(node) {
   if (type === "button" || type === "checkbox" || type === "radio" || type === "range" || type === "file" || type === "submit") return null;
   return field;
 }
+function submitKey(ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  const box = document.getElementById("lickey");
+  const note = document.getElementById("licnote");
+  const key = box ? box.value.trim() : "";
+  licDraft = key;
+  if (!key) {
+    licMsg = "Paste the key from your receipt first.";
+    if (note) note.textContent = licMsg;
+    return;
+  }
+  const pass = key.replace(/\s+/g, "");
+  if (pass === "MERIDIAN-DEV") {
+    let dev = "no";
+    try { dev = String(MeridianPhone.devUnlock(pass) || "no"); } catch (e) { dev = "no"; }
+    if (dev === "premium") {
+      licMsg = "";
+      licDraft = "";
+      paidAt = 0;
+      tierAt = 0;
+      paidCache = true;
+      tierCache = "premium";
+      tap();
+      toast("Premium is on.");
+      announce("Premium is on.");
+      const sheet = document.getElementById("sheet");
+      if (sheet) sheet.hidden = true;
+      const intro = document.getElementById("intro");
+      if (intro && !intro.hidden) closeIntro(function () { goNav({ view: "pay", more: "menu", openCmd: "" }); });
+      else goNav({ view: "pay", more: "menu", openCmd: "" });
+      return;
+    }
+  }
+  let r = null;
+  try { r = JSON.parse(MeridianPhone.activate(key)); } catch (e) { r = null; }
+  if (typeof r === "string") {
+    try { r = JSON.parse(r); } catch (e) { r = null; }
+  }
+  if (r && r.ok) {
+    licMsg = "";
+    licDraft = "";
+    paidAt = 0;
+    tierAt = 0;
+    tierCache = r.sku === "premium" ? "premium" : "pro";
+    tap();
+    toast("Unlocked. Thank you.");
+    announce("Licence accepted.");
+    const sheet = document.getElementById("sheet");
+    if (sheet) sheet.hidden = true;
+    const intro = document.getElementById("intro");
+    if (intro && !intro.hidden) closeIntro(function () { goNav({ view: "build", more: "menu", openCmd: "" }); });
+    else goNav({ view: "build", more: "menu", openCmd: "" });
+    return;
+  }
+  licMsg = (r && r.error) ? String(r.error) : "The key could not be checked.";
+  if (note) note.textContent = licMsg;
+  else render();
+}
+function keyboardInset() {
+  const vv = window.visualViewport;
+  if (!vv) return 0;
+  return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+}
+function revealField(node) {
+  const field = textField(node || document.activeElement);
+  const inset = keyboardInset();
+  document.documentElement.style.setProperty("--kb", inset + "px");
+  document.body.classList.toggle("ime", inset > 48);
+  const planField = field && field.id === "goal";
+  document.body.classList.toggle("typing-focus", !!planField);
+  if (!field) return;
+  const scroller = field.closest(".winbody") || field.closest(".sheet") || field.closest(".introslide");
+  const vv = window.visualViewport;
+  const limit = (vv ? vv.offsetTop + vv.height : window.innerHeight) - 16;
+  const rect = field.getBoundingClientRect();
+  if (scroller && rect.bottom > limit) scroller.scrollTop += rect.bottom - limit + 36;
+  else if (scroller && rect.top < 8) scroller.scrollTop -= 8 - rect.top;
+}
 function armKeyboard() {
   if (window.__ime) return;
   window.__ime = 1;
   let downField = null;
+  function lift(field) {
+    revealField(field);
+    setTimeout(function () { revealField(field); }, 60);
+    setTimeout(function () { revealField(field); }, 320);
+  }
   document.addEventListener("pointerdown", function (ev) {
     downField = textField(ev.target);
     if (!downField) return;
@@ -2995,6 +3098,7 @@ function armKeyboard() {
   document.addEventListener("focusin", function (ev) {
     if (!textField(ev.target)) return;
     try { MeridianPhone.showKeyboard(); } catch (e) {}
+    lift(ev.target);
   });
   document.addEventListener("pointerup", function (ev) {
     if (downField) {
@@ -3004,14 +3108,23 @@ function armKeyboard() {
         try { field.focus(); } catch (e) {}
       }
       try { MeridianPhone.showKeyboard(); } catch (e) {}
+      lift(field);
       return;
     }
     if (textField(ev.target)) return;
     const active = document.activeElement;
     if (active && active.blur && textField(active)) active.blur();
     try { MeridianPhone.hideKeyboard(); } catch (e) {}
+    document.body.classList.remove("ime");
+    document.body.classList.remove("typing-focus");
+    document.documentElement.style.setProperty("--kb", "0px");
   }, true);
   document.addEventListener("pointercancel", function () { downField = null; }, true);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", function () { revealField(document.activeElement); });
+    window.visualViewport.addEventListener("scroll", function () { revealField(document.activeElement); });
+  }
+  window.addEventListener("resize", function () { revealField(document.activeElement); });
 }
 function bind() {
   const openset = document.getElementById("openset");
@@ -3116,38 +3229,7 @@ function bind() {
     } else box.focus();
   };
   const activate = document.getElementById("activate");
-  if (activate) activate.onclick = function (ev) {
-    if (ev && ev.preventDefault) ev.preventDefault();
-    const box = document.getElementById("lickey");
-    const note = document.getElementById("licnote");
-    const key = box ? box.value.trim() : "";
-    licDraft = key;
-    if (!key) {
-      licMsg = "Paste the key from your receipt first.";
-      if (note) note.textContent = licMsg;
-      return;
-    }
-    let r = null;
-    try { r = JSON.parse(MeridianPhone.activate(key)); } catch (e) { r = null; }
-    if (typeof r === "string") {
-      try { r = JSON.parse(r); } catch (e) { r = null; }
-    }
-    if (r && r.ok) {
-      licMsg = "";
-      licDraft = "";
-      paidAt = 0;
-      tierAt = 0;
-      tierCache = r.sku === "premium" ? "premium" : "pro";
-      tap();
-      toast("Unlocked. Thank you.");
-      announce("Licence accepted.");
-      goNav({ view: "build", more: "menu", openCmd: "" });
-      return;
-    }
-    licMsg = (r && r.error) ? String(r.error) : "The key could not be checked.";
-    if (note) note.textContent = licMsg;
-    else render();
-  };
+  if (activate) activate.onclick = submitKey;
   const winlogo = document.getElementById("winlogo");
   if (winlogo) winlogo.onclick = function () {
     logoPressed = !logoPressed;
@@ -4204,6 +4286,10 @@ function showIntro(on) {
   el.hidden = !on;
   if (on) setIntro(introIx);
 }
+function introUp() {
+  const intro = document.getElementById("intro");
+  return !!(intro && !intro.hidden);
+}
 function openSheet(kind) {
   const el = document.getElementById("sheet");
   if (!el) return;
@@ -4213,6 +4299,22 @@ function openSheet(kind) {
     body += '<h2>Help</h2><p><b>Where do commands run?</b></p><p>Commands run in Termux on this phone. There is no account and no server.</p><p><b>Permission denied</b></p><p>Android is asking for the Termux command permission. Allow it. That is not a ban.</p><p><b>Network looks stuck</b></p><p>If the phone closes its counters, the gauge shows the link speed instead of a dash.</p><button class="btn" type="button" id="sheetsetup">Open Setup</button><button class="ghost" type="button" id="sheetdoctor">Troubleshooting</button><button class="ghost" type="button" id="sheetmail">Contact Support</button><button class="ghost" type="button" id="sheetintro">Show the intro</button>';
   } else if (kind === "terms") {
     body += '<h2>Terms</h2><p>Meridian is proprietary software. All rights reserved. It is free to install. That install is not a licence to the source.</p><p>Pro is €15 once and includes two keys. It is not a subscription. Premium is a separate key.</p><p>Commands run in Termux on this phone. You read a command before it runs.</p>';
+  } else if (kind === "started") {
+    body += '<h2>Get Started</h2><p>Install Termux from F-Droid, not Play. Come back to Meridian and press Connect.</p><p>If Android says permission denied, it is asking for the Termux command permission. Allow it. That is not a ban and not a broken phone.</p><p>The line turns into Connected when the bond is there.</p><button class="btn" type="button" id="sheetcontinue">Continue</button>';
+  } else if (kind === "plans") {
+    body += '<h2>Plans</h2><p>Free keeps the dashboard, the readings, Plan, and one console.</p><p>Pro is €15 once and includes two keys. It is not a subscription. It adds Build, Tweaks, file writing, and Linux PC.</p><p>Premium adds running a whole plan, the scheduler, and a hardware report without the footer.</p><label class="muted" for="lickey">Licence key</label><input id="lickey" placeholder="MERIDIAN-…" autocapitalize="off" autocomplete="off" spellcheck="false" /><button class="btn" type="button" id="activate">Activate</button><p class="muted" id="licnote"></p>';
+  } else if (kind === "prefs") {
+    body += '<h2>Preferences</h2><p>Look stays on this handset.</p><div class="setrow"><div class="k">Theme</div><div class="seg">';
+    [["oled", "OLED"], ["dark", "Dark"], ["light", "Light"], ["system", "System"]].forEach(function (o) {
+      body += '<button class="ghost' + (prefs.theme === o[0] ? " on" : "") + '" type="button" data-pref="theme" data-val="' + o[0] + '">' + o[1] + '</button>';
+    });
+    body += '</div></div><div class="setrow"><div class="k">Accent</div><div class="accentrow">';
+    [["cyan", "#00D4FF"], ["mint", "#34d399"], ["amber", "#c4a46a"], ["violet", "#a78bfa"], ["rose", "#fb7185"], ["pink", "#ff4d9a"]].forEach(function (a) {
+      body += '<button class="swatch' + (prefs.accent === a[0] ? " on" : "") + '" type="button" data-accent="' + a[0] + '" style="--sw:' + a[1] + '" aria-label="' + a[0] + '"></button>';
+    });
+    body += '</div></div>';
+  } else if (kind === "doctor") {
+    body += '<h2>Troubleshooting</h2><p>Permission denied is the Termux command permission. Allow it. That is not a ban.</p><p>If the network gauge looks stuck, the phone closed its counters and the gauge shows the link speed.</p><p>A stuck package installer can be released from the console.</p>';
   } else {
     body += '<h2>Privacy</h2><p>Commands run in Termux on this phone. There is no account and no server.</p><p>Readings stay on this handset. A saved API key stays here and is sent only when you press Plan. The licence check is offline.</p>';
   }
@@ -4221,13 +4323,40 @@ function openSheet(kind) {
   const back = document.getElementById("sheetback");
   if (back) back.onclick = function () { el.hidden = true; };
   const setup = document.getElementById("sheetsetup");
-  if (setup) setup.onclick = function () { el.hidden = true; goNav({ view: "setup", more: "menu", openCmd: "" }); };
+  if (setup) setup.onclick = function () {
+    if (introUp()) { openSheet("started"); return; }
+    el.hidden = true;
+    goNav({ view: "setup", more: "menu", openCmd: "" });
+  };
   const doctor = document.getElementById("sheetdoctor");
-  if (doctor) doctor.onclick = function () { el.hidden = true; goNav({ view: "tools", more: "doctor", openCmd: "" }); };
+  if (doctor) doctor.onclick = function () {
+    if (introUp()) { openSheet("doctor"); return; }
+    el.hidden = true;
+    goNav({ view: "tools", more: "doctor", openCmd: "" });
+  };
   const mail = document.getElementById("sheetmail");
   if (mail) mail.onclick = function () { try { MeridianPhone.open("mailto:Pozun.alen96@gmail.com"); } catch (e) {} };
   const again = document.getElementById("sheetintro");
   if (again) again.onclick = function () { el.hidden = true; introIx = 0; showIntro(true); };
+  const activate = document.getElementById("activate");
+  if (activate) activate.onclick = submitKey;
+  const cont = document.getElementById("sheetcontinue");
+  if (cont) cont.onclick = function () {
+    el.hidden = true;
+    if (introUp()) closeIntro(function () { goNav({ view: "home", more: "menu", openCmd: "" }); });
+  };
+  el.querySelectorAll("button[data-pref]").forEach(function (b) {
+    b.onclick = function () {
+      applyPref(b.getAttribute("data-pref"), b.getAttribute("data-val"));
+      openSheet("prefs");
+    };
+  });
+  el.querySelectorAll("button[data-accent]").forEach(function (b) {
+    b.onclick = function () {
+      applyPref("accent", b.getAttribute("data-accent"));
+      openSheet("prefs");
+    };
+  });
 }
 function closeIntro(go) {
   markIntro();
@@ -4286,11 +4415,11 @@ render();
   const next2 = document.getElementById("intronext2");
   if (next2) next2.onclick = function () { setIntro(2); };
   const start = document.getElementById("getstarted");
-  if (start) start.onclick = function () { closeIntro(function () { goNav({ view: "setup", more: "menu", openCmd: "" }); }); };
+  if (start) start.onclick = function () { openSheet("started"); };
   const planBtn = document.getElementById("introplan");
-  if (planBtn) planBtn.onclick = function () { closeIntro(function () { goNav({ view: "pay", more: "menu", openCmd: "" }); }); };
+  if (planBtn) planBtn.onclick = function () { openSheet("plans"); };
   const prefBtn = document.getElementById("introprefs");
-  if (prefBtn) prefBtn.onclick = function () { closeIntro(function () { goNav({ view: "settings", more: "menu", openCmd: "" }); }); };
+  if (prefBtn) prefBtn.onclick = function () { openSheet("prefs"); };
   function paintIntroToggles() {
     const notices = document.getElementById("intronotices");
     if (notices) {
@@ -4313,7 +4442,7 @@ render();
   const dark = document.getElementById("introdark");
   if (dark) dark.onclick = function () {
     const on = prefs.theme === "dark" || prefs.theme === "oled";
-    applyPref("theme", on ? "system" : "dark");
+    applyPref("theme", on ? "light" : "oled");
     paintIntroToggles();
   };
   const help = document.getElementById("introhelp");

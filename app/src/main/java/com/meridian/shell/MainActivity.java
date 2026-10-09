@@ -115,7 +115,26 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
+        fitKeyboard(web);
         adoptLegacyUnlock();
+    }
+
+    /** Pads the page only while the keyboard covers it. A nav-bar inset stays below the threshold. */
+    private void fitKeyboard(final WebView web) {
+        if (Build.VERSION.SDK_INT >= 30) getWindow().setDecorFitsSystemWindows(true);
+        web.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (MainActivity.this.web == null) return;
+                android.graphics.Rect frame = new android.graphics.Rect();
+                MainActivity.this.web.getWindowVisibleDisplayFrame(frame);
+                int root = MainActivity.this.web.getRootView().getHeight();
+                if (root <= 0) return;
+                int overlap = root - frame.bottom;
+                int pad = overlap > root / 6 ? overlap : 0;
+                if (MainActivity.this.web.getPaddingBottom() != pad) MainActivity.this.web.setPadding(0, 0, 0, pad);
+            }
+        });
     }
 
     @Override
@@ -1025,10 +1044,14 @@ public class MainActivity extends Activity {
             });
         }
 
-        /** Licence keys are the only unlock. This bridge does not grant a plan. */
+        /** Debug builds only. A release build returns no. paid, full, and unlocked are not accepted. */
         @JavascriptInterface
-        public String devUnlock() {
-            return "no";
+        public String devUnlock(String pass) {
+            if (!debuggable()) return "no";
+            String p = pass == null ? "" : pass.trim().replace("\r", "").replace("\n", "").replace(" ", "");
+            if (!"MERIDIAN-DEV".equals(p)) return "no";
+            markTier("premium");
+            return "premium";
         }
 
         @JavascriptInterface

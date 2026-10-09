@@ -38,7 +38,8 @@ assert.match(paint, /setAttribute\("d"/);
 
 assert.match(html, /function uniqueParts/);
 assert.match(html, /commandPh:"Query the terminal or enter a command\.\.\."/);
-assert.match(html, /animation: pulse-ring 2s cubic-bezier\(0\.25, 1, 0\.5, 1\) infinite/);
+assert.match(html, /animation: latpulse 2\.8s var\(--ease\) infinite/);
+assert.equal(/pulse-ring/.test(html), false);
 assert.match(html, /\.spark \{ width: calc\(100% \+ 32px\); height: 64px; margin: 8px -16px 0;/);
 assert.match(html, /\.speedometers \{ display: grid; grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\)/);
 assert.equal(/What is a star/i.test(html), false);
