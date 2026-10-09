@@ -1000,12 +1000,16 @@ public class MainActivity extends Activity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (web == null) return;
-                    web.post(new Runnable() {
-                        public void run() {
-                            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                            if (imm != null) imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT);
-                        }
-                    });
+                    web.requestFocus();
+                    final InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm == null) return;
+                    if (!imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT)) {
+                        web.post(new Runnable() {
+                            public void run() {
+                                imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT);
+                            }
+                        });
+                    }
                 }
             });
         }
