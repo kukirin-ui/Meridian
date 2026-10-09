@@ -46,22 +46,19 @@
   body { display: flex; flex-direction: column; min-height: 100dvh; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: 56px; height: 56px; padding: 0 8px 0 0; background: var(--header); border-bottom: 1px solid var(--line); }
+  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: flex-end; gap: 8px; min-height: 56px; height: 56px; padding: 0 8px 6px 0; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
-  header h1 { margin: 0; padding-left: 2px; font-size: 0.9375rem; font-weight: 650; letter-spacing: 0.08em; -webkit-text-stroke: 0; font-synthesis: none; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 14px var(--accent-glow); white-space: nowrap; }
+  header h1 { margin: 0; padding: 0 0 0 2px; line-height: 1; font-size: 0.9375rem; font-weight: 650; letter-spacing: 0.08em; -webkit-text-stroke: 0; font-synthesis: none; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 14px var(--accent-glow); white-space: nowrap; align-self: flex-end; }
   header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #bondline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .grow { flex: 1; min-width: 0; }
   .setmenu { position: absolute; top: 52px; right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
   .setmenu[hidden] { display: none !important; }
   .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
-  .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; }
-  .meridian-pulse i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent); display: block; animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
-  .meridian-pulse b { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
+  .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; color: var(--accent); }
+  .meridian-pulse svg { width: 22px; height: 22px; display: block; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transform-origin: center; animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
-  .logo-slot .meridian-pulse { width: 28px; height: 28px; }
-  .logo-slot .meridian-pulse i { width: 22px; height: 22px; }
-  #clock { color: var(--fg); font-size: 0.75rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+  #clock { align-self: center; color: var(--fg); font-size: 0.75rem; font-weight: 650; font-variant-numeric: tabular-nums; }
   .leads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .leads div { min-width: 0; text-align: center; padding: 8px 2px; border-radius: 12px; background: var(--plate); border: 1px solid var(--line); }
   .leads b { display: block; color: var(--accent); font-size: 0.9375rem; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -196,6 +193,7 @@
   .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
   .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
   #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(64px + env(safe-area-inset-bottom)); }
+  body:has(#devicecare) #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   body.term #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--line); box-shadow: 0 8px 28px var(--accent-glow); background: var(--win); }
   .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px; overscroll-behavior: contain; display: flex; flex-direction: column; }
@@ -245,6 +243,7 @@
   .kv span { color: var(--muted); flex: none; }
   .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: ui-monospace, "Roboto Mono", "Fira Code", monospace; overflow-wrap: anywhere; word-break: break-word; }
   .stack { display: flex; flex-direction: column; gap: 10px; }
+  .home-stack { flex: 1; min-height: 100%; }
   h2, .wintop > b { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: 0.04em; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 16px var(--accent-glow); }
   .muted { color: var(--muted); }
   .plate p, .muted { overflow-wrap: anywhere; }
@@ -278,7 +277,9 @@
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
     nav button { flex: 0 0 48px; min-height: 48px; }
     #main { padding: 8px 10px 10px 116px; }
+    body:has(#devicecare) #main { padding-bottom: 72px; }
     body.term #main { padding-bottom: 70px; }
+    #devicecare { bottom: 16px; }
     #dock { left: 116px; bottom: 12px; }
     .desk .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .filegrid, .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -327,8 +328,8 @@
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
   .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
-  .care-row { display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; }
-  #devicecare { align-self: center; width: auto; min-height: 48px; padding: 12px 24px; border-radius: 999px; }
+  .care-row { height: 0; margin: 0; padding: 0; overflow: visible; }
+  #devicecare { position: fixed; right: 20px; bottom: calc(68px + env(safe-area-inset-bottom)); z-index: 6; width: auto; min-height: 44px; padding: 0 18px; border-radius: 999px; }
   #ramout:empty { display: none; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .planpage .chips { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: column; gap: 8px; align-items: stretch; }
@@ -361,13 +362,15 @@
   .cascade-item { animation: meridian-cascade 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   .hwhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
   .hwhead .sec { margin: 0; }
-  #sharereport { width: auto; max-width: 58%; min-height: 28px; height: 28px; padding: 0 12px; font-size: 12px; margin-left: auto; white-space: nowrap; }
+  #sharereport { width: auto; max-width: 58%; min-height: 28px; height: 28px; padding: 0 12px; font-size: 12px; margin-left: auto; white-space: nowrap; background: #fff; color: var(--accent); -webkit-text-fill-color: var(--accent); box-shadow: none; text-shadow: none; }
   .accordion { width: auto; display: flex; align-items: center; justify-content: space-between; min-height: 44px; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--fg); margin: 0 -16px; padding: 8px 16px; font-size: 13px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; touch-action: manipulation; }
   .accordion-body[hidden] { display: none !important; }
   .page:has(.planpage) { height: 100%; }
   .planpage { display: flex; flex-direction: column; flex: 1; min-height: 0; height: 100%; gap: 10px; }
   .planask { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
-  .planask textarea { flex: 1 1 auto; min-height: 280px; height: 100%; }
+  .planask textarea, #goal { flex: 1 1 280px; min-height: 280px; height: auto; color: var(--fg); -webkit-text-fill-color: var(--fg); caret-color: var(--accent); background: var(--field); opacity: 1; }
+  #goal::placeholder { color: var(--muted); -webkit-text-fill-color: var(--muted); opacity: 1; }
+  .page:has(#goal) { animation: none; }
   .answer p { margin: 0; color: var(--fg); }
   html[data-density="compact"], html[data-density="compact"] body { font-size: 14px; }
   html[data-density="roomy"], html[data-density="roomy"] body { font-size: 16px; }
@@ -378,7 +381,8 @@
   .accordion-body { padding: 8px 0 16px; }
   .hwmono { margin: 0 0 8px; font: 400 13px/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; color: var(--fg); }
   .about-screen { flex: 1; display: flex; flex-direction: column; min-height: 100%; }
-  .copyfoot { margin-top: auto; padding: 24px 0 8px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .copyrule { display: block; border: 0; height: 1px; width: calc(100% + 32px); margin: 18px -16px 0; padding: 0; background: var(--line); }
+  .copyfoot { margin-top: 12px; padding: 0 0 8px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 500; }
   #appversion { min-height: 48px; display: flex; align-items: center; justify-content: center; }
   .desk { margin: 0 -16px; overflow-x: hidden; }
   .desk .sec { padding: 16px 16px 0; color: var(--fg); -webkit-text-fill-color: var(--fg); text-shadow: 0 0 12px var(--accent-glow); }
@@ -472,8 +476,7 @@
   html[data-motion="reduce"] *::before,
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
   html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
-  html[data-motion="full"] .meridian-pulse i,
-  html[data-motion="full"] .meridian-pulse b { animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite !important; }
+  html[data-motion="full"] .meridian-pulse svg { animation: pulse-ring 2s cubic-bezier(0.25, 1, 0.5, 1) infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
   html[data-motion="full"] .marklogo,
@@ -489,7 +492,7 @@
   <p id="bondline" class="sr-only" role="status">Not connected</p>
   <div class="grow"></div>
   <b id="clock" aria-hidden="true"></b>
-  <button class="ghost iconbtn" id="openset" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" data-i18n-aria="settingsAria"><span class="meridian-pulse" aria-hidden="true"><i></i><b></b></span></button>
+  <button class="ghost iconbtn" id="openset" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" data-i18n-aria="settingsAria"><span class="meridian-pulse" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></button>
   <div id="setmenu" class="setmenu" hidden role="menu">
     <button type="button" role="menuitem" data-device="settings">Device settings</button>
     <button type="button" role="menuitem" data-device="developer">Developer options</button>
@@ -1342,9 +1345,9 @@ function homePage() {
   const net = netView(p);
   const dial = netDial(p);
   const bad = sick(p, s);
-  let html = '<div class="stack">';
+  let html = '<div class="stack home-stack">';
   if (bond !== "termux") html += '<button class="btn" type="button" data-go="setup">' + esc(t("setup")) + '</button><article class="plate stack"><b>' + esc(t("connectTermux")) + '</b><p class="muted">' + esc(t("connectTermuxBody")) + '</p><pre>' + esc(BOND_LINE) + '</pre><button class="ghost" type="button" id="copybond">' + esc(t("copyLine")) + '</button></article>';
-  html += '<div class="care-row"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="ramout"></p>';
+  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="hero">';
   html += '<div class="speedometers">';
   html += gaugeHtml("STO", diskN == null ? "—" : diskN, t("storage"));
@@ -1366,10 +1369,10 @@ function homePage() {
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
-  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="plate">';
   html += '<p class="muted" data-s="Network">' + esc(net.sub) + '</p>';
   html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><p class="muted" id="carrierline">' + esc(carrierLabel()) + '</p></div><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
+  html += '<p class="muted" id="ramout"></p><div class="care-row"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div>';
   html += '</div>';
   return html;
 }
@@ -2324,7 +2327,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.5"; } catch (e) { return "2.3.5"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.6"; } catch (e) { return "2.3.6"; }
 }
 function savedDownloads() {
   try {
@@ -2362,7 +2365,7 @@ function securityPage() {
 }
 function aboutPage() {
   const shown = savedDownloads() || "—";
-  return '<div class="about-screen"><article class="plate stack about"><h2>Meridian</h2><p id="appversion">' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(t("aboutLicense")) + '</p><p>' + esc(t("aboutCredits")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">' + esc(t("contactSupport")) + '</button></article><p class="copyfoot">' + esc(t("copyright")) + '</p></div>';
+  return '<div class="about-screen"><article class="plate stack about"><h2>Meridian</h2><p id="appversion">' + esc(appVersion()) + '</p><p>' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><p>' + esc(t("aboutBlurb")) + '</p><p class="muted">' + esc(t("aboutReadings")) + '</p><p>' + esc(t("aboutLicense")) + '</p><p>' + esc(t("aboutCredits")) + '</p><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com">' + esc(t("contactSupport")) + '</button></article><hr class="copyrule"><p class="copyfoot">' + esc(t("copyright")) + '</p></div>';
 }
 function settingsPage() {
   function seg(key, opts) {
