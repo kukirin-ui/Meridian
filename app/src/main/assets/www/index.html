@@ -193,7 +193,6 @@
   .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
   .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
   #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(64px + env(safe-area-inset-bottom)); }
-  body:has(#devicecare) #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   body.term #main { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   .win { display: flex; flex-direction: column; flex: 1 1 auto; height: 100%; max-height: 100%; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--line); box-shadow: 0 8px 28px var(--accent-glow); background: var(--win); }
   .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px; overscroll-behavior: contain; display: flex; flex-direction: column; }
@@ -237,13 +236,18 @@
   .core b::after { content: " MHz"; font-size: 10px; font-weight: 550; color: var(--muted); }
   .bar { display: block; height: 7px; margin-top: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); transition: width 400ms ease-out; }
+  .xtal { display: flex; align-items: center; height: 72px; margin: 14px 0 4px; }
+  .xtal-orb { width: 72px; height: 72px; border-radius: 50%; flex: none; z-index: 2; display: grid; place-items: center; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%), radial-gradient(circle at 50% 60%, #eaff6a 0%, #8dff3c 26%, #1c9a52 56%, rgba(6, 28, 20, .4) 80%); box-shadow: inset 0 0 0 3px rgba(186, 255, 255, .95), inset 0 0 0 8px rgba(0, 190, 230, .28), inset 0 -12px 18px rgba(0, 30, 16, .5), 0 0 22px rgba(0, 230, 255, .55); }
+  .xtal-orb svg { width: 26px; height: 26px; display: block; fill: #0b3a22; }
+  .xtal-track { position: relative; flex: 1; height: 44px; margin-left: -16px; border-radius: 8px 26px 10px 8px; transform: skewX(-18deg); overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 36%, rgba(0, 16, 32, .55)), repeating-linear-gradient(105deg, rgba(90, 160, 180, .16) 0 8px, rgba(8, 24, 36, .35) 8px 15px); border: 2px solid rgba(140, 248, 255, .95); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -12px 16px rgba(0, 50, 80, .5), 0 0 16px rgba(0, 210, 255, .45); }
+  .xtal-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%, rgba(0, 70, 30, .22)), repeating-linear-gradient(105deg, rgba(210, 255, 60, .2) 0 6px, #f3ff78 6px 11px, rgba(90, 210, 20, .35) 11px 16px); box-shadow: inset 0 0 14px rgba(255,255,255,.3); }
+  .xtal-track::after { content: ""; position: absolute; left: 10px; right: 22px; top: 5px; height: 7px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(255,255,255,.08)); pointer-events: none; }
   .sec { color: var(--accent); font-size: 13px; font-weight: 650; margin: 0 0 8px; letter-spacing: 0.14em; text-transform: uppercase; -webkit-text-stroke: 0; -webkit-text-fill-color: var(--accent); text-shadow: 0 0 12px var(--accent-glow); font-synthesis: none; filter: none; }
   .kv { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 0 -16px; padding: 10px 16px; border-top: 1px solid var(--line); }
   .plate > .kv:first-child { border-top: 0; }
   .kv span { color: var(--muted); flex: none; }
   .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: ui-monospace, "Roboto Mono", "Fira Code", monospace; overflow-wrap: anywhere; word-break: break-word; }
   .stack { display: flex; flex-direction: column; gap: 10px; }
-  .home-stack { flex: 1; min-height: 100%; }
   h2, .wintop > b { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: 0.04em; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 16px var(--accent-glow); }
   .muted { color: var(--muted); }
   .plate p, .muted { overflow-wrap: anywhere; }
@@ -277,9 +281,7 @@
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
     nav button { flex: 0 0 48px; min-height: 48px; }
     #main { padding: 8px 10px 10px 116px; }
-    body:has(#devicecare) #main { padding-bottom: 72px; }
     body.term #main { padding-bottom: 70px; }
-    #devicecare { bottom: 16px; }
     #dock { left: 116px; bottom: 12px; }
     .desk .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .filegrid, .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -328,8 +330,7 @@
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
   .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
-  .care-row { height: 0; margin: 0; padding: 0; overflow: visible; }
-  #devicecare { position: fixed; right: 20px; bottom: calc(68px + env(safe-area-inset-bottom)); z-index: 6; width: auto; min-height: 44px; padding: 0 18px; border-radius: 999px; }
+  .speedrow #devicecare { margin-left: auto; width: auto; flex: none; }
   #ramout:empty { display: none; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .planpage .chips { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: column; gap: 8px; align-items: stretch; }
@@ -362,15 +363,15 @@
   .cascade-item { animation: meridian-cascade 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite; }
   .hwhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
   .hwhead .sec { margin: 0; }
-  #sharereport { width: auto; max-width: 58%; min-height: 28px; height: 28px; padding: 0 12px; font-size: 12px; margin-left: auto; white-space: nowrap; background: #fff; color: var(--accent); -webkit-text-fill-color: var(--accent); box-shadow: none; text-shadow: none; }
+  #sharereport { width: auto; max-width: 62%; min-height: 0; height: auto; margin: 0 0 0 auto; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--accent); -webkit-text-fill-color: var(--accent); font-size: 13px; font-weight: 650; letter-spacing: 0.14em; text-transform: uppercase; text-shadow: 0 0 12px var(--accent-glow); white-space: nowrap; }
   .accordion { width: auto; display: flex; align-items: center; justify-content: space-between; min-height: 44px; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--fg); margin: 0 -16px; padding: 8px 16px; font-size: 13px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; touch-action: manipulation; }
   .accordion-body[hidden] { display: none !important; }
   .page:has(.planpage) { height: 100%; }
   .planpage { display: flex; flex-direction: column; flex: 1; min-height: 0; height: 100%; gap: 10px; }
   .planask { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
-  .planask textarea, #goal { flex: 1 1 280px; min-height: 280px; height: auto; color: var(--fg); -webkit-text-fill-color: var(--fg); caret-color: var(--accent); background: var(--field); opacity: 1; }
+  .winbody > .typing { animation: none; opacity: 1; }
+  .planask textarea, #goal { display: block; flex: none; width: 100%; min-height: 220px; height: 240px; resize: none; color: var(--fg); -webkit-text-fill-color: var(--fg); caret-color: var(--accent); background: var(--field); opacity: 1; font: 16px/1.45 system-ui, sans-serif; -webkit-user-select: text; user-select: text; touch-action: manipulation; pointer-events: auto; position: relative; z-index: 1; }
   #goal::placeholder { color: var(--muted); -webkit-text-fill-color: var(--muted); opacity: 1; }
-  .page:has(#goal) { animation: none; }
   .answer p { margin: 0; color: var(--fg); }
   html[data-density="compact"], html[data-density="compact"] body { font-size: 14px; }
   html[data-density="roomy"], html[data-density="roomy"] body { font-size: 16px; }
@@ -452,9 +453,9 @@
   .cheatcard .row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 0.875rem; }
   .cheatcard kbd { font: 0.75rem/1 ui-monospace, monospace; color: var(--accent); }
   html[data-theme="oled"] .win { box-shadow: none; }
-  .speedrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-  .speedrow .ghost { width: auto; }
-  #carrierline { margin: 0; min-width: 0; }
+  .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 8px; }
+  .speedrow .ghost { width: auto; flex: none; }
+  #carrierline { margin: 8px 0 0; min-width: 0; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
     display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 0.8125rem; letter-spacing: 0; text-shadow: none; font-synthesis: none;
@@ -565,6 +566,7 @@
 <div id="sheet" class="sheet" hidden></div>
 <script>
 let view = "home";
+let goalDraft = "";
 let bond = "off";
 let userOff = false;
 let sessions = [[]];
@@ -1181,6 +1183,12 @@ function netView(p) {
   return { big: "—", sub: "interface closed" };
 }
 function bar(pct) { let n = parseInt(pct, 10); if (isNaN(n) || n < 0) n = 0; if (n > 100) n = 100; return '<i class="bar"><i style="width:' + n + '%"></i></i>'; }
+function crystalBat(pct) {
+  let n = parseInt(pct, 10);
+  if (isNaN(n) || n < 0) n = 0;
+  if (n > 100) n = 100;
+  return '<div class="xtal" aria-hidden="true"><span class="xtal-orb"><svg viewBox="0 0 24 24"><path d="M14.2 1.6 6 13.2h5.6L10.2 22.4 18.8 10h-5.8l1.2-8.4z"/></svg></span><span class="xtal-track"><span class="xtal-fill" id="batfill" style="width:' + n + '%"></span></span></div>';
+}
 function shortKernel(k) { k = String(k || ""); const cut = k.indexOf("("); return (cut > 8 ? k.slice(0, cut) : k).trim(); }
 function shortGl(v) { v = String(v || ""); const d = v.indexOf(" Driver"); return (d > 0 ? v.slice(0, d) : v).trim(); }
 function shortGpu(name) {
@@ -1345,9 +1353,9 @@ function homePage() {
   const net = netView(p);
   const dial = netDial(p);
   const bad = sick(p, s);
-  let html = '<div class="stack home-stack">';
+  let html = '<div class="stack">';
   if (bond !== "termux") html += '<button class="btn" type="button" data-go="setup">' + esc(t("setup")) + '</button><article class="plate stack"><b>' + esc(t("connectTermux")) + '</b><p class="muted">' + esc(t("connectTermuxBody")) + '</p><pre>' + esc(BOND_LINE) + '</pre><button class="ghost" type="button" id="copybond">' + esc(t("copyLine")) + '</button></article>';
-  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
+  html += '<p class="muted" id="ramout"></p>';
   html += '<article class="hero">';
   html += '<div class="speedometers">';
   html += gaugeHtml("STO", diskN == null ? "—" : diskN, t("storage"));
@@ -1369,10 +1377,10 @@ function homePage() {
   html += '<article class="tile"><div class="k">' + esc(t("memory")) + '</div><b data-k="Memory">' + esc(memPct) + '</b><span data-s="Memory">' + gb((p.memTotal || 0) - (p.memFree || 0)) + t("usedOf") + gb(p.memTotal) + '</span>' + bar(memPct) + '</article>';
   html += '<article class="tile"><div class="k">' + esc(t("virtual")) + '</div><b data-k="SensSwap">' + (v.total ? gb(v.total) : "—") + '</b><span class="fit" data-s="SensSwap">' + (v.total ? gb(v.free) + " " + t("ramFree").toLowerCase() : t("noRamPlus")) + '</span></article>';
   html += '</div>';
+  html += '<article class="plate freq"><div class="freqhead"><div><div class="k">' + esc(t("liveClocks")) + '</div><p class="muted" id="freqnote">' + esc(t("reading")) + '</p></div><button class="ghost" id="hold" type="button">' + esc(held ? t("live") : t("hold")) + '</button></div><div class="k">' + esc(t("cpu")) + '</div><b id="cpuhz">—</b><svg id="spark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="sparkfill" fill="var(--accent)" fill-opacity="0.16" stroke="none"></path><path id="sparkline" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg><div class="k">' + esc(t("gpu")) + '</div><b id="gpupct">—</b><svg id="gspark" class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path id="gsparkfill" fill="var(--accent2)" fill-opacity="0.14" stroke="none"></path><path id="gsparkline" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg></article>';
   html += '<article class="plate">';
   html += '<p class="muted" data-s="Network">' + esc(net.sub) + '</p>';
-  html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><p class="muted" id="carrierline">' + esc(carrierLabel()) + '</p></div><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
-  html += '<p class="muted" id="ramout"></p><div class="care-row"><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div>';
+  html += '<div class="speedrow"><button class="ghost" type="button" id="speed">' + esc(t("testSpeed")) + '</button><button class="ghost" type="button" id="devicecare">' + esc(t("deviceCare")) + '</button></div><p class="muted" id="carrierline">' + esc(carrierLabel()) + '</p><p class="muted" id="speedout" role="status">' + esc(speedText === "Testing…" ? t("testing") : speedText) + '</p></article>';
   html += '</div>';
   return html;
 }
@@ -1515,10 +1523,8 @@ function paintBattery() {
     if (s.tempKnown) temp.textContent = Number(s.temp || 0).toFixed(1) + "°C";
     else temp.remove();
   }
-  if (pct.parentElement) {
-    const fill = pct.parentElement.querySelector(".bar i");
-    if (fill) fill.style.width = Math.max(0, Math.min(100, Number(s.battery) || 0)) + "%";
-  }
+  const fill = document.getElementById("batfill");
+  if (fill) fill.style.width = Math.max(0, Math.min(100, Number(s.battery) || 0)) + "%";
 }
 function paintGraph() {
   if (document.hidden || view !== "home") return;
@@ -1620,7 +1626,7 @@ function batteryPage() {
   let html = '<div class="stack"><article class="plate"><p class="sec">' + esc(s.state || "Battery") + '</p>';
   html += '<b style="font-size:40px;color:var(--accent)" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
   if (s.tempKnown) html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>";
-  html += bar(s.battery);
+  html += crystalBat(s.battery);
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");
@@ -2053,7 +2059,7 @@ function planPage() {
   const rows = Math.max(1, chips.length / 2);
   let html = '<div class="planpage"><div class="chips" style="grid-template-rows:repeat(' + rows + ',auto)">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
-  html += '</div><div id="steps"></div><div class="planask"><textarea id="goal" placeholder="Query the terminal or enter a command..." enterkeyhint="send"></textarea><button class="btn" type="button" id="plan">Write the steps</button></div>' + termLog() + '</div>';
+  html += '</div><div id="steps"></div><div class="planask"><textarea id="goal" placeholder="Query the terminal or enter a command..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" inputmode="text">' + esc(goalDraft) + '</textarea><button class="btn" type="button" id="plan">Write the steps</button></div>' + termLog() + '</div>';
   return html;
 }
 function mark(name) {
@@ -2327,7 +2333,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.6"; } catch (e) { return "2.3.6"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.7"; } catch (e) { return "2.3.7"; }
 }
 function savedDownloads() {
   try {
@@ -2573,7 +2579,7 @@ function render() {
     const d = trialDays();
     trial = '<p class="trialline">' + esc(tN("trialLine", d)) + '<button type="button" data-go="pay">' + esc(t("getFull")) + '</button></p>';
   }
-  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page">' + trial + (map[view] || homePage)() + '</div></div></section>';
+  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + '">' + trial + (map[view] || homePage)() + '</div></div></section>';
   document.body.className = view === "console" ? "term" : "";
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
@@ -2850,24 +2856,32 @@ function textField(node) {
 function armKeyboard() {
   if (window.__ime) return;
   window.__ime = 1;
-  let imeWanted = false;
+  let downField = null;
   document.addEventListener("pointerdown", function (ev) {
-    imeWanted = !!textField(ev.target);
+    downField = textField(ev.target);
+    if (!downField) return;
+    try { downField.focus(); } catch (e) {}
   }, true);
   document.addEventListener("focusin", function (ev) {
-    if (!imeWanted || !textField(ev.target)) return;
+    if (!textField(ev.target)) return;
     try { MeridianPhone.showKeyboard(); } catch (e) {}
   });
   document.addEventListener("pointerup", function (ev) {
-    if (textField(ev.target)) {
+    if (downField) {
+      const field = downField;
+      downField = null;
+      if (document.activeElement !== field) {
+        try { field.focus(); } catch (e) {}
+      }
       try { MeridianPhone.showKeyboard(); } catch (e) {}
       return;
     }
-    imeWanted = false;
+    if (textField(ev.target)) return;
     const active = document.activeElement;
-    if (active && active.blur && active !== ev.target && (active.tagName === "INPUT" || active.tagName === "TEXTAREA")) active.blur();
+    if (active && active.blur && textField(active)) active.blur();
     try { MeridianPhone.hideKeyboard(); } catch (e) {}
   }, true);
+  document.addEventListener("pointercancel", function () { downField = null; }, true);
 }
 function bind() {
   const openset = document.getElementById("openset");
@@ -3201,6 +3215,7 @@ function bind() {
   const goalBox = document.getElementById("goal");
   if (goalBox) {
     goalBox.oninput = function () {
+      goalDraft = goalBox.value;
       const el = document.getElementById("askhint");
       if (el) el.textContent = askHint(goalBox.value);
     };
@@ -3266,7 +3281,7 @@ function bind() {
   document.querySelectorAll("[data-chip]").forEach(function (b) {
     b.onclick = function () {
       const goal = document.getElementById("goal");
-      if (goal) goal.value = b.getAttribute("data-chip") || "";
+      if (goal) { goalDraft = b.getAttribute("data-chip") || ""; goal.value = goalDraft; }
       planGoal();
     };
   });
