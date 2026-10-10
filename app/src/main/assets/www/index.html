@@ -66,7 +66,9 @@
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: 64px; height: 64px; padding: 0 8px; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
-  .brandlogo { height: 48px; width: auto; max-width: calc(50vw - 92px); flex: none; display: block; object-fit: contain; object-position: left center; background: transparent; border-radius: 0; }
+  .brandlogo { width: 40px; height: 40px; flex: none; display: block; color: var(--icon); background: transparent; }
+  .brandmark { width: 100%; height: 100%; display: block; }
+  .brandmark .merline { stroke: var(--accent); }
   .clockstack { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; max-width: 42vw; pointer-events: none; text-align: center; }
   header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #bondline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -214,7 +216,8 @@
   body.term #main { padding-bottom: calc(128px + env(safe-area-inset-bottom)); }
   body.ime #main { padding-bottom: calc(20px + var(--kb, 0px)); }
   body.ime nav { visibility: hidden; }
-  .win { display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--line); box-shadow: 0 8px 28px var(--accent-glow); background: var(--win); }
+  .win { position: relative; display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid transparent; box-shadow: none; background: var(--win); }
+  .win::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1px solid var(--accent); box-shadow: 0 0 8px var(--accent-glow); opacity: 0.45; animation: latpulse 2.8s var(--ease) infinite; pointer-events: none; z-index: 3; }
   .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px 16px 32px; overscroll-behavior: contain; display: flex; flex-direction: column; }
   body.ime .winbody { padding-bottom: calc(28px + var(--kb, 0px)); }
   .pair.sens .tile { height: auto; min-height: 86px; }
@@ -336,20 +339,21 @@
   .grid.big { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; }
   .grid.big .ico { min-height: 118px; }
   .grid.big .glyph { width: 72px; height: 56px; }
-  .ico.own { border-color: var(--accent); background: var(--field); box-shadow: 0 0 18px var(--accent-glow); }
-  .ico.own em { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+  .ico.own { border-color: transparent; background: var(--field); box-shadow: none; }
+  .ico.own em { color: var(--icon); -webkit-text-fill-color: var(--icon); }
   .ico.own .glyph.file { border-color: var(--icon); box-shadow: none; }
-  .ico { border: 1px solid var(--accent); border-radius: 16px; min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--icon); background: transparent; box-shadow: 0 0 14px var(--accent-glow); }
+  .ico { position: relative; border: 1px solid transparent; border-radius: 16px; min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--icon); background: transparent; box-shadow: none; }
+  .ico::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1px solid var(--accent); box-shadow: 0 0 8px var(--accent-glow); opacity: 0.45; animation: latpulse 2.8s var(--ease) infinite; pointer-events: none; }
   .ico .mark { width: 28px; height: 28px; stroke: var(--icon); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .grid.big .ico .mark { width: 36px; height: 36px; }
-  .ico.on { border-color: var(--accent); box-shadow: 0 0 18px var(--accent-glow); }
+  .ico.on { border-color: transparent; box-shadow: none; }
   .ico.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
   .glyph { width: 46px; height: 36px; position: relative; }
   .grid .glyph.file, .grid .glyph.dir { border-color: var(--icon); }
   .glyph.dir { background: linear-gradient(var(--icon), var(--icon)) 2px 0 / 18px 6px no-repeat, linear-gradient(var(--icon-soft), var(--icon-soft)) 0 6px / 100% 30px no-repeat; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--icon); }
   .glyph.file { background: transparent; border: 1px solid var(--icon); border-radius: 2px; }
   .glyph.file::after { content: ""; position: absolute; top: -1px; right: -1px; border-width: 0 9px 9px 0; border-style: solid; border-color: var(--paper) var(--accent-strong) transparent transparent; }
-  .ico em { font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; }
+  .ico em { font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--icon); -webkit-text-fill-color: var(--icon); text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; }
   .ico em::before, .ico em::after, .sec::before, .sec::after, .deskbar b::before, .deskbar b::after { content: none !important; }
   textarea.cmd { font: var(--term-size)/1.3 ui-monospace, monospace; padding: 8px; white-space: pre-wrap; overflow: auto; word-break: normal; overflow-wrap: break-word; min-height: 0; }
   .about { align-items: center; text-align: center; }
@@ -428,7 +432,7 @@
   .introslide h2 { font-size: 28px; }
   .introtitle { display: flex; align-items: center; gap: 12px; min-height: 52px; }
   .introtitle h2 { margin: 0; }
-  .intromark { width: auto; height: 44px; max-width: 96px; object-fit: contain; object-position: left center; background: transparent; flex: none; display: block; }
+  .intromark { width: 44px; height: 44px; color: var(--icon); background: transparent; flex: none; display: block; }
   body.typing-focus .planhead, body.ime .planhead,
   body.typing-focus .page.typing .chips, body.ime .page.typing .chips { display: none; }
   .introprivacy { margin: 0; color: var(--fg); font-size: 1.05rem; line-height: 1.45; }
@@ -520,9 +524,11 @@
   html[data-motion="full"] .meridian-pulse svg,
   html[data-motion="full"] .wintop::after,
   html[data-motion="full"] .bend,
+  html[data-motion="full"] .win::before,
+  html[data-motion="full"] .ico::before,
   html[data-motion="full"] .page.readings .kv::before,
   html[data-motion="full"] .page.readings .stack > .sec::before { animation: latpulse 2.8s var(--ease) infinite !important; }
-  html[data-motion="full"] .planmark { animation: planmark 3.2s ease-in-out infinite !important; }
+  html[data-motion="full"] .planmark .brandmark { animation: planmark 3.2s ease-in-out infinite !important; }
   html[data-motion="reduce"] .marklogo,
   html[data-motion="reduce"] .marklogo *,
   html[data-motion="full"] .marklogo,
@@ -530,11 +536,14 @@
   html[data-motion="full"] .logo i:nth-child(2),
   html[data-motion="full"] .logo i:nth-child(3),
   html[data-motion="full"] .logo s { animation-name: spin !important; }
-  .aboutlogo { width: min(100%, 340px); max-width: 100%; height: auto; display: block; margin: 2px auto 0; background: transparent; border-radius: 0; object-fit: contain; }
-  .planmark { width: min(100%, 280px); height: auto; margin: 0 auto; object-fit: contain; object-position: center; background: transparent; flex: none; display: block; animation: planmark 3.2s ease-in-out infinite; }
+  .aboutlogo, .planmark { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 2px auto 0; color: var(--icon); background: transparent; }
+  .aboutlogo .brandmark { width: 72px; height: 72px; }
+  .planmark { gap: 6px; }
+  .planmark .brandmark { width: 64px; height: 64px; animation: planmark 3.2s ease-in-out infinite; }
+  .logoword { font-size: 0.78rem; font-weight: 650; letter-spacing: 0.22em; text-transform: uppercase; color: var(--icon); }
   @keyframes planmark {
-    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(255, 77, 154, .28)); }
-    50% { transform: translateY(-4px) scale(1.035); filter: drop-shadow(0 0 16px rgba(180, 210, 230, .55)); }
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.04); }
   }
   .verpill { align-self: center; margin: 10px auto 12px; padding: 3px 12px; border-radius: 999px; background: var(--field); color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
   .studio-card, .policycard, .docrow, .tiercard {
@@ -582,7 +591,7 @@
 </head>
 <body>
 <header>
-  <img class="brandlogo" src="meridian-logo.png" alt="Meridian" />
+  <span class="brandlogo" data-mark role="img" aria-label="Meridian"></span>
   <p id="bondline" class="sr-only" role="status">Not connected</p>
   <div class="clockstack">
     <b id="clock" aria-hidden="true"></b>
@@ -627,7 +636,7 @@
 <div id="intro" class="intro" hidden>
   <div class="introtrack" id="introtrack">
     <section class="introslide">
-      <div class="introtitle"><img class="intromark" src="meridian-mark.png" alt="" /><h2>Meridian</h2></div>
+      <div class="introtitle"><span class="intromark" data-mark></span><h2>Meridian</h2></div>
       <p class="introprivacy">Commands run in Termux on this phone. There is no account and no server.</p>
       <p class="muted">Readings stay on this handset. A saved key stays here too, and leaves only when you press Plan.</p>
       <div class="introdots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -2188,7 +2197,7 @@ function askHint(text) {
 function planPage() {
   const chips = ["Python", "Local model", "GPU compute", "Format", "Remote shell", "Fastfetch"];
   let html = '<div class="planpage">';
-  html += '<article class="planhead hero"><img class="planmark" src="meridian-logo.png" alt="" /><div><b>How to ask</b><p class="muted" id="askhint">' + esc(askHint(goalDraft)) + '</p></div></article>';
+  html += '<article class="planhead hero"><div class="planmark">' + meridianMark() + '<span class="logoword">Meridian</span></div><div><b>How to ask</b><p class="muted" id="askhint">' + esc(askHint(goalDraft)) + '</p></div></article>';
   html += '<div class="chips">';
   chips.forEach(function (c) { html += '<button class="chip" type="button" data-chip="' + esc(c) + '">' + esc(c) + '</button>'; });
   html += '</div><div class="planask"><textarea id="goal" placeholder="Query the terminal or enter a command..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" inputmode="text">' + esc(goalDraft) + '</textarea><button class="btn" type="button" id="plan">Write the steps</button></div><div id="steps"></div>' + termLog() + '</div>';
@@ -2465,7 +2474,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.12"; } catch (e) { return "2.3.12"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.13"; } catch (e) { return "2.3.13"; }
 }
 function savedDownloads() {
   try {
@@ -2528,7 +2537,7 @@ function privacyPage() {
 }
 function aboutPage() {
   const shown = savedDownloads() || "—";
-  return '<div class="about-screen"><img class="aboutlogo" src="meridian-logo.png" alt="" /><p class="verpill" id="appversion">' + esc(appVersion()) + '</p><article class="studio-card"><h2><span class="studio-ico" aria-hidden="true">i</span> About Meridian</h2><h3>Deep Termux integration</h3><p>' + esc(t("aboutBlurb")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span> Offline on this phone <span class="localpill">Local only</span></h3><p>' + esc(t("aboutReadings")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="14" r="3"/><path d="M11 14h10M17 14v3M20 14v2"/></svg></span> Local key security</h3><p>A key you save is encrypted with the Android Keystore on this phone. It is sent only when you press Plan.</p><p class="muted" style="margin-top:10px">' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><div class="aboutrow"><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>' + esc(t("contactSupport")) + '</button></div></article><hr class="copyrule"><p class="copyfoot">© 2026 [ TermuxSolutions ] • All rights reserved.<br>All interface text, user experience designs, system architectures, and human-authored components of this application are protected under applicable copyright laws. Unassigned automated code generation tools were utilized as an assistive mechanism during development.</p></div>';
+  return '<div class="about-screen"><div class="aboutlogo">' + meridianMark() + '<span class="logoword">Meridian</span></div><p class="verpill" id="appversion">' + esc(appVersion()) + '</p><article class="studio-card"><h2><span class="studio-ico" aria-hidden="true">i</span> About Meridian</h2><h3>Deep Termux integration</h3><p>' + esc(t("aboutBlurb")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span> Offline on this phone <span class="localpill">Local only</span></h3><p>' + esc(t("aboutReadings")) + '</p><h3><span class="studio-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="14" r="3"/><path d="M11 14h10M17 14v3M20 14v2"/></svg></span> Local key security</h3><p>A key you save is encrypted with the Android Keystore on this phone. It is sent only when you press Plan.</p><p class="muted" style="margin-top:10px">' + esc(t("downloads")) + ' <b id="dlcount">' + esc(shown) + '</b></p><div class="aboutrow"><button class="aboutbtn" type="button" data-open="mailto:Pozun.alen96@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>' + esc(t("contactSupport")) + '</button></div></article><hr class="copyrule"><p class="copyfoot">© 2026 [ TermuxSolutions ] • All rights reserved.<br>All interface text, user experience designs, system architectures, and human-authored components of this application are protected under applicable copyright laws. Unassigned automated code generation tools were utilized as an assistive mechanism during development.</p></div>';
 }
 function settingsPage() {
   function seg(key, opts) {
@@ -4523,6 +4532,13 @@ render();
   });
   if (introOpen()) showIntro(true);
 })();
+function meridianMark() {
+  return '<svg class="brandmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="1.7"/><path class="merline" d="M24 6.5v35" fill="none" stroke-width="1.7" stroke-linecap="round"/><path d="M27.2 20.4 32 24l-4.8 3.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function paintMarks() {
+  document.querySelectorAll("[data-mark]").forEach(function (el) { el.innerHTML = meridianMark(); });
+}
+paintMarks();
 startRefresh();
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) { probeAt = 0; paintMeters(); paintGraph(); paintHardware(); paintBattery(); }

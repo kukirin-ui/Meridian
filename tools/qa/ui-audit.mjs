@@ -96,5 +96,11 @@ assert.match(html, /function clipOut/);
 assert.match(html, /\[earlier output trimmed\]/);
 assert.match(html, /m-draft/);
 assert.match(html, /m-goal/);
+assert.match(html, /\.ico em \{[^}]*color: var\(--icon\)/);
+assert.match(html, /\.win::before \{[^}]*animation: latpulse 2\.8s var\(--ease\) infinite/);
+assert.match(html, /\.ico::before \{[^}]*animation: latpulse 2\.8s var\(--ease\) infinite/);
+assert.equal(/meridian-logo\.png/.test(html), false);
+assert.equal(/meridian-mark\.png/.test(html), false);
+assert.match(html, /function meridianMark/);
 
 console.log("ui audit ok");
