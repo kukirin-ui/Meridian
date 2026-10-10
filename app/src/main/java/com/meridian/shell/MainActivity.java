@@ -25,6 +25,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -90,6 +95,7 @@ public class MainActivity extends Activity {
     private double shownTx = 0;
     private boolean netClosed = false;
     private int netStall = 0;
+    private ConnectivityManager.NetworkCallback signalCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +124,135 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
         fitKeyboard(web);
+        concealStatusBar();
+        watchSignal();
         adoptLegacyUnlock();
+    }
+
+    /**
+     * The Android status bar (clock, notifications, signal, battery) stays hidden while
+     * Meridian is open. A swipe down from the top edge shows it, then it hides again.
+     * The system navigation bar stays put.
+     */
+    private void concealStatusBar() {
+        final Window window = getWindow();
+        if (Build.VERSION.SDK_INT >= 29) window.setStatusBarContrastEnforced(false);
+        if (Build.VERSION.SDK_INT >= 28) {
+            WindowManager.LayoutParams attrs = window.getAttributes();
+            attrs.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(attrs);
+        }
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Keep the framework fitting the navigation bar and the keyboard. Only the status bar is hidden.
+            window.setDecorFitsSystemWindows(true);
+            WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars());
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+        } else {
+            final View decor = window.getDecorView();
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+        if (web != null) web.post(new Runnable() { public void run() { applyCutout(); } });
+    }
+
+    /** Keeps the header below a camera cutout after the status bar is hidden. */
+    private void applyCutout() {
+        if (web == null || Build.VERSION.SDK_INT < 28) return;
+        int top = 0;
+        android.view.WindowInsets insets = getWindow().getDecorView().getRootWindowInsets();
+        if (insets != null && insets.getDisplayCutout() != null) top = insets.getDisplayCutout().getSafeInsetTop();
+        web.evaluateJavascript("document.documentElement.style.setProperty('--cutout','" + top + "px')", null);
+    }
+
+    /** Pushes a fresh signal glyph when the active network changes. */
+    private void watchSignal() {
+        if (signalCallback != null) return;
+        final ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (cm == null) return;
+        signalCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) { pushSignal(); }
+            @Override
+            public void onLost(Network network) { pushSignal(); }
+        };
+        try {
+            cm.registerDefaultNetworkCallback(signalCallback);
+        } catch (Exception ex) {
+            signalCallback = null;
+        }
+    }
+
+    private void pushSignal() {
+        final WebView page = web;
+        if (page == null) return;
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (web != null) web.evaluateJavascript("window.meridianSignal&&window.meridianSignal()", null);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        concealStatusBar();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) concealStatusBar();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (signalCallback != null) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                if (cm != null) cm.unregisterNetworkCallback(signalCallback);
+            } catch (Exception ignored) {}
+            signalCallback = null;
+        }
+        super.onDestroy();
+    }
+
+    /** Maps a dBm reading to four bars. The same steps serve Wi-Fi RSSI and cellular. */
+    private static int barsFromDbm(int dbm) {
+        if (dbm >= -55) return 4;
+        if (dbm >= -67) return 3;
+        if (dbm >= -80) return 2;
+        if (dbm >= -90) return 1;
+        return 0;
+    }
+
+    private int wifiBars() {
+        try {
+            android.net.wifi.WifiManager wm = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            if (wm == null || wm.getConnectionInfo() == null) return 0;
+            int rssi = wm.getConnectionInfo().getRssi();
+            if (rssi < -126 || rssi >= 0) return 0;
+            return barsFromDbm(rssi);
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
+
+    private int cellBars() {
+        if (Build.VERSION.SDK_INT < 28) return 0;
+        try {
+            TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            if (tm == null) return 0;
+            android.telephony.SignalStrength strength = tm.getSignalStrength();
+            if (strength == null) return 0;
+            return Math.max(0, Math.min(4, strength.getLevel()));
+        } catch (Exception ignored) {
+            return 0;
+        }
     }
 
     /** Pads the page only while the keyboard covers it. A nav-bar inset stays below the threshold. */
@@ -1427,6 +1561,45 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 return "{\"kind\":\"\",\"name\":\"—\"}";
             }
+        }
+
+        /**
+         * Live Wi-Fi or cellular strength for the header glyph.
+         * Uses the active network already read by the Security page. No location permission.
+         */
+        @JavascriptInterface
+        public String signalBars() {
+            JSONObject o = new JSONObject();
+            String kind = "none";
+            int level = 0;
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                Network net = cm == null ? null : cm.getActiveNetwork();
+                NetworkCapabilities caps = (cm == null || net == null) ? null : cm.getNetworkCapabilities(net);
+                if (caps != null) {
+                    if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) kind = "wifi";
+                    else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) kind = "cell";
+                    else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) kind = "ethernet";
+                    else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) kind = "vpn";
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        int strength = caps.getSignalStrength();
+                        if (strength != NetworkCapabilities.SIGNAL_STRENGTH_UNSPECIFIED) {
+                            if (strength >= 0 && strength <= 4) level = strength;
+                            else level = barsFromDbm(strength);
+                        }
+                    }
+                }
+                if ("wifi".equals(kind) && level == 0) level = wifiBars();
+                if ("cell".equals(kind) && level == 0) level = cellBars();
+                o.put("kind", kind);
+                o.put("level", level);
+            } catch (Exception ex) {
+                try {
+                    o.put("kind", "none");
+                    o.put("level", 0);
+                } catch (Exception ignored) {}
+            }
+            return o.toString();
         }
 
         @JavascriptInterface
