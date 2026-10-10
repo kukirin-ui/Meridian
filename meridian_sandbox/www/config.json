@@ -1,0 +1,11 @@
+{
+  "agent_name": "Meridian",
+  "active_tier": "mid",
+  "execution_mode": "hybrid",
+  "active_skill_tree": "code",
+  "revenue_layer": "disabled",
+  "api_key_override": "",
+  "custom_model_path": "",
+  "selected_local_voice_index": 0,
+  "installed_at": 1791657908598
+}

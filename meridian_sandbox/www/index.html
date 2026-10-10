@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meridian Omni-Mesh System Terminal</title>
+    <style>
+        body { background: #070709; color: #00ffcc; font-family: 'Courier New', monospace; padding: 15px; margin: 0; box-sizing: border-box; }
+        .wrapper { display: flex; flex-direction: column; gap: 15px; max-width: 900px; margin: 0 auto; }
+        h2 { margin: 0; color: #ffffff; border-bottom: 2px solid #00ffcc; padding-bottom: 5px; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: #111116; border: 1px solid #22222c; border-left: 4px solid #00ffcc; padding: 15px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .card.active-run { border-left-color: #00ff66; }
+        .card.danger-run { border-left-color: #ff0055; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        label { font-size: 0.85em; color: #888899; text-transform: uppercase; font-weight: bold; }
+        select, input, textarea { background: #181822; color: #00ffcc; border: 1px solid #333344; padding: 10px; font-family: monospace; border-radius: 4px; box-sizing: border-box; width: 100%; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-panel { display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
+        button { background: #00ffcc; color: #070709; border: none; padding: 11px 20px; font-family: monospace; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; font-size: 0.9em; }
+        button:hover { background: #ffffff; box-shadow: 0 0 15px #00ffcc; }
+        button.btn-danger { background: #ff0055; color: #ffffff; }
+        button.btn-danger:hover { background: #ffffff; color: #ff0055; box-shadow: 0 0 15px #ff0055; }
+        .terminal-log { background: #030305; border: 1px solid #1a1a24; padding: 12px; border-radius: 4px; max-height: 250px; overflow-y: auto; font-size: 0.85em; color: #a0a0b0; white-space: pre-wrap; }
+        .status-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; margin-left: 10px; text-transform: uppercase; }
+        .pill-sleeping { background: #332200; color: #ffaa00; }
+        .pill-listening { background: #003311; color: #00ff66; }
+        .fine { margin-top: 8px; color: #888899; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="card active-run">
+            <h2>Core Mesh Orchestration <span id="agent-status-pill" class="status-pill pill-sleeping">Native Standby</span></h2>
+            <div style="margin-top: 10px; font-size: 0.9em;">Active Agent Keyword: <span id="display-wake-word" style="color: #ffffff; font-weight: bold;">[Loading...]</span></div>
+            <p class="fine">The microphone listens only while this screen is open. Leaving the app stops it.</p>
+        </div>
+        <div class="card">
+            <h2>Step A: Installation &amp; Gating Identity</h2>
+            <div class="grid-2" style="margin-top: 10px;">
+                <div class="form-group">
+                    <label>Agent System Identity Name</label>
+                    <input type="text" id="input-agent-name" value="Meridian">
+                </div>
+                <div class="form-group">
+                    <label>Local Device Voice Package Index</label>
+                    <select id="select-voice-index"></select>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Step B: Skill Tree Selection</h2>
+            <div class="grid-2" style="margin-top: 10px;">
+                <div class="form-group">
+                    <label>Active Domain Master</label>
+                    <select id="select-agent-master">
+                        <option value="code">Agent 1: Code Master (36 Skills, 5 Tiers)</option>
+                        <option value="graphics">Agent 2: Graphics Master (36 Skills, 6 Rings)</option>
+                        <option value="understanding">Agent 3: Understanding Master (36 Skills, 7 Rungs)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Revenue Layer</label>
+                    <select id="select-revenue-layer">
+                        <option value="disabled">Disabled (Local Tasks Only)</option>
+                        <option value="enabled">Enabled (Stages 1-5, strict R-16 autonomy governance)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card danger-run">
+            <h2>Step D: Active Workspace Text Terminal</h2>
+            <div class="form-group" style="margin-top: 10px;">
+                <label>Console Instruction Shell String</label>
+                <textarea id="text-console-command" rows="2" placeholder="Type plain English instructions here..."></textarea>
+            </div>
+            <div class="btn-panel">
+                <button type="button" id="save-identity">Save Identity</button>
+                <button type="button" id="fire-command">Fire Command</button>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Real-Time Diagnostic Feed Monitor</h2>
+            <div id="terminal-logs" class="terminal-log" style="margin-top: 10px;">System UI mounted. Awaiting native Android speech bridge connection...</div>
+        </div>
+    </div>
+    <script>
+        class MeridianMeshClient {
+            constructor() {
+                this.logView = document.getElementById('terminal-logs');
+                this.statusPill = document.getElementById('agent-status-pill');
+                this.wakeWordDisplay = document.getElementById('display-wake-word');
+                this.agentName = "meridian";
+                this.voiceIndex = 0;
+                this.isAgentAwake = false;
+                this.systemVoices = [];
+                this.initLocalVoiceSystem();
+            }
+            log(msg) {
+                this.logView.innerText += "\n[" + new Date().toLocaleTimeString() + "] " + msg;
+                this.logView.scrollTop = this.logView.scrollHeight;
+            }
+            initLocalVoiceSystem() {
+                const self = this;
+                if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = function () { self.populateVoiceDropdown(); };
+                } else { this.populateVoiceDropdown(); }
+                this.loadConfigurationFile();
+            }
+            populateVoiceDropdown() {
+                const dropDown = document.getElementById('select-voice-index');
+                dropDown.innerHTML = "";
+                this.systemVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+                this.systemVoices.forEach(function (voice, index) {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = voice.name + " (" + voice.lang + ")";
+                    dropDown.appendChild(option);
+                });
+            }
+            async loadConfigurationFile() {
+                try {
+                    const response = await fetch('config.json');
+                    const config = await response.json();
+                    this.agentName = String(config.agent_name || "meridian").toLowerCase().trim();
+                    this.wakeWordDisplay.innerText = '"' + String(config.agent_name || "MERIDIAN").toUpperCase() + '"';
+                    document.getElementById('input-agent-name').value = config.agent_name || "Meridian";
+                    if (config.active_skill_tree) document.getElementById('select-agent-master').value = config.active_skill_tree;
+                    if (config.revenue_layer) document.getElementById('select-revenue-layer').value = config.revenue_layer;
+                    this.log("Local system environment initialized. The microphone listens only while this screen is open.");
+                } catch (e) {
+                    this.log("Config not found, defaulting to MERIDIAN.");
+                }
+            }
+            commitInstallationSettings() {
+                const targetName = document.getElementById('input-agent-name').value.toLowerCase().trim();
+                if (targetName) {
+                    this.agentName = targetName;
+                    this.wakeWordDisplay.innerText = '"' + targetName.toUpperCase() + '"';
+                    this.log("[Save] Wake word updated to: [" + targetName.toUpperCase() + "].");
+                    this.speakLocally("Identity saved. I will now only respond to " + targetName);
+                }
+            }
+            onNativeSpeechResult(text, isFinal) {
+                const transcript = String(text || "").toLowerCase().trim();
+                if (!this.isAgentAwake) {
+                    if (transcript.indexOf(this.agentName) >= 0) {
+                        this.isAgentAwake = true;
+                        this.statusPill.className = "status-pill pill-listening";
+                        this.statusPill.innerText = "Processing Command";
+                        this.log("Wake word '" + this.agentName.toUpperCase() + "' detected.");
+                        const keywordIndex = transcript.indexOf(this.agentName) + this.agentName.length;
+                        const embeddedCommand = transcript.substring(keywordIndex).trim();
+                        if (embeddedCommand.length > 0) this.processTargetPayload(embeddedCommand);
+                        else this.speakLocally("Yes? I am listening.");
+                    }
+                } else if (isFinal) {
+                    this.processTargetPayload(transcript);
+                }
+            }
+            onHardwareSignature(ok, detail) {
+                this.log(ok ? "[TEE] " + detail : "[TEE] " + detail);
+            }
+            speakLocally(textToOutput) {
+                if (typeof speechSynthesis === 'undefined') return;
+                const utterance = new SpeechSynthesisUtterance(textToOutput);
+                if (this.systemVoices.length > 0) {
+                    const idx = document.getElementById('select-voice-index').value || 0;
+                    utterance.voice = this.systemVoices[idx];
+                }
+                window.speechSynthesis.speak(utterance);
+            }
+            executeManualTextCommand() {
+                const textArea = document.getElementById('text-console-command');
+                const rawCmd = textArea.value.trim();
+                if (!rawCmd) return;
+                this.log("[Terminal Trigger]: Direct console string input captured...");
+                this.processTargetPayload(rawCmd);
+                textArea.value = "";
+            }
+            processTargetPayload(commandText) {
+                this.log('Evaluating Command Sequence: "' + commandText + '"');
+                const packedPayload = JSON.stringify({ cmd: commandText, timestamp: Date.now() });
+                const revLayerActive = document.getElementById('select-revenue-layer').value === 'enabled';
+                const highRiskRegex = revLayerActive ? /(restart|kill|remove|delete|sudo|pay|buy|send contract|post)/i : /(restart|kill|remove|delete|sudo)/i;
+                if (highRiskRegex.test(commandText)) {
+                    this.log("[High-Risk Intercept]: This action needs a hardware signature on this phone.");
+                    if (window.AndroidBridge && window.AndroidBridge.requestBiometricSignature) {
+                        window.AndroidBridge.requestBiometricSignature(packedPayload);
+                    } else {
+                        this.log("[TEE] The phone bridge is not on this screen.");
+                    }
+                } else {
+                    this.log("[ok] Task verified. It stays on this phone.");
+                }
+                this.isAgentAwake = false;
+                this.statusPill.className = "status-pill pill-sleeping";
+                this.statusPill.innerText = "Native Standby";
+            }
+        }
+        window.meridian = new MeridianMeshClient();
+        document.getElementById('save-identity').onclick = function () { window.meridian.commitInstallationSettings(); };
+        document.getElementById('fire-command').onclick = function () { window.meridian.executeManualTextCommand(); };
+    </script>
+</body>
+</html>
