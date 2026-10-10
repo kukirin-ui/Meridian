@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.17**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.18**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,13 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.17 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.18 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.17-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.17** (versionCode 60). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.18-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.18** (versionCode 61). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+
+Free keeps a live Dashboard. Other pages are an imagined preview, pulse stays off, and colour does not stick. The gear offers Language, Plans, About, Privacy, and Documentation. Pro is the whole app. Premium adds Desk: run a whole plan, the scheduler, UFS, 32 API platforms, and a Markdown hardware report.
 
 Console text sent to the page stays at the newest 24,000 characters, and Termux itself only returns the tail of a huge log, so a long listing cannot freeze the screen. The command you type is written as one quoted script: quotes, pipes, newlines, and emoji stay inside that command. An unsent console line and the Plan text are kept on the phone if the app process is closed. Turning the phone does not reload the page.
 

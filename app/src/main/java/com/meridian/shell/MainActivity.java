@@ -123,6 +123,9 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Deck(), "MeridianPhone");
         web.loadUrl("file:///android_asset/www/index.html");
         setContentView(web);
+        // Focus the WebView once at start. Doing it again inside showKeyboard()
+        // steals the first tap from a textarea.
+        web.requestFocus();
         fitKeyboard(web);
         concealStatusBar();
         watchSignal();
@@ -1209,9 +1212,10 @@ public class MainActivity extends Activity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (web == null) return;
-                    web.requestFocus();
                     final InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     if (imm == null) return;
+                    // Do not requestFocus() here. It moves focus off the textarea,
+                    // so the first tap does nothing and the second tap is the one that types.
                     if (!imm.showSoftInput(web, InputMethodManager.SHOW_IMPLICIT)) {
                         web.post(new Runnable() {
                             public void run() {
