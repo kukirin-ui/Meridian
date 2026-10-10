@@ -2568,7 +2568,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.23"; } catch (e) { return "2.3.23"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.24"; } catch (e) { return "2.3.24"; }
 }
 function savedDownloads() {
   try {
@@ -2700,10 +2700,17 @@ function pcPage() {
   html += '<div class="deskfoot">' + (html.match(/class="ico"/g) || []).length + ' items</div></div>';
   return html;
 }
+const MESH_MODELS = {
+  low: { label: "Llama 3.2 1B", file: "Llama-3.2-1B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf", size: "0.8 GB" },
+  mid: { label: "Qwen 2.5 3B", file: "Qwen2.5-3B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf", size: "1.8 GB" },
+  high: { label: "Llama 3.1 8B", file: "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", size: "4.6 GB" },
+  premium: { label: "Gemma 2 9B", file: "gemma-2-9b-it-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf", size: "5.4 GB" }
+};
 let meshName = "Meridian";
 let meshSkill = "code";
 let meshRevenue = "disabled";
-let meshVoice = "0";
+let meshTier = "mid";
+let meshVoice = "";
 let meshAwake = false;
 let meshArm = 0;
 let meshDraft = "";
@@ -2718,8 +2725,10 @@ function meshBoot() {
     if (skill === "code" || skill === "graphics" || skill === "understanding") meshSkill = skill;
     const rev = localStorage.getItem("m-mesh-revenue");
     if (rev === "disabled" || rev === "enabled") meshRevenue = rev;
+    const tier = localStorage.getItem("m-mesh-tier");
+    if (tier === "low" || tier === "mid" || tier === "high" || tier === "premium") meshTier = tier;
     const voice = localStorage.getItem("m-mesh-voice");
-    if (voice && /^\d+$/.test(voice)) meshVoice = voice;
+    if (voice && voice.length <= 120 && voice.indexOf("\n") < 0) meshVoice = voice;
   } catch (e) {}
   meshNameDraft = meshName;
 }
@@ -2752,29 +2761,100 @@ function meshPage() {
     + '<option value="graphics"' + (meshSkill === "graphics" ? " selected" : "") + '>Graphics</option>'
     + '<option value="understanding"' + (meshSkill === "understanding" ? " selected" : "") + '>Understanding</option>'
     + '</select>'
+    + '<p class="muted" id="meshskillnote">' + esc(meshSkillNote()) + '</p>'
     + '<label class="muted" for="mesh-revenue">Revenue layer</label>'
     + '<select id="mesh-revenue">'
     + '<option value="disabled"' + (meshRevenue === "disabled" ? " selected" : "") + '>Disabled</option>'
     + '<option value="enabled"' + (meshRevenue === "enabled" ? " selected" : "") + '>Enabled</option>'
     + '</select>'
+    + '<label class="muted" for="mesh-model">Model</label>'
+    + '<select id="mesh-model">' + meshModelOptions() + '</select>'
+    + '<p class="muted" id="meshmodelnote">' + esc(meshModelNote()) + '</p>'
+    + '<button class="btn" type="button" id="meshget">Download model</button>'
     + '<label class="muted" for="mesh-cmd">Command</label>'
-    + '<textarea id="mesh-cmd" rows="3" placeholder="Type a command">' + esc(meshDraft) + '</textarea>'
+    + '<textarea id="mesh-cmd" rows="3" placeholder="Ask, read file ~/notes/a.txt, or fetch https://example.com">' + esc(meshDraft) + '</textarea>'
+    + '<p class="muted">Ask a question to run the chosen model. read file reads one file in the home folder. fetch reads a public page.</p>'
     + '<button class="btn" type="button" id="meshsave">Save identity</button>'
     + '<button class="ghost" type="button" id="meshfire">Fire command</button>'
     + '<pre class="meshlog" id="meshlog">' + esc(meshLines.join("\n")) + '</pre>'
     + '</div>';
 }
+function meshSkillNote() {
+  if (meshSkill === "graphics") return "Graphics answers layout and picture questions.";
+  if (meshSkill === "understanding") return "Understanding reads pages and files, then answers.";
+  return "Code answers build and fix questions.";
+}
+function meshModel() {
+  return MESH_MODELS[meshTier] || MESH_MODELS.mid;
+}
+function meshModelNote() {
+  const model = meshModel();
+  return model.label + " is about " + model.size + ". Download model saves it in ~/models and installs llama.cpp.";
+}
+function meshModelOptions() {
+  const order = ["low", "mid", "high", "premium"];
+  let html = "";
+  for (let i = 0; i < order.length; i++) {
+    const id = order[i];
+    const model = MESH_MODELS[id];
+    html += '<option value="' + id + '"' + (meshTier === id ? " selected" : "") + ">" + esc(model.label + " · " + model.size) + "</option>";
+  }
+  return html;
+}
+function paintMeshNotes() {
+  const skill = document.getElementById("meshskillnote");
+  if (skill) skill.textContent = meshSkillNote();
+  const note = document.getElementById("meshmodelnote");
+  if (note) note.textContent = meshModelNote();
+}
 function meshSpeak(text) {
+  const line = String(text || "").slice(0, 400);
+  if (!line) return;
+  try {
+    if (window.MeridianPhone && MeridianPhone.meshSpeak) {
+      MeridianPhone.meshSpeak(line, meshVoice || "");
+      return;
+    }
+  } catch (e) {}
   if (typeof speechSynthesis === "undefined" || typeof SpeechSynthesisUtterance === "undefined") return;
   try {
-    const utter = new SpeechSynthesisUtterance(String(text || ""));
+    const utter = new SpeechSynthesisUtterance(line);
     const idx = Number(meshVoice) || 0;
     if (meshVoices[idx]) utter.voice = meshVoices[idx];
     speechSynthesis.speak(utter);
-  } catch (e) {}
+  } catch (e2) {}
 }
 function meshFold(text) {
   return String(text || "").toLowerCase().replace(/[.,!?;:'"“”‘’]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function meshCommandAfter(raw, foldedEnd) {
+  const src = String(raw || "");
+  const punct = /[.,!?;:'"“”‘’]/;
+  let emitted = 0;
+  let started = false;
+  let i = 0;
+  while (i < src.length) {
+    const ch = src.charAt(i);
+    if (punct.test(ch) || /\s/.test(ch)) {
+      let j = i;
+      while (j < src.length && (punct.test(src.charAt(j)) || /\s/.test(src.charAt(j)))) j++;
+      if (!started) {
+        i = j;
+        continue;
+      }
+      if (emitted === foldedEnd) return src.slice(j).replace(/^[.,!?;:'"“”‘’\s]+/, "").trim();
+      emitted += 1;
+      if (emitted === foldedEnd) return src.slice(j).replace(/^[.,!?;:'"“”‘’\s]+/, "").trim();
+      i = j;
+      continue;
+    }
+    started = true;
+    if (emitted === foldedEnd) return src.slice(i).trim();
+    emitted += 1;
+    i += 1;
+    if (emitted === foldedEnd) return src.slice(i).replace(/^[.,!?;:'"“”‘’\s]+/, "").trim();
+  }
+  return "";
 }
 function meshHeard(text) {
   const spoken = meshFold(text);
@@ -2786,7 +2866,7 @@ function meshHeard(text) {
   const afterAt = at + name.length;
   const after = afterAt === spoken.length || spoken.charAt(afterAt) === " ";
   if (!before || !after) return { hit: false, command: "" };
-  return { hit: true, command: spoken.slice(afterAt).trim() };
+  return { hit: true, command: meshCommandAfter(text, afterAt) };
 }
 function meshEcho(text) {
   const spoken = meshFold(text);
@@ -2823,6 +2903,97 @@ function meshHighRisk(text) {
     : /(restart|kill|remove|delete|sudo)/i;
   return re.test(String(text || ""));
 }
+function meshQuote(text) {
+  return "'" + String(text || "").replace(/'/g, "'\\''") + "'";
+}
+function meshWebTarget(text) {
+  const found = String(text || "").match(/^(?:fetch|read page|read site)\s+(https?:\/\/\S+)$/i);
+  if (!found) return "";
+  const raw = found[1].replace(/[),.;]+$/, "");
+  if (raw.length > 300) return "";
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+    return url.toString();
+  } catch (e) {
+    return "";
+  }
+}
+function meshFileTarget(text) {
+  const found = String(text || "").match(/^(?:read file|open file|read)\s+(\S+)$/i);
+  if (!found) return "";
+  const path = found[1];
+  if (path.indexOf("://") >= 0) return "";
+  if (!/^[A-Za-z0-9_./~+-]+$/.test(path)) return "";
+  if (path.indexOf("..") >= 0 || path.charAt(0) === "/") return "";
+  return path;
+}
+function meshFetchPage(url) {
+  meshLog("Reading " + url);
+  let text = "";
+  try {
+    if (window.MeridianPhone && MeridianPhone.meshReadPage) text = String(MeridianPhone.meshReadPage(url) || "");
+  } catch (e) {
+    text = "";
+  }
+  if (text) {
+    meshLog(text);
+    return;
+  }
+  const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : 0;
+  fetch(url, ctrl ? { signal: ctrl.signal } : {}).then(function (res) {
+    return res.text();
+  }).then(function (html) {
+    const clean = String(html || "").replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 4000);
+    meshLog(clean || "The page was empty.");
+  }).catch(function () {
+    meshLog("That page could not be read.");
+  }).then(function () {
+    if (timer) clearTimeout(timer);
+  });
+}
+function meshReadLocal(path) {
+  const cmd = "f=" + meshQuote(path) + "\n"
+    + "case \"$f\" in ~/*) f=\"$HOME/${f#~/}\";; /*) ;; *) f=\"$HOME/$f\";; esac\n"
+    + "if [ ! -f \"$f\" ]; then echo 'That file is not on this phone.'; exit 0; fi\n"
+    + "n=$(wc -c < \"$f\" | tr -d ' ')\n"
+    + "if [ \"$n\" -gt 1000000 ]; then echo 'That file is over 1 MB.'; exit 0; fi\n"
+    + "echo \"--- $f ---\"\n"
+    + "head -c 20000 \"$f\"\n";
+  meshLog("Reading " + path);
+  meshRest();
+  exec("Read file", cmd);
+}
+function meshDownload() {
+  const model = meshModel();
+  const cmd = "pkg install -y curl llama-cpp\n"
+    + "mkdir -p ~/models\n"
+    + "f=~/models/" + model.file + "\n"
+    + "if [ -f \"$f\" ]; then n=$(wc -c < \"$f\" | tr -d ' '); if [ \"$n\" -lt 1000000 ]; then rm -f \"$f\"; echo 'Removed a short file that was not the model.'; fi; fi\n"
+    + "curl -L --fail --retry 3 -C - -o \"$f\" \"" + model.url + "\"\n"
+    + "ls -lh \"$f\"\n";
+  meshLog("Downloading " + model.label + " (" + model.size + ") into ~/models.");
+  toast("Downloading " + model.label + ". About " + model.size + ".");
+  meshRest();
+  exec("Model", cmd);
+}
+function meshAsk(prompt) {
+  const model = meshModel();
+  const role = meshSkill === "graphics"
+    ? "You answer graphics and layout questions on this phone. Be brief."
+    : meshSkill === "understanding"
+      ? "You read and explain on this phone. Be brief."
+      : "You answer coding questions on this phone. Be brief.";
+  const text = (role + "\n" + String(prompt || "")).slice(0, 1800);
+  const cmd = "f=~/models/" + model.file + "\n"
+    + "if ! command -v llama-cli >/dev/null 2>&1; then echo 'llama.cpp is not installed yet. Press Download model on Mesh.'; exit 0; fi\n"
+    + "if [ ! -f \"$f\" ]; then echo 'This model is not on the phone yet. Press Download model on Mesh.'; exit 0; fi\n"
+    + "llama-cli -m \"$f\" -p " + meshQuote(text) + " -n 160 -c 2048 -ngl 0\n";
+  meshLog("Asking " + model.label + ".");
+  meshRest();
+  exec(model.label, cmd);
+}
 function processMesh(commandText) {
   const text = String(commandText || "").trim();
   if (!text) return;
@@ -2838,10 +3009,21 @@ function processMesh(commandText) {
       }
     } catch (e) {}
     if (!sent) meshLog("The phone bridge is not on this screen.");
-  } else {
-    meshLog("Verified. It stays on this phone.");
+    meshRest();
+    return;
   }
-  meshRest();
+  const page = meshWebTarget(text);
+  if (page) {
+    meshFetchPage(page);
+    meshRest();
+    return;
+  }
+  const file = meshFileTarget(text);
+  if (file) {
+    meshReadLocal(file);
+    return;
+  }
+  meshAsk(text);
 }
 function saveMeshIdentity() {
   const input = document.getElementById("mesh-name");
@@ -2855,11 +3037,14 @@ function saveMeshIdentity() {
   }
   if (skill && (skill.value === "code" || skill.value === "graphics" || skill.value === "understanding")) meshSkill = skill.value;
   if (rev && (rev.value === "disabled" || rev.value === "enabled")) meshRevenue = rev.value;
-  if (voice && meshVoices.length && /^\d+$/.test(voice.value)) meshVoice = voice.value;
+  if (voice) meshVoice = String(voice.value || "").slice(0, 120);
+  const tier = document.getElementById("mesh-model");
+  if (tier && MESH_MODELS[tier.value]) meshTier = tier.value;
   try {
     localStorage.setItem("m-mesh-name", meshName);
     localStorage.setItem("m-mesh-skill", meshSkill);
     localStorage.setItem("m-mesh-revenue", meshRevenue);
+    localStorage.setItem("m-mesh-tier", meshTier);
     localStorage.setItem("m-mesh-voice", meshVoice);
   } catch (e) {}
   meshRest();
@@ -2874,20 +3059,42 @@ function fireMeshCommand() {
   if (box) box.value = "";
   processMesh(raw);
 }
+let meshVoiceTries = 0;
 function fillMeshVoices() {
   const drop = document.getElementById("mesh-voice");
   if (!drop) return;
+  let native = [];
+  try {
+    if (window.MeridianPhone && MeridianPhone.meshVoiceList) {
+      const parsed = JSON.parse(MeridianPhone.meshVoiceList() || "[]");
+      if (Array.isArray(parsed)) native = parsed;
+    }
+  } catch (e) {}
+  native = native.filter(function (voice) { return voice && voice.name; });
+  if (!native.length && meshVoiceTries < 4) {
+    meshVoiceTries++;
+    setTimeout(fillMeshVoices, 500);
+  }
+  if (native.length) {
+    let html = '<option value="">Default voice</option>';
+    for (let i = 0; i < native.length; i++) {
+      const voice = native[i];
+      const label = voice.locale ? voice.name + " (" + voice.locale + ")" : voice.name;
+      html += '<option value="' + esc(voice.name) + '">' + esc(label) + "</option>";
+    }
+    drop.innerHTML = html;
+    if (meshVoice && drop.querySelector("option[value='" + String(meshVoice).replace(/'/g, "") + "']")) drop.value = meshVoice;
+    return;
+  }
   meshVoices = (typeof speechSynthesis !== "undefined" && speechSynthesis.getVoices) ? speechSynthesis.getVoices() : [];
-  const current = meshVoice || "0";
-  let html = '<option value="0">Default voice</option>';
+  const current = meshVoice || "";
+  let html = '<option value="">Default voice</option>';
   for (let i = 0; i < meshVoices.length; i++) {
     const voice = meshVoices[i];
     html += '<option value="' + i + '">' + esc(voice.name + " (" + voice.lang + ")") + "</option>";
   }
   drop.innerHTML = html;
-  const max = meshVoices.length > 0 ? meshVoices.length - 1 : Number(current) || 0;
-  const pick = String(Math.max(0, Math.min(max, Number(current) || 0)));
-  if (drop.querySelector('option[value="' + pick + '"]')) drop.value = pick;
+  if (drop.querySelector('option[value="' + current + '"]')) drop.value = current;
 }
 function syncMeshMic() {
   const on = view === "tools" && more === "mesh";
@@ -2918,7 +3125,7 @@ window.meridianMesh = {
       }
       return;
     }
-    const command = heard.hit ? heard.command : meshFold(text);
+    const command = heard.hit ? heard.command : String(text || "").trim();
     if (!command) {
       meshListen();
       meshSpeak("Yes? I am listening.");
@@ -3753,7 +3960,17 @@ function bind() {
   if (meshCmdBox) meshCmdBox.oninput = function () { meshDraft = meshCmdBox.value; };
   const meshSkillBox = document.getElementById("mesh-skill");
   if (meshSkillBox) meshSkillBox.onchange = function () {
-    if (meshSkillBox.value === "code" || meshSkillBox.value === "graphics" || meshSkillBox.value === "understanding") meshSkill = meshSkillBox.value;
+    if (meshSkillBox.value === "code" || meshSkillBox.value === "graphics" || meshSkillBox.value === "understanding") {
+      meshSkill = meshSkillBox.value;
+      paintMeshNotes();
+    }
+  };
+  const meshModelBox = document.getElementById("mesh-model");
+  if (meshModelBox) meshModelBox.onchange = function () {
+    if (MESH_MODELS[meshModelBox.value]) {
+      meshTier = meshModelBox.value;
+      paintMeshNotes();
+    }
   };
   const meshRevBox = document.getElementById("mesh-revenue");
   if (meshRevBox) meshRevBox.onchange = function () {
@@ -3761,10 +3978,12 @@ function bind() {
   };
   const meshVoiceBox = document.getElementById("mesh-voice");
   if (meshVoiceBox) meshVoiceBox.onchange = function () {
-    if (/^\d+$/.test(meshVoiceBox.value)) meshVoice = meshVoiceBox.value;
+    meshVoice = String(meshVoiceBox.value || "").slice(0, 120);
   };
   const meshsave = document.getElementById("meshsave");
   if (meshsave) meshsave.onclick = function () { saveMeshIdentity(); };
+  const meshget = document.getElementById("meshget");
+  if (meshget) meshget.onclick = function () { meshDownload(); };
   const meshfire = document.getElementById("meshfire");
   if (meshfire) meshfire.onclick = function () { fireMeshCommand(); };
   const sharereport = document.getElementById("sharereport");
@@ -4372,9 +4591,10 @@ function pushBlock(log, block) {
   log.push(block);
   while (log.length > MAX_BLOCKS) log.shift();
 }
-const GGUF_FILES = {
-  "gemma-2-9b-it-q4_k_m.gguf": "https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf"
-};
+const GGUF_FILES = {};
+Object.keys(MESH_MODELS).forEach(function (id) {
+  GGUF_FILES[MESH_MODELS[id].file.toLowerCase()] = MESH_MODELS[id].url;
+});
 function ggufFileUrl(name) {
   const base = String(name || "").split("/").pop().toLowerCase();
   return GGUF_FILES[base] || "";
@@ -4401,7 +4621,7 @@ function exec(title, cmd, done) {
   cmd = answerLine(cmd);
   const fetched = expandModelFetch(cmd);
   if (fetched !== cmd) {
-    toast("That link is the website. Downloading the model file instead. About 5.4 GB.");
+    toast("That link is the website. Downloading the model file instead.");
     cmd = fetched;
   }
   const answering = cmd.indexOf("Answering") >= 0;
