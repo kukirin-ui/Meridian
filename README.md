@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.25**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.26**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,15 +26,15 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.25 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.26 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.25-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.25** (versionCode 68). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.26-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.26** (versionCode 69). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 Free keeps a live Dashboard. Other pages are an imagined preview, pulse stays off, and colour does not stick. The gear offers Language, Plans, About, Privacy, and Documentation. Pro is the whole app. Premium adds Desk: run a whole plan, the scheduler, UFS, 32 API platforms, and a Markdown hardware report.
 
-Termux → Mesh saves the name you choose. Speech wakes listening only when that name is spoken. The name alone opens a short command window, then it returns to standby. The Model menu downloads Llama 3.2 1B, Qwen 2.5 3B, Llama 3.1 8B, Gemma 2 9B, or Qwen 2.5 32B into ~/models and installs llama.cpp. A question runs that model with one skill card from Code Master, Graphics Master, or Understanding Master (36 skills each, in `docs/skill-trees.md`). The card is chosen from the question, or pinned in Skill card. Hardware lane is CPU, CPU and GPU, or GPU. `read file ~/notes/a.txt` reads one home file. `fetch https://example.com` reads a public page. The Voice menu uses the voices installed on the phone. Revenue layer R-16 widens the fingerprint gate to money, contracts, and public posts. A high-risk line asks for a hardware signature on this phone and does not run a shell command. The microphone listens only while that screen is open.
+Termux → Mesh saves the name you choose. Speech wakes listening only when that name is spoken. The name alone opens a short command window, then it returns to standby. The Model menu downloads Llama 3.2 1B, Qwen 2.5 3B, Llama 3.1 8B, Gemma 2 9B, or Qwen 2.5 32B into ~/models and installs llama.cpp. A question runs that model with one skill card from Code Master, Graphics Master, or Understanding Master (36 skills each, in `docs/skill-trees.md`). The card is chosen from the question, or pinned in Skill card. Hardware lane is CPU, CPU and GPU, or GPU. The model then works for up to 5 steps in `~/meridian-sandbox`: it can read, write, edit, delete, and search there, and it can read a public page. A new file elsewhere in the Termux home folder is written immediately. Deleting or replacing an existing file outside the sandbox prints the change and waits for a fingerprint on this phone. `read file ~/notes/a.txt` reads one home file. `fetch https://example.com` reads a public page. The Voice menu uses the voices installed on the phone. Revenue layer R-16 still asks for a fingerprint before money, contracts, or public posts, and that signature does not run a shell command. `sudo`, `kill`, and `restart` do the same. The microphone listens only while that screen is open.
 
 A curl of `https://huggingface.co` saves the website, a few kilobytes. Build → Local model downloads Gemma 2 9B Q4 (about 5.4 GB) from the file address. The same command with that homepage and the file name `gemma-2-9b-it-Q4_K_M.gguf` uses the file address.
 
