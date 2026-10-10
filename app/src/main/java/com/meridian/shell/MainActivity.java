@@ -40,6 +40,8 @@ import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
@@ -91,6 +93,9 @@ public class MainActivity extends Activity {
     private static final int MIC_REQUEST = 1024;
     private SpeechRecognizer speechRecognizer;
     private Intent speechIntent;
+    private TextToSpeech meshTts;
+    private boolean meshTtsReady = false;
+    private volatile String meshVoiceJson = "[]";
     private final Handler meshHandler = new Handler(Looper.getMainLooper());
     /** True while the Mesh screen asked to listen. Pausing the activity does not clear it. */
     private boolean meshWanted = false;
@@ -177,6 +182,7 @@ public class MainActivity extends Activity {
         watchSignal();
         adoptLegacyUnlock();
         generateHardwareBoundKey();
+        ensureMeshTts();
     }
 
     /**
@@ -309,6 +315,14 @@ public class MainActivity extends Activity {
             try { speechRecognizer.destroy(); } catch (Exception ignored) {}
             speechRecognizer = null;
         }
+        if (meshTts != null) {
+            try {
+                meshTts.stop();
+                meshTts.shutdown();
+            } catch (Exception ignored) {}
+            meshTts = null;
+            meshTtsReady = false;
+        }
         if (signalCallback != null) {
             try {
                 ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -361,6 +375,88 @@ public class MainActivity extends Activity {
             }
             @Override public void onEvent(int eventType, Bundle params) {}
         });
+    }
+
+    private void ensureMeshTts() {
+        if (meshTts != null) return;
+        meshTts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                meshTtsReady = status == TextToSpeech.SUCCESS;
+                if (meshTtsReady) refreshMeshVoices();
+            }
+        });
+    }
+
+    private void refreshMeshVoices() {
+        if (meshTts == null) return;
+        try {
+            java.util.Set<Voice> voices = meshTts.getVoices();
+            JSONArray arr = new JSONArray();
+            if (voices != null) {
+                int count = 0;
+                for (Voice voice : voices) {
+                    if (voice == null || voice.getName() == null || voice.getName().length() == 0 || voice.getName().length() > 120) continue;
+                    java.util.Set<String> features = voice.getFeatures();
+                    if (features != null && features.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
+                    JSONObject item = new JSONObject();
+                    item.put("name", voice.getName());
+                    Locale locale = voice.getLocale();
+                    item.put("locale", locale == null ? "" : locale.toLanguageTag());
+                    arr.put(item);
+                    if (++count >= 40) break;
+                }
+            }
+            meshVoiceJson = arr.toString();
+        } catch (Exception ex) {
+            meshVoiceJson = "[]";
+        }
+    }
+
+    private static boolean meshPublicHost(String host) {
+        if (host == null) return false;
+        String name = host.toLowerCase(Locale.US);
+        if (name.length() == 0 || name.indexOf('.') < 0) return false;
+        if (name.equals("localhost") || name.endsWith(".local") || name.equals("0.0.0.0")) return false;
+        if (name.startsWith("127.") || name.startsWith("10.") || name.startsWith("192.168.") || name.startsWith("169.254.")) return false;
+        if (name.startsWith("172.")) {
+            String[] parts = name.split("\\.");
+            if (parts.length > 1) {
+                try {
+                    int second = Integer.parseInt(parts[1]);
+                    if (second >= 16 && second <= 31) return false;
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return true;
+    }
+
+    private static String meshPlain(String html) {
+        String lower = html.toLowerCase(Locale.US);
+        StringBuilder out = new StringBuilder();
+        int i = 0;
+        while (i < html.length() && out.length() < 8000) {
+            if (html.charAt(i) == '<') {
+                int end = html.indexOf('>', i);
+                if (end < 0) break;
+                int tagEnd = Math.min(end, i + 16);
+                String tag = lower.substring(i, tagEnd);
+                if (tag.startsWith("<script") || tag.startsWith("<style")) {
+                    String close = tag.startsWith("<script") ? "</script>" : "</style>";
+                    int skip = lower.indexOf(close, end);
+                    i = skip < 0 ? html.length() : skip + close.length();
+                    continue;
+                }
+                out.append(' ');
+                i = end + 1;
+                continue;
+            }
+            out.append(html.charAt(i));
+            i++;
+        }
+        String text = out.toString().replaceAll("\\s+", " ").trim();
+        if (text.length() > 4000) text = text.substring(0, 4000);
+        return text;
     }
 
     private void startMeshListening() {
@@ -1453,6 +1549,91 @@ public class MainActivity extends Activity {
                     if (!meshListening) startMeshListening();
                 }
             });
+        }
+
+        /** Device text-to-speech voices. Empty until the engine has started. */
+        @JavascriptInterface
+        public String meshVoiceList() {
+            return meshVoiceJson == null ? "[]" : meshVoiceJson;
+        }
+
+        /** Speaks with a voice installed on this phone. */
+        @JavascriptInterface
+        public void meshSpeak(final String text, final String voiceName) {
+            if (text == null) return;
+            final String say = text.length() > 400 ? text.substring(0, 400) : text;
+            if (say.trim().length() == 0) return;
+            final String pick = voiceName == null ? "" : voiceName;
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    ensureMeshTts();
+                    if (meshTts == null || !meshTtsReady) return;
+                    if (pick.length() > 0 && pick.length() <= 120) {
+                        try {
+                            java.util.Set<Voice> voices = meshTts.getVoices();
+                            if (voices != null) {
+                                for (Voice voice : voices) {
+                                    if (voice != null && pick.equals(voice.getName())) {
+                                        meshTts.setVoice(voice);
+                                        break;
+                                    }
+                                }
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    meshTts.speak(say, TextToSpeech.QUEUE_FLUSH, null, "meridian-mesh");
+                }
+            });
+        }
+
+        /** Reads a public web page as plain text. The address stays http or https. */
+        @JavascriptInterface
+        public String meshReadPage(String raw) {
+            if (raw == null) return "That page could not be read.";
+            String address = raw.trim();
+            if (address.length() == 0 || address.length() > 300) return "That page could not be read.";
+            if (!(address.startsWith("https://") || address.startsWith("http://"))) return "That page could not be read.";
+            HttpURLConnection conn = null;
+            try {
+                URL target = new URL(address);
+                if (!("https".equals(target.getProtocol()) || "http".equals(target.getProtocol()))) return "That page could not be read.";
+                if (!meshPublicHost(target.getHost())) return "That page could not be read.";
+                conn = (HttpURLConnection) target.openConnection();
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setInstanceFollowRedirects(true);
+                conn.setRequestProperty("User-Agent", "Meridian/2.3.26");
+                int code = conn.getResponseCode();
+                URL landed = conn.getURL();
+                if (landed == null || !meshPublicHost(landed.getHost())) return "That page could not be read.";
+                if (!("https".equals(landed.getProtocol()) || "http".equals(landed.getProtocol()))) return "That page could not be read.";
+                if (code < 200 || code >= 300) return "That page returned " + code + ".";
+                String type = conn.getContentType();
+                if (type != null) {
+                    String kind = type.toLowerCase(Locale.US);
+                    if (!(kind.startsWith("text/") || kind.contains("json") || kind.contains("xml") || kind.contains("html"))) {
+                        return "That page is not text.";
+                    }
+                }
+                InputStream in = conn.getInputStream();
+                byte[] buf = new byte[4096];
+                int total = 0;
+                StringBuilder html = new StringBuilder();
+                while (total < 200000) {
+                    int n = in.read(buf);
+                    if (n < 0) break;
+                    total += n;
+                    html.append(new String(buf, 0, n, StandardCharsets.UTF_8));
+                }
+                in.close();
+                String text = meshPlain(html.toString());
+                if (text.length() == 0) return "The page was empty.";
+                return text;
+            } catch (Exception ex) {
+                return "That page could not be read.";
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
         }
 
         /** Stops the recognizer when Mesh is no longer the screen in front. */
