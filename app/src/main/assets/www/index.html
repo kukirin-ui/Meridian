@@ -716,6 +716,7 @@
   </div>
 </div>
 <div id="sheet" class="sheet" hidden></div>
+<script src="skill-trees.js"></script>
 <script>
 let view = "home";
 let goalDraft = "";
@@ -2568,7 +2569,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.24"; } catch (e) { return "2.3.24"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.25"; } catch (e) { return "2.3.25"; }
 }
 function savedDownloads() {
   try {
@@ -2704,12 +2705,15 @@ const MESH_MODELS = {
   low: { label: "Llama 3.2 1B", file: "Llama-3.2-1B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf", size: "0.8 GB" },
   mid: { label: "Qwen 2.5 3B", file: "Qwen2.5-3B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf", size: "1.8 GB" },
   high: { label: "Llama 3.1 8B", file: "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf", size: "4.6 GB" },
-  premium: { label: "Gemma 2 9B", file: "gemma-2-9b-it-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf", size: "5.4 GB" }
+  premium: { label: "Gemma 2 9B", file: "gemma-2-9b-it-Q4_K_M.gguf", url: "https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf", size: "5.4 GB" },
+  enterprise: { label: "Qwen 2.5 32B", file: "Qwen2.5-32B-Instruct-Q3_K_M.gguf", url: "https://huggingface.co/bartowski/Qwen2.5-32B-Instruct-GGUF/resolve/main/Qwen2.5-32B-Instruct-Q3_K_M.gguf", size: "14.8 GB" }
 };
 let meshName = "Meridian";
 let meshSkill = "code";
 let meshRevenue = "disabled";
 let meshTier = "mid";
+let meshLane = "cpu";
+let meshCard = "auto";
 let meshVoice = "";
 let meshAwake = false;
 let meshArm = 0;
@@ -2726,7 +2730,11 @@ function meshBoot() {
     const rev = localStorage.getItem("m-mesh-revenue");
     if (rev === "disabled" || rev === "enabled") meshRevenue = rev;
     const tier = localStorage.getItem("m-mesh-tier");
-    if (tier === "low" || tier === "mid" || tier === "high" || tier === "premium") meshTier = tier;
+    if (tier === "low" || tier === "mid" || tier === "high" || tier === "premium" || tier === "enterprise") meshTier = tier;
+    const lane = localStorage.getItem("m-mesh-lane");
+    if (lane === "cpu" || lane === "hybrid" || lane === "gpu") meshLane = lane;
+    const card = localStorage.getItem("m-mesh-card");
+    if (card && /^([LGUR]-\d{2}|auto)$/.test(card)) meshCard = card;
     const voice = localStorage.getItem("m-mesh-voice");
     if (voice && voice.length <= 120 && voice.indexOf("\n") < 0) meshVoice = voice;
   } catch (e) {}
@@ -2757,42 +2765,70 @@ function meshPage() {
     + '<select id="mesh-voice"><option value="0">Default voice</option></select>'
     + '<label class="muted" for="mesh-skill">Skill tree</label>'
     + '<select id="mesh-skill">'
-    + '<option value="code"' + (meshSkill === "code" ? " selected" : "") + '>Code</option>'
-    + '<option value="graphics"' + (meshSkill === "graphics" ? " selected" : "") + '>Graphics</option>'
-    + '<option value="understanding"' + (meshSkill === "understanding" ? " selected" : "") + '>Understanding</option>'
+    + '<option value="code"' + (meshSkill === "code" ? " selected" : "") + '>Code Master</option>'
+    + '<option value="graphics"' + (meshSkill === "graphics" ? " selected" : "") + '>Graphics Master</option>'
+    + '<option value="understanding"' + (meshSkill === "understanding" ? " selected" : "") + '>Understanding Master</option>'
     + '</select>'
+    + '<label class="muted" for="mesh-card">Skill card</label>'
+    + '<select id="mesh-card">' + meshCardOptions() + '</select>'
     + '<p class="muted" id="meshskillnote">' + esc(meshSkillNote()) + '</p>'
     + '<label class="muted" for="mesh-revenue">Revenue layer</label>'
     + '<select id="mesh-revenue">'
     + '<option value="disabled"' + (meshRevenue === "disabled" ? " selected" : "") + '>Disabled</option>'
-    + '<option value="enabled"' + (meshRevenue === "enabled" ? " selected" : "") + '>Enabled</option>'
+    + '<option value="enabled"' + (meshRevenue === "enabled" ? " selected" : "") + '>Enabled, R-16</option>'
     + '</select>'
     + '<label class="muted" for="mesh-model">Model</label>'
     + '<select id="mesh-model">' + meshModelOptions() + '</select>'
     + '<p class="muted" id="meshmodelnote">' + esc(meshModelNote()) + '</p>'
+    + '<label class="muted" for="mesh-lane">Hardware lane</label>'
+    + '<select id="mesh-lane">'
+    + '<option value="cpu"' + (meshLane === "cpu" ? " selected" : "") + '>CPU only</option>'
+    + '<option value="hybrid"' + (meshLane === "hybrid" ? " selected" : "") + '>CPU and GPU</option>'
+    + '<option value="gpu"' + (meshLane === "gpu" ? " selected" : "") + '>GPU only</option>'
+    + '</select>'
     + '<button class="btn" type="button" id="meshget">Download model</button>'
     + '<label class="muted" for="mesh-cmd">Command</label>'
     + '<textarea id="mesh-cmd" rows="3" placeholder="Ask, read file ~/notes/a.txt, or fetch https://example.com">' + esc(meshDraft) + '</textarea>'
-    + '<p class="muted">Ask a question to run the chosen model. read file reads one file in the home folder. fetch reads a public page.</p>'
+    + '<p class="muted">A question loads one skill card from the tree, then runs the chosen model. read file reads one file in the home folder. fetch reads a public page.</p>'
     + '<button class="btn" type="button" id="meshsave">Save identity</button>'
     + '<button class="ghost" type="button" id="meshfire">Fire command</button>'
     + '<pre class="meshlog" id="meshlog">' + esc(meshLines.join("\n")) + '</pre>'
     + '</div>';
 }
+function meshTreePack() {
+  return (typeof SKILL_TREES !== "undefined" && SKILL_TREES[meshSkill]) || { name: "Code Master", shape: "", start: [], skills: [] };
+}
+function meshCardOptions() {
+  const pack = meshTreePack();
+  const known = pack.skills.some(function (skill) { return skill.id === meshCard; });
+  const current = known ? meshCard : "auto";
+  let html = '<option value="auto"' + (current === "auto" ? " selected" : "") + '>Match the question</option>';
+  for (let i = 0; i < pack.skills.length; i++) {
+    const skill = pack.skills[i];
+    html += '<option value="' + skill.id + '"' + (current === skill.id ? " selected" : "") + '>' + esc(skill.id + " " + skill.title) + "</option>";
+  }
+  return html;
+}
 function meshSkillNote() {
-  if (meshSkill === "graphics") return "Graphics answers layout and picture questions.";
-  if (meshSkill === "understanding") return "Understanding reads pages and files, then answers.";
-  return "Code answers build and fix questions.";
+  const pack = meshTreePack();
+  const count = pack.skills.length;
+  return pack.name + ": " + count + " skills. " + pack.shape;
 }
 function meshModel() {
   return MESH_MODELS[meshTier] || MESH_MODELS.mid;
 }
 function meshModelNote() {
   const model = meshModel();
-  return model.label + " is about " + model.size + ". Download model saves it in ~/models and installs llama.cpp.";
+  const heavy = meshTier === "enterprise" ? " Many phones cannot run a model this large." : "";
+  return model.label + " is about " + model.size + ". Download model saves it in ~/models and installs llama.cpp." + heavy;
+}
+function meshNgl() {
+  if (meshLane === "gpu") return "99";
+  if (meshLane === "hybrid") return "16";
+  return "0";
 }
 function meshModelOptions() {
-  const order = ["low", "mid", "high", "premium"];
+  const order = ["low", "mid", "high", "premium", "enterprise"];
   let html = "";
   for (let i = 0; i < order.length; i++) {
     const id = order[i];
@@ -2899,7 +2935,7 @@ function meshHighRisk(text) {
   const node = document.getElementById("mesh-revenue");
   const rev = node && node.value ? node.value : meshRevenue;
   const re = rev === "enabled"
-    ? /(restart|kill|remove|delete|sudo|pay|buy|send contract|post)/i
+    ? /(restart|kill|remove|delete|sudo|pay|buy|charge|invoice|send contract|new account|publish|post)/i
     : /(restart|kill|remove|delete|sudo)/i;
   return re.test(String(text || ""));
 }
@@ -2978,19 +3014,69 @@ function meshDownload() {
   meshRest();
   exec("Model", cmd);
 }
+function meshFindSkill(pack, id) {
+  for (let i = 0; i < pack.skills.length; i++) if (pack.skills[i].id === id) return pack.skills[i];
+  return null;
+}
+function meshPickSkill(text) {
+  const pack = meshTreePack();
+  const named = String(text || "").match(/\b([LGUR]-\d{2})\b/i);
+  if (named) {
+    const hit = meshFindSkill(pack, named[1].toUpperCase());
+    if (hit) return hit;
+  }
+  const box = document.getElementById("mesh-card");
+  const chosen = box && box.value ? box.value : meshCard;
+  if (chosen && chosen !== "auto") {
+    const pinned = meshFindSkill(pack, chosen);
+    if (pinned) return pinned;
+  }
+  const stop = { this: 1, that: 1, with: 1, from: 1, your: 1, have: 1, what: 1, when: 1, then: 1, they: 1, them: 1, into: 1, over: 1, only: 1, also: 1, about: 1, there: 1, their: 1, help: 1, does: 1, make: 1, want: 1, need: 1, please: 1, just: 1, some: 1, more: 1, than: 1, will: 1, each: 1, used: 1, using: 1 };
+  const words = String(text || "").toLowerCase().split(/[^a-z0-9]+/).filter(function (word) { return word.length > 3 && !stop[word]; });
+  let best = null;
+  let score = 0;
+  for (let i = 0; i < pack.skills.length; i++) {
+    const skill = pack.skills[i];
+    const title = skill.title.toLowerCase();
+    const how = skill.how.toLowerCase();
+    let n = 0;
+    for (let w = 0; w < words.length; w++) {
+      const word = words[w];
+      const inTitle = title.indexOf(word) === 0 || title.indexOf(" " + word) >= 0 || title.indexOf(word) > 0 && !/[a-z0-9]/.test(title.charAt(title.indexOf(word) - 1));
+      if (inTitle) n += 4;
+      else if (how.indexOf(word) >= 0) n += 1;
+    }
+    if (n > score) { score = n; best = skill; }
+  }
+  if (best && score > 0) return best;
+  return meshFindSkill(pack, pack.start[0]) || pack.skills[0] || { id: "L-01", title: "Exact reading", how: "Read what is there before changing it.", proof: "The answer names a real file." };
+}
+function meshPrompt(question) {
+  const pack = meshTreePack();
+  const skill = meshPickSkill(question);
+  const lines = [
+    "You are Meridian. Active tree: " + pack.name + ". " + pack.shape,
+    "Rules: Verify before trusting. Unchecked output is a draft. Deletion needs a dry run and a person. Stay lawful. Do not write malware. Label a claim established, supported, speculative, or unknown.",
+    "Skill " + skill.id + " " + skill.title + ".",
+    "How: " + skill.how,
+    "Proof: " + skill.proof
+  ];
+  if (meshRevenue === "enabled" && typeof SKILL_TREES !== "undefined") {
+    const gate = meshFindSkill(SKILL_TREES.revenue, "R-16");
+    if (gate) lines.push("Revenue R-16: " + gate.how);
+  }
+  lines.push("Question: " + String(question || "").slice(0, 900));
+  lines.push("Use this skill. Name its id. End with Verify: and Lesson:. Be brief.");
+  return { skill: skill, text: lines.join("\n").slice(0, 2800) };
+}
 function meshAsk(prompt) {
   const model = meshModel();
-  const role = meshSkill === "graphics"
-    ? "You answer graphics and layout questions on this phone. Be brief."
-    : meshSkill === "understanding"
-      ? "You read and explain on this phone. Be brief."
-      : "You answer coding questions on this phone. Be brief.";
-  const text = (role + "\n" + String(prompt || "")).slice(0, 1800);
+  const built = meshPrompt(prompt);
   const cmd = "f=~/models/" + model.file + "\n"
     + "if ! command -v llama-cli >/dev/null 2>&1; then echo 'llama.cpp is not installed yet. Press Download model on Mesh.'; exit 0; fi\n"
     + "if [ ! -f \"$f\" ]; then echo 'This model is not on the phone yet. Press Download model on Mesh.'; exit 0; fi\n"
-    + "llama-cli -m \"$f\" -p " + meshQuote(text) + " -n 160 -c 2048 -ngl 0\n";
-  meshLog("Asking " + model.label + ".");
+    + "llama-cli -m \"$f\" -p " + meshQuote(built.text) + " -n 220 -c 4096 -ngl " + meshNgl() + "\n";
+  meshLog("Asking " + model.label + " with " + built.skill.id + " " + built.skill.title + ".");
   meshRest();
   exec(model.label, cmd);
 }
@@ -2999,7 +3085,9 @@ function processMesh(commandText) {
   if (!text) return;
   meshLog('Evaluating "' + text + '"');
   if (meshHighRisk(text)) {
-    meshLog("High-risk. This action needs a hardware signature on this phone.");
+    meshLog(meshRevenue === "enabled"
+      ? "R-16. Money, a contract, a public post, or a destructive command needs a hardware signature on this phone."
+      : "High-risk. This action needs a hardware signature on this phone.");
     const payload = JSON.stringify({ cmd: text.slice(0, 3500), timestamp: Date.now() });
     let sent = false;
     try {
@@ -3040,11 +3128,17 @@ function saveMeshIdentity() {
   if (voice) meshVoice = String(voice.value || "").slice(0, 120);
   const tier = document.getElementById("mesh-model");
   if (tier && MESH_MODELS[tier.value]) meshTier = tier.value;
+  const card = document.getElementById("mesh-card");
+  if (card && (card.value === "auto" || /^[LGUR]-\d{2}$/.test(card.value))) meshCard = card.value;
+  const lane = document.getElementById("mesh-lane");
+  if (lane && (lane.value === "cpu" || lane.value === "hybrid" || lane.value === "gpu")) meshLane = lane.value;
   try {
     localStorage.setItem("m-mesh-name", meshName);
     localStorage.setItem("m-mesh-skill", meshSkill);
     localStorage.setItem("m-mesh-revenue", meshRevenue);
     localStorage.setItem("m-mesh-tier", meshTier);
+    localStorage.setItem("m-mesh-card", meshCard);
+    localStorage.setItem("m-mesh-lane", meshLane);
     localStorage.setItem("m-mesh-voice", meshVoice);
   } catch (e) {}
   meshRest();
@@ -3962,8 +4056,19 @@ function bind() {
   if (meshSkillBox) meshSkillBox.onchange = function () {
     if (meshSkillBox.value === "code" || meshSkillBox.value === "graphics" || meshSkillBox.value === "understanding") {
       meshSkill = meshSkillBox.value;
+      meshCard = "auto";
+      const cards = document.getElementById("mesh-card");
+      if (cards) cards.innerHTML = meshCardOptions();
       paintMeshNotes();
     }
+  };
+  const meshCardBox = document.getElementById("mesh-card");
+  if (meshCardBox) meshCardBox.onchange = function () {
+    if (meshCardBox.value === "auto" || /^[LGUR]-\d{2}$/.test(meshCardBox.value)) meshCard = meshCardBox.value;
+  };
+  const meshLaneBox = document.getElementById("mesh-lane");
+  if (meshLaneBox) meshLaneBox.onchange = function () {
+    if (meshLaneBox.value === "cpu" || meshLaneBox.value === "hybrid" || meshLaneBox.value === "gpu") meshLane = meshLaneBox.value;
   };
   const meshModelBox = document.getElementById("mesh-model");
   if (meshModelBox) meshModelBox.onchange = function () {

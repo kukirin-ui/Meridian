@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 
 const root = join(import.meta.dirname, "..", "..");
 const html = readFileSync(join(root, "app/src/main/assets/www/index.html"), "utf8");
+const trees = readFileSync(join(root, "app/src/main/assets/www/skill-trees.js"), "utf8");
 
 function sliceFn(name) {
   const start = html.indexOf("function " + name);
@@ -136,6 +137,14 @@ assert.match(html, /Yes\? I am listening/);
 assert.match(html, /I will now only respond to/);
 assert.match(html, /Other speech is ignored/);
 assert.equal(/exec\(|startJob\(/.test(sliceFn("processMesh(commandText)")), false, "a mesh line must not run a shell command");
+assert.match(html, /function meshPickSkill/);
+assert.match(html, /skill-trees\.js/);
+assert.match(trees, /"id":"L-01","title":"Exact reading of code and files"/);
+assert.match(trees, /"id":"G-36","title":"Entering an unknown visual category"/);
+assert.match(trees, /"id":"U-35","title":"Handling open problems and unknowns"/);
+assert.match(trees, /"id":"R-16","title":"Autonomy governance for money-making agents"/);
+assert.equal((trees.match(/"id":/g) || []).length, 124, "three trees of 36 plus 16 revenue skills");
+assert.equal(/shizuku|rish|pm install/i.test(html + java + trees), false, "Mesh does not install packages through Shizuku");
 assert.match(html, /function meshDownload/);
 assert.match(html, /Qwen2\.5-3B-Instruct-Q4_K_M\.gguf/);
 assert.match(html, /Llama-3\.2-1B-Instruct-Q4_K_M\.gguf/);

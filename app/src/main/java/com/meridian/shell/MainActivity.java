@@ -1602,7 +1602,7 @@ public class MainActivity extends Activity {
                 conn.setConnectTimeout(8000);
                 conn.setReadTimeout(8000);
                 conn.setInstanceFollowRedirects(true);
-                conn.setRequestProperty("User-Agent", "Meridian/2.3.24");
+                conn.setRequestProperty("User-Agent", "Meridian/2.3.25");
                 int code = conn.getResponseCode();
                 URL landed = conn.getURL();
                 if (landed == null || !meshPublicHost(landed.getHost())) return "That page could not be read.";
