@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.16**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.17**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,11 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.16 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.17 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.16-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.16** (versionCode 59). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.17-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.17** (versionCode 60). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 Console text sent to the page stays at the newest 24,000 characters, and Termux itself only returns the tail of a huge log, so a long listing cannot freeze the screen. The command you type is written as one quoted script: quotes, pipes, newlines, and emoji stay inside that command. An unsent console line and the Plan text are kept on the phone if the app process is closed. Turning the phone does not reload the page.
 
@@ -42,7 +42,7 @@ Plans can store two verified keys at once: **Pro / Personal** and **Premium Ente
 
 - **Language:** Settings → Language only. English, Hrvatski, Deutsch, 日本語, हिन्दी, Español, Français. Stored as `m-lang`. Recipes stay in English (they are shell). About does not have a language picker.
 - **Settings:** the gear opens Plans, About, Documentation, Privacy, Device settings, Developer options, or App preferences. App preferences is the only in-app settings page.
-- **Carrier:** the clock and the carrier sit beside the logo, with a signal glyph for this phone's Wi-Fi or cellular strength. The glyph updates from the active network while the app is open. The Android status bar stays hidden until a swipe down from the top edge, and the page fills that space instead of leaving a black band. No location permission.
+- **Carrier:** the clock and the carrier sit beside the logo, with a signal glyph for this phone's Wi-Fi or cellular strength. The glyph updates from the active network while the app is open. The Android status bar and the Android navigation bar stay hidden so they do not cover the header or the bottom inventory. A swipe from the top or bottom edge shows them, then they hide. No location permission.
 - **Window mark:** a small blinking terminal prompt in the window title. The page name stays centered.
 - **Dashboard orb:** a terminal prompt (`>_`) with a caret. Settings → Motion **On** blinks the caret. Motion **Off** freezes it. It is not a globe.
 - **Linux PC:** Termux shelf → **Linux PC**. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
