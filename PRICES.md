@@ -4,7 +4,7 @@ The consumer price is **Pro, €15 once**. Each purchase includes **two Pro keys
 
 | Tier | Price | What it keeps |
 |---|---|---|
-| Free | €0 | Dashboard, Hardware, System, Battery, Network Security, Plan with one saved API platform, one console, Setup, Doctor, Commands, Links, and read-only Files. |
+| Free | €0 | A live Dashboard only. Other pages are an imagined preview. Pulse stays off, colour does not stick, and a saved API key waits for an upgrade. The gear offers Language, Plans, About, Privacy, and Documentation. |
 | Pro | €15 once, two keys | Every listed AI platform (eight saved), custom themes, advanced readings, build recipes, tweaks, extra consoles, file write, and Linux PC. |
 | Premium | €15 and up | A separate business key. UFS storage class, up to 32 API platforms, batch scripts, the scheduler, and the desktop monitor. |
 
