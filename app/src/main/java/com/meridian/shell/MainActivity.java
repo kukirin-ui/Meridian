@@ -130,12 +130,14 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * The Android status bar (clock, notifications, signal, battery) stays hidden while
-     * Meridian is open. A swipe down from the top edge shows it, then it hides again.
-     * The system navigation bar stays put.
+     * The Android status bar stays hidden while Meridian is open. A swipe down from the
+     * top edge shows it, then it hides again. The page itself fills that strip. The
+     * system navigation bar stays, and the page ends above it.
      */
     private void concealStatusBar() {
         final Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(0x00000000);
         if (Build.VERSION.SDK_INT >= 29) window.setStatusBarContrastEnforced(false);
         if (Build.VERSION.SDK_INT >= 28) {
             WindowManager.LayoutParams attrs = window.getAttributes();
@@ -143,12 +145,26 @@ public class MainActivity extends Activity {
             window.setAttributes(attrs);
         }
         if (Build.VERSION.SDK_INT >= 30) {
-            // Keep the framework fitting the navigation bar and the keyboard. Only the status bar is hidden.
-            window.setDecorFitsSystemWindows(true);
+            window.setDecorFitsSystemWindows(false);
             WindowInsetsController controller = window.getInsetsController();
             if (controller != null) {
                 controller.hide(WindowInsets.Type.statusBars());
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            }
+            if (web != null) {
+                web.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                    @Override
+                    public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                        android.graphics.Insets nav = insets.getInsets(WindowInsets.Type.navigationBars());
+                        android.graphics.Insets ime = insets.getInsets(WindowInsets.Type.ime());
+                        int bottom = Math.max(nav.bottom, ime.bottom);
+                        if (v.getPaddingLeft() != 0 || v.getPaddingTop() != 0 || v.getPaddingRight() != 0 || v.getPaddingBottom() != bottom) {
+                            v.setPadding(0, 0, 0, bottom);
+                        }
+                        return WindowInsets.CONSUMED;
+                    }
+                });
+                web.requestApplyInsets();
             }
         } else {
             final View decor = window.getDecorView();
@@ -157,16 +173,13 @@ public class MainActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
-        if (web != null) web.post(new Runnable() { public void run() { applyCutout(); } });
-    }
-
-    /** Keeps the header below a camera cutout after the status bar is hidden. */
-    private void applyCutout() {
-        if (web == null || Build.VERSION.SDK_INT < 28) return;
-        int top = 0;
-        android.view.WindowInsets insets = getWindow().getDecorView().getRootWindowInsets();
-        if (insets != null && insets.getDisplayCutout() != null) top = insets.getDisplayCutout().getSafeInsetTop();
-        web.evaluateJavascript("document.documentElement.style.setProperty('--cutout','" + top + "px')", null);
+        if (web != null) {
+            web.post(new Runnable() {
+                public void run() {
+                    if (web != null) web.evaluateJavascript("document.documentElement.style.setProperty('--cutout','0px')", null);
+                }
+            });
+        }
     }
 
     /** Pushes a fresh signal glyph when the active network changes. */
@@ -255,9 +268,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** Pads the page only while the keyboard covers it. A nav-bar inset stays below the threshold. */
+    /** Pads the page only while the keyboard covers it. API 30+ does this from window insets. */
     private void fitKeyboard(final WebView web) {
-        if (Build.VERSION.SDK_INT >= 30) getWindow().setDecorFitsSystemWindows(true);
+        if (Build.VERSION.SDK_INT >= 30) return;
         web.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
