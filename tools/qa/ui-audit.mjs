@@ -98,6 +98,8 @@ assert.match(java, /printf -- %s /);
 assert.match(java, /refuseCmd/);
 assert.match(java, /signalBars/);
 assert.match(java, /BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE/);
+assert.match(java, /setDecorFitsSystemWindows\(false\)/);
+assert.equal(/setDecorFitsSystemWindows\(true\)/.test(java), false, "the hidden status bar must not leave an empty band");
 assert.match(java, /SYSTEM_UI_FLAG_IMMERSIVE_STICKY/);
 assert.match(manifest, /ACCESS_WIFI_STATE/);
 assert.match(html, /function clipOut/);
