@@ -2929,9 +2929,11 @@ public class MainActivity extends Activity {
             if ("premium".equals(readSmallText(licence, 32))) return "premium";
             return "pro";
         }
-        try {
-            if (new Deck().trialLeft() > 0) return "pro";
-        } catch (Exception ignored) {}
+        if (debuggable()) {
+            String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
+            if ("premium".equals(dev)) return "premium";
+            if ("pro".equals(dev)) return "pro";
+        }
         return "free";
     }
 
@@ -2939,7 +2941,7 @@ public class MainActivity extends Activity {
         String tier = effectiveTier();
         if ("premium".equals(tier)) return 32;
         if ("pro".equals(tier)) return 8;
-        return 1;
+        return 0;
     }
 
     private File platformFile() {
@@ -3002,8 +3004,8 @@ public class MainActivity extends Activity {
             int count = items == null ? 0 : items.length();
             int cap = platformCap();
             if (count > cap) {
-                return cap == 1
-                    ? "Free keeps one API platform. Pro keeps the list."
+                return cap <= 0
+                    ? "A saved platform unlocks after you upgrade."
                     : "This plan keeps " + cap + " API platforms.";
             }
             if (items != null) {
@@ -3019,6 +3021,8 @@ public class MainActivity extends Activity {
             JSONObject active = root.optJSONObject("active");
             if (active != null) {
                 String base = active.optString("base", "");
+                String activeKey = active.optString("key", "").trim();
+                if (cap <= 0 && activeKey.length() > 0) return "A saved platform unlocks after you upgrade.";
                 if (base.length() > 0 && !base.startsWith("https://")) return "The address must start with https://";
                 if (active.optString("key", "").length() > 512) return "That field is too long.";
             }

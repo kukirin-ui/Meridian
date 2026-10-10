@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.18**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.19**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,11 +26,11 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.18 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.19 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.18-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.18** (versionCode 61). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.19-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.19** (versionCode 62). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 Free keeps a live Dashboard. Other pages are an imagined preview, pulse stays off, and colour does not stick. The gear offers Language, Plans, About, Privacy, and Documentation. Pro is the whole app. Premium adds Desk: run a whole plan, the scheduler, UFS, 32 API platforms, and a Markdown hardware report.
 
@@ -47,7 +47,7 @@ Plans can store two verified keys at once: **Pro / Personal** and **Premium Ente
 - **Carrier:** the clock and the carrier sit beside the logo, with a signal glyph for this phone's Wi-Fi or cellular strength. The glyph updates from the active network while the app is open. The Android status bar and the Android navigation bar stay hidden so they do not cover the header or the bottom inventory. A swipe from the top or bottom edge shows them, then they hide. No location permission.
 - **Window mark:** a small blinking terminal prompt in the window title. The page name stays centered.
 - **Dashboard orb:** a terminal prompt (`>_`) with a caret. Settings → Motion **On** blinks the caret. Motion **Off** freezes it. It is not a globe.
-- **Linux PC:** Termux shelf → **Linux PC**. This is a Pro feature (the 7-day trial includes it). Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
+- **Linux PC:** Termux shelf → **Linux PC**. This is a Pro feature. Check proot-distro, install Debian/Ubuntu, then **Open Debian** / **Open Ubuntu** for a real TTY in the Termux app. This is a Linux userspace, not a VGA Windows emulator. QEMU is not downloaded by default.
 - **API platforms:** keys are encrypted with the Android Keystore (AES-GCM) into `files/api-platforms.bin`. They are not stored in SharedPreferences. An update keeps them only when the signing certificate stays the same. The address must start with `https://`. Free stores one platform, Pro stores eight, Premium stores 32. If Save fails, the line under the button is the reason (plan limit, address, or keystore). Fix that and save again. A reinstall with a different certificate starts empty.
 - **Network Security:** this phone's link, DNS, and its own listening sockets. It does not scan other machines and does not capture packets.
 - **Desktop:** `node desktop/meridian-desktop.mjs` prints local readings. `--serve` publishes JSON on `127.0.0.1` only. `--tty` opens the local shell on standard input. There is no command endpoint on the HTTP port.
@@ -81,12 +81,11 @@ The consumer price is **Pro €15 once**. Each purchase includes two Pro keys: o
 
 | Free | Pro (€15 once) | Premium (€15 and up) |
 |---|---|---|
-| Dashboard, Hardware, System, Battery, Network Security | Build recipes and Linux PC | UFS storage class on Hardware |
-| Plan with one saved API platform | The platform list (eight), custom themes | Up to 32 API platforms |
-| One console, Setup, Doctor, Commands, Links | Tweaks, extra consoles, file write | Batch “run the plan” and the scheduler |
-| Read-only Files | | Desktop monitor companion |
+| Live Dashboard only | The whole app, with no limits | Everything in Pro |
+| Other pages are an imagined preview | Live readings, Build, Plan, colour, and pulse | Desk: run a whole plan, the scheduler, UFS |
+| Language, Plans, About, Privacy, Documentation | API platforms (eight) and Termux tools | 32 API platforms and a Markdown hardware report |
 
-Every install gets a 7-day trial of Pro (`TRIAL_DAYS` in `MainActivity.java`). After that the Pro tabs show a `PRO` badge and route to Plans.
+A fresh install stays Free until a signed key is activated. The first-run clock does not open Pro. `MERIDIAN-DEV` still opens Premium on a debug build.
 
 Plans has one buy button, **Buy Pro · €15**. Premium is described on that page and unlocked by a separate `sku: premium` key. It does not reuse the Pro checkout.
 
