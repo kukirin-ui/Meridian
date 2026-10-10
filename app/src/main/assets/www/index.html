@@ -663,6 +663,7 @@
 <script>
 let view = "home";
 let goalDraft = "";
+try { goalDraft = localStorage.getItem("m-goal") || ""; } catch (e) { goalDraft = ""; }
 let bond = "off";
 let userOff = false;
 let sessions = [[]];
@@ -1083,6 +1084,31 @@ let quiet = false;
 let more = "menu";
 const MAX_BLOCKS = 40;
 const MAX_OUT = 24000;
+function clipOut(text) {
+  const s = String(text || "");
+  if (s.length <= MAX_OUT) return s;
+  const note = "[earlier output trimmed]\n";
+  return note + s.slice(-(MAX_OUT - note.length));
+}
+function refuseCmd(cmd) {
+  const s = String(cmd == null ? "" : cmd);
+  if (s.indexOf("\0") >= 0) return "That command contains a character the shell cannot run.";
+  if (s.length > 100000) return "That command is too long to run from here.";
+  return "";
+}
+function saveDraft(text) {
+  try {
+    if (text) localStorage.setItem("m-draft", text);
+    else localStorage.removeItem("m-draft");
+  } catch (e) {}
+}
+function saveGoal(text) {
+  goalDraft = String(text || "");
+  try {
+    if (goalDraft) localStorage.setItem("m-goal", goalDraft);
+    else localStorage.removeItem("m-goal");
+  } catch (e) {}
+}
 let termWrap = localStorage.getItem("m-wrap") === "1";
 let cmdHistory = [];
 let histIx = -1;
@@ -1105,7 +1131,7 @@ function saveSessions() {
     const slim = sessions.map(function (s) {
       return s.slice(-MAX_BLOCKS).map(function (b) {
         const out = String(b.out || "");
-        return { title: b.title, cmd: b.cmd, out: out.length > MAX_OUT ? "[earlier output trimmed]\n" + out.slice(-MAX_OUT) : out };
+        return { title: b.title, cmd: b.cmd, out: clipOut(out) };
       });
     });
     localStorage.setItem("m-sessions", JSON.stringify({ sessions: slim, ix: sessionIx, names: sessionNames.slice(0, sessions.length) }));
@@ -1790,7 +1816,7 @@ function termTranscript() {
     const last = i === blocks.length - 1;
     const running = last && busy;
     html += '<div class="line"><span class="ps">$</span> ' + esc(b.cmd) + '</div>';
-    html += '<div class="out' + (!running && failed(b.out) ? " fail" : "") + '"' + (last ? ' id="liveout"' : '') + '>' + esc(explainOut(b.cmd, b.out)) + '</div>';
+    html += '<div class="out' + (!running && failed(b.out) ? " fail" : "") + '"' + (last ? ' id="liveout"' : '') + '>' + esc(explainOut(b.cmd, clipOut(b.out))) + '</div>';
   });
   html += '</div>';
   if (busy) html += '<div class="runbar"><span class="pulse" aria-hidden="true"></span><span class="muted">Running in Termux…</span><button class="ghost danger" type="button" id="stopjob">Stop</button></div>';
@@ -2439,7 +2465,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.11"; } catch (e) { return "2.3.11"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.12"; } catch (e) { return "2.3.12"; }
 }
 function savedDownloads() {
   try {
@@ -3428,7 +3454,7 @@ function bind() {
   const goalBox = document.getElementById("goal");
   if (goalBox) {
     goalBox.oninput = function () {
-      goalDraft = goalBox.value;
+      saveGoal(goalBox.value);
       const el = document.getElementById("askhint");
       if (el) el.textContent = askHint(goalBox.value);
     };
@@ -3494,7 +3520,7 @@ function bind() {
   document.querySelectorAll("[data-chip]").forEach(function (b) {
     b.onclick = function () {
       const goal = document.getElementById("goal");
-      if (goal) { goalDraft = b.getAttribute("data-chip") || ""; goal.value = goalDraft; }
+      if (goal) { saveGoal(b.getAttribute("data-chip") || ""); goal.value = goalDraft; }
       const hint = document.getElementById("askhint");
       if (hint) hint.textContent = askHint(goalDraft);
       planGoal();
@@ -3705,6 +3731,11 @@ function bind() {
   const line = document.getElementById("line");
   if (line && !line.__bound) {
     line.__bound = true;
+    try {
+      const draft = localStorage.getItem("m-draft") || "";
+      if (draft && !line.value) line.value = draft;
+    } catch (e) {}
+    line.oninput = function () { saveDraft(line.value); };
     line.onkeydown = function (e) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         if (!cmdHistory.length) return;
@@ -3712,12 +3743,14 @@ function bind() {
         if (histIx < 0) histIx = cmdHistory.length;
         histIx += e.key === "ArrowUp" ? -1 : 1;
         if (histIx < 0) histIx = 0;
-        if (histIx >= cmdHistory.length) { histIx = -1; line.value = ""; return; }
+        if (histIx >= cmdHistory.length) { histIx = -1; line.value = ""; saveDraft(""); return; }
         line.value = cmdHistory[histIx];
         line.setSelectionRange(line.value.length, line.value.length);
+        saveDraft(line.value);
       } else if (e.key === "Escape") {
         line.value = "";
         histIx = -1;
+        saveDraft("");
       } else if (e.key === "c" && e.ctrlKey && busy) {
         e.preventDefault();
         try { MeridianPhone.cancelJob(); } catch (err) {}
@@ -3725,7 +3758,15 @@ function bind() {
     };
   }
   const dock = document.getElementById("dock");
-  dock.onsubmit = function (e) { e.preventDefault(); const input = document.getElementById("line"); const cmd = input.value; input.value = ""; histIx = -1; if (cmd.trim()) exec("Console", cmd); };
+  dock.onsubmit = function (e) {
+    e.preventDefault();
+    const input = document.getElementById("line");
+    const cmd = input.value;
+    input.value = "";
+    histIx = -1;
+    saveDraft("");
+    if (cmd.trim()) exec("Console", cmd);
+  };
 }
 function applyTheme(next) {
   prefs.theme = next === "oled" || next === "light" || next === "dark" || next === "system" ? next : "system";
@@ -3837,7 +3878,7 @@ function quietJob(cmd, done) {
     if (!s || !s.done) return;
     clearInterval(timer);
     quiet = false;
-    done(cleanOut(s.out || ""));
+    done(cleanOut(clipOut(s.out || "")));
   }, 400);
   return true;
 }
@@ -3899,6 +3940,14 @@ function exec(title, cmd, done) {
     finishExec(1);
     return;
   }
+  const refused = refuseCmd(cmd);
+  if (refused) {
+    if (view !== "build") goNav({ view: "console", more: "menu" }, { silent: true });
+    pushBlock(blocks, { title: title, cmd: cmd.slice(0, 500), out: refused + "\nexit 1" });
+    render();
+    finishExec(1);
+    return;
+  }
   if (interactiveCmd(cmd)) {
     let r = "ok";
     try { r = String(MeridianPhone.openInTermux(cmd)); } catch (e) { r = "missing"; }
@@ -3907,7 +3956,9 @@ function exec(title, cmd, done) {
       ? "This command needs a keyboard and a live screen, so it was opened in the Termux app. Come back here when it is done.\nexit 0"
       : r === "asleep"
         ? "This command needs a keyboard and a live screen. Termux is asleep, so it could not be opened. Open Termux once, then try again.\nexit 1"
-        : "Termux is not installed.\nexit 1";
+        : r === "refused"
+          ? "That command is too long, or it contains a character the shell cannot run.\nexit 1"
+          : "Termux is not installed.\nexit 1";
     pushBlock(blocks, { title: title, cmd: cmd, out: why });
     rememberCmd(cmd);
     saveSessions();
@@ -3934,7 +3985,7 @@ function exec(title, cmd, done) {
     try { s = JSON.parse(MeridianPhone.jobStatus()); } catch (e) { return; }
     if (!s.done) {
       if (s.out) {
-        const text = cleanOut(s.out);
+        const text = cleanOut(clipOut(s.out));
         log[log.length - 1].out = text;
         if (blocks === log) {
           const node = document.getElementById("liveout");
@@ -3955,7 +4006,7 @@ function exec(title, cmd, done) {
     }
     clearInterval(jobTimer);
     jobTimer = 0;
-    const finalOut = cleanOut(s.out || "");
+    const finalOut = cleanOut(clipOut(s.out || ""));
     log[log.length - 1].out = finalOut;
     busy = false;
     try { MeridianPhone.keepAwake(false); } catch (e) {}

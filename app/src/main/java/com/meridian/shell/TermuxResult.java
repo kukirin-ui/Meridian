@@ -33,7 +33,7 @@ public class TermuxResult extends BroadcastReceiver {
             if (out.length() == 0 && bundle.getString("stdout_original_length", "0").length() > 1) out = MainActivity.pendingOut;
         }
         synchronized (MainActivity.GATE) {
-            MainActivity.pendingOut = out;
+            MainActivity.pendingOut = MainActivity.clipOut(out);
             MainActivity.pendingCode = code;
             MainActivity.ready = true;
             MainActivity.GATE.notifyAll();
