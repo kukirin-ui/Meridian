@@ -124,6 +124,8 @@ assert.match(sliceFn("linksPage()"), /items<\/div>/);
 assert.equal(/meridian-logo\.png/.test(html), false);
 assert.equal(/meridian-mark\.png/.test(html), false);
 assert.match(html, /function meridianMark/);
+assert.match(html, /function expandModelFetch/);
+assert.match(html, /bartowski\/gemma-2-9b-it-GGUF\/resolve\/main\/gemma-2-9b-it-Q4_K_M\.gguf/);
 assert.match(sliceFn("previewing()"), /more === "mesh"/);
 assert.match(sliceFn("syncMeshMic()"), /stopMeshListen/);
 assert.match(sliceFn("syncMeshMic()"), /startMeshListen/);

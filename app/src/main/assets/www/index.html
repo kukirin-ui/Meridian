@@ -1281,6 +1281,9 @@ function explainOut(cmd, out) {
   if (/CANNOT LINK EXECUTABLE/.test(t)) {
     t += "\n\nThe program file is installed, but its library does not match. For vulkaninfo, libc++ and vulkan-tools must be the same version. Press Repair Vulkan.";
   }
+  if (/\.gguf/i.test(String(cmd || "")) && /<!doctype|<html|huggingface\.co\/?\s*["']?\s*$/i.test(t)) {
+    t += "\n\nThat address is the Hugging Face website, so the saved file is the page, a few kilobytes, not the model. The model file is a different link and is about 5.4 GB.";
+  }
   if (/Not allowed to start service|app is in background|Termux was asleep/.test(t)) {
     return "Termux was asleep. Android blocked the command because Termux had no running process. Open Termux, leave it open for a second, then run this again.\n\nexit 1";
   }
@@ -1323,6 +1326,7 @@ function whyFor(cmd) {
   if (c.indexOf("free -h") >= 0) return "This shows memory in use and memory still free.";
   if (c.indexOf("df -h") >= 0) return "This shows how full the storage is.";
   if (c.indexOf("uname") >= 0) return "This prints the kernel name and version.";
+  if (/\.gguf/.test(c) && /huggingface\.co/.test(c)) return "This downloads the model file into ~/models. Gemma 2 9B Q4 is about 5.4 GB. A link that is only huggingface.co is the website, so the file address is used instead.";
   if (c.indexOf("mkdir") >= 0) return "This creates a folder. It does not download anything.";
   if (c.indexOf("http.server") >= 0) return "This serves the page on this phone so a browser can open it.";
   if (c.indexOf("ssh-keygen") >= 0) return "This creates the SSH host keys. Run it once.";
@@ -2245,7 +2249,7 @@ const IDEAS = [
   ["tmux", "Keep a session running after you leave it.", ["pkg install -y tmux", "tmux -V"]],
   ["Zsh", "Another shell, instead of bash.", ["pkg install -y zsh", "zsh --version"]],
   ["Folders", "Make the usual project folders.", ["mkdir -p ~/bin ~/projects ~/models ~/notes ~/logs ~/work && ls -1d ~/*"]],
-  ["Local model", "llama.cpp on this phone. A small model first.", ["pkg update && pkg upgrade -y", "pkg install -y git clang cmake llama-cpp", "mkdir -p ~/models ~/projects", "echo 'Put a .gguf file in ~/models, then run: llama-cli -m ~/models/model.gguf -t $(nproc) -c 2048'"]],
+  ["Local model", "llama.cpp on this phone. Gemma 2 9B Q4 is about 5.4 GB.", ["pkg update && pkg upgrade -y", "pkg install -y curl llama-cpp", "mkdir -p ~/models\nf=~/models/gemma-2-9b-it-Q4_K_M.gguf\nif [ -f \"$f\" ]; then n=$(wc -c < \"$f\" | tr -d ' '); if [ \"$n\" -lt 1000000 ]; then rm -f \"$f\"; echo 'Removed a short file that was not the model.'; fi; fi\ncurl -L --fail --retry 3 -C - -o \"$f\" \"https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf\"\nls -lh \"$f\"", "echo 'Run it with: llama-cli -m ~/models/gemma-2-9b-it-Q4_K_M.gguf -t $(nproc) -c 2048 -ngl 0'"]],
   ["Python job", "Python, pip, and a folder for a script.", ["pkg update", "pkg install -y python", "mkdir -p ~/projects/job && cd ~/projects/job && python -m venv .venv && . .venv/bin/activate && python -V"]],
   ["Node service", "Node.js and a project you can edit in Files.", ["pkg update", "pkg install -y nodejs", "mkdir -p ~/projects/web && cd ~/projects/web && npm init -y"]],
   ["GPU compute", "Vulkan and OpenCL for this GPU.", ["pkg update", "pkg install -y vulkan-tools vulkan-loader-android opencl-vendor-driver ocl-icd clinfo", "vulkaninfo --summary 2>/dev/null | head -n 30 || vulkaninfo 2>/dev/null | head -n 30", "clinfo -l 2>/dev/null || true"]],
@@ -2256,7 +2260,7 @@ const IDEAS = [
   ["Compiler", "clang, cmake, and make for a C or C++ build.", ["pkg update", "pkg install -y clang cmake make pkg-config binutils git", "mkdir -p ~/projects && cd ~/projects && pwd"]],
   ["Media box", "yt-dlp and ffmpeg so this phone can pull a video and remux it. Files land in ~/media.", ["pkg update -y", "pkg install -y python ffmpeg", "pip install -U yt-dlp", "mkdir -p ~/media && yt-dlp --version && ffmpeg -version | head -n 1 && echo 'Example: yt-dlp -o ~/media/%(title)s.%(ext)s URL'"]],
   ["yt-dlp", "Download a video or audio file. Change the URL before you run it.", ["pkg install -y python ffmpeg", "pip install -U yt-dlp", "yt-dlp --version"]],
-  ["On-device AI", "llama.cpp on this phone. Put a small .gguf in ~/models, then run it here. No cloud.", ["pkg update && pkg upgrade -y", "pkg install -y git clang cmake llama-cpp", "mkdir -p ~/models ~/projects", "echo 'Copy a small .gguf into ~/models, then: llama-cli -m ~/models/MODEL.gguf -t $(nproc) -c 2048 -ngl 0'"]],
+  ["On-device AI", "llama.cpp on this phone. Gemma 2 9B Q4 is about 5.4 GB and stays in ~/models.", ["pkg update && pkg upgrade -y", "pkg install -y curl llama-cpp", "mkdir -p ~/models\nf=~/models/gemma-2-9b-it-Q4_K_M.gguf\nif [ -f \"$f\" ]; then n=$(wc -c < \"$f\" | tr -d ' '); if [ \"$n\" -lt 1000000 ]; then rm -f \"$f\"; echo 'Removed a short file that was not the model.'; fi; fi\ncurl -L --fail --retry 3 -C - -o \"$f\" \"https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf\"\nls -lh \"$f\"", "echo 'Run it with: llama-cli -m ~/models/gemma-2-9b-it-Q4_K_M.gguf -t $(nproc) -c 2048 -ngl 0'"]],
   ["llama server", "An HTTP server for a local GGUF model on this phone.", ["pkg install -y llama-cpp", "echo 'llama-server -m ~/models/MODEL.gguf --host 127.0.0.1 --port 8080 -t $(nproc) -c 2048'"]],
   ["Python+Pip", "Python and pip on this phone.", ["pkg install -y python", "python -V", "pip install --upgrade pip"]],
   ["Node.js+NPM", "Node.js and npm.", ["pkg install -y nodejs", "node -v", "npm -v"]],
@@ -2564,7 +2568,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.21"; } catch (e) { return "2.3.21"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.22"; } catch (e) { return "2.3.22"; }
 }
 function savedDownloads() {
   try {
@@ -4323,6 +4327,26 @@ function pushBlock(log, block) {
   log.push(block);
   while (log.length > MAX_BLOCKS) log.shift();
 }
+const GGUF_FILES = {
+  "gemma-2-9b-it-q4_k_m.gguf": "https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf"
+};
+function ggufFileUrl(name) {
+  const base = String(name || "").split("/").pop().toLowerCase();
+  return GGUF_FILES[base] || "";
+}
+function expandModelFetch(cmd) {
+  let text = String(cmd || "");
+  if (!/\b(?:curl|wget)\b/.test(text)) return text;
+  const named = text.match(/[A-Za-z0-9._+-]+\.gguf/g);
+  if (!named) return text;
+  const file = named[0];
+  const target = ggufFileUrl(file);
+  if (!target) return text;
+  return text.replace(/https?:\/\/(?:www\.)?huggingface\.co(?:\/[^\s'"]*)?/gi, function (found) {
+    if (found.indexOf("/resolve/") >= 0) return found;
+    return target;
+  });
+}
 function exec(title, cmd, done) {
   if (!paid()) {
     toast("Imagined preview. Real commands unlock after you upgrade.");
@@ -4330,6 +4354,11 @@ function exec(title, cmd, done) {
     return;
   }
   cmd = answerLine(cmd);
+  const fetched = expandModelFetch(cmd);
+  if (fetched !== cmd) {
+    toast("That link is the website. Downloading the model file instead. About 5.4 GB.");
+    cmd = fetched;
+  }
   const answering = cmd.indexOf("Answering") >= 0;
   const fixing = cmd.indexOf("Releasing a stuck") >= 0 || cmd.indexOf("pkg install -y termux-api") === 0;
   if (bond !== "termux") {
@@ -4443,7 +4472,7 @@ function localPlan(goal) {
     if (name.length >= 4 && g.indexOf(name) >= 0) return IDEAS[i][2].slice();
   }
   const alias = [
-    [/llama|gguf|\bllm\b|local model/, "Local model"],
+    [/llama|gguf|\bllm\b|local model|gemma/, "Local model"],
     [/python|\bpip\b/, "Python"],
     [/node|npm|javascript/, "Node"],
     [/vulkan|opencl|\bgpu\b/, "GPU compute"],
