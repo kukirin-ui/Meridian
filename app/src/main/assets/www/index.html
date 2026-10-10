@@ -64,21 +64,23 @@
   body { display: flex; flex-direction: column; min-height: 100dvh; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: 64px; height: 64px; padding: 0 8px; background: var(--header); border-bottom: 1px solid var(--line); }
+  header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: calc(64px + var(--cutout, 0px)); height: calc(64px + var(--cutout, 0px)); padding: var(--cutout, 0px) 8px 0; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
   .brandlogo { width: 40px; height: 40px; flex: none; display: block; color: var(--icon); background: transparent; }
   .brandmark { width: 100%; height: 100%; display: block; }
   .brandmark .merline { stroke: var(--accent); }
-  .clockstack { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; max-width: 42vw; pointer-events: none; text-align: center; }
+  .clockstack { position: static; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; max-width: 46vw; min-width: 0; pointer-events: none; text-align: left; }
   header p { margin: 0; color: var(--muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #bondline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .grow { flex: 1; min-width: 0; }
-  .setmenu { position: absolute; top: 60px; right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
+  .setmenu { position: absolute; top: calc(60px + var(--cutout, 0px)); right: 10px; z-index: 12; display: flex; flex-direction: column; min-width: 220px; padding: 6px; background: var(--plate); border: 1px solid var(--accent); border-radius: 16px; }
   .setmenu[hidden] { display: none !important; }
   .setmenu button { min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 12px; padding: 0 12px; color: var(--fg); }
   .meridian-pulse { width: 22px; height: 22px; display: grid; place-items: center; position: relative; color: var(--accent); }
   .meridian-pulse svg { width: 22px; height: 22px; display: block; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transform-origin: center; animation: latpulse 2.8s var(--ease) infinite; }
-  #clock { align-self: center; color: var(--fg); font-size: 1.05rem; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
+  #clock { align-self: flex-start; color: var(--fg); font-size: 1.05rem; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
+  .carrierrow { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 100%; }
+  .signal { width: 16px; height: 14px; flex: none; display: block; color: var(--fg); }
   .leads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .leads div { min-width: 0; text-align: center; padding: 8px 2px; border-radius: 12px; background: var(--plate); border: 1px solid var(--line); }
   .leads b { display: block; color: var(--accent); font-size: 0.9375rem; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -212,8 +214,8 @@
   .speedometers { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; text-align: center; }
   .speedometers .gauge { width: 96px; height: 96px; margin: 0 auto; }
   .speedometers .gauge b { width: 72px; height: 72px; font-size: 0.75rem; }
-  #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(80px + env(safe-area-inset-bottom)); }
-  body.term #main { padding-bottom: calc(128px + env(safe-area-inset-bottom)); }
+  #main { flex: 1; min-height: 0; overflow: hidden; overflow-x: hidden; display: flex; flex-direction: column; padding: 8px 8px calc(66px + env(safe-area-inset-bottom)); }
+  body.console #main { padding-bottom: calc(116px + env(safe-area-inset-bottom)); }
   body.ime #main { padding-bottom: calc(20px + var(--kb, 0px)); }
   body.ime nav { visibility: hidden; }
   .win { position: relative; display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--accent); box-shadow: none; background: var(--win); animation: tileglow 2.8s var(--ease) infinite; }
@@ -337,7 +339,7 @@
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
     nav button { flex: 0 0 48px; min-height: 48px; }
     #main { padding: 8px 10px 10px 116px; }
-    body.term #main { padding-bottom: 70px; }
+    body.console #main { padding-bottom: 70px; }
     #dock { left: 116px; bottom: 12px; }
     .desk .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .filegrid, .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -357,7 +359,6 @@
   .deskbar { position: relative; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 10px; background: var(--header); border-bottom: 1px solid transparent; }
   .desk .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .desk .grid:has(> :nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .desk .grid:has(> :nth-child(1):last-child) { grid-template-columns: minmax(0, 1fr); }
   .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; }
   .crumbs button { border: 0; background: transparent; color: var(--fg); min-height: 28px; padding: 0 4px; }
   .crumbs span { color: var(--muted); }
@@ -529,7 +530,7 @@
   html[data-theme="oled"] .win { box-shadow: none; }
   .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 8px; }
   .speedrow .ghost { width: auto; flex: none; }
-  #carrierline { margin: 0; min-width: 0; max-width: 100%; color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.14em; line-height: 1.15; text-transform: uppercase; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #carrierline { margin: 0; min-width: 0; flex: 1; max-width: 100%; color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.14em; line-height: 1.15; text-transform: uppercase; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
     display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 0.8125rem; letter-spacing: 0; text-shadow: none; font-synthesis: none;
@@ -634,7 +635,10 @@
   <p id="bondline" class="sr-only" role="status">Not connected</p>
   <div class="clockstack">
     <b id="clock" aria-hidden="true"></b>
-    <span id="carrierline"></span>
+    <span class="carrierrow">
+      <svg id="signal" class="signal" viewBox="0 0 24 24" aria-label="Signal"></svg>
+      <span id="carrierline"></span>
+    </span>
   </div>
   <div class="grow"></div>
   <button class="ghost iconbtn" id="openset" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" data-i18n-aria="settingsAria"><span class="meridian-pulse" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></button>
@@ -2375,7 +2379,6 @@ function buildPage() {
     return '<article class="pack"><div class="packhead"><b>' + esc(title) + '</b><span class="probadge">PRO</span></div><p class="muted">' + esc(blurb) + '</p>' + chips + '</article>';
   }
   let shop = '<div class="packs">';
-  shop += packCard("Install", "Python, Node, Git, and the rest of the set.", ["Python+Pip", "Node.js+NPM", "Git+Curl", "Docker CLI", "Go", "Rust", "Ruby", "Java JDK", "C/C++ build-essential", "PHP"]);
   shop += packCard("Workstation", "Languages, compilers, and the tools you already use on a laptop.", ["Python", "Node", "Git", "Compiler"]);
   shop += packCard("Media box", "Pull a video, remux it, keep the files in Termux.", ["Media box", "yt-dlp", "FFmpeg"]);
   shop += packCard("On-device AI", "A local GGUF model. No account, no cloud round-trip.", ["On-device AI", "llama server", "Local model"]);
@@ -2518,7 +2521,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.14"; } catch (e) { return "2.3.14"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.15"; } catch (e) { return "2.3.15"; }
 }
 function savedDownloads() {
   try {
@@ -2815,7 +2818,7 @@ function render() {
   main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + trial + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
   const typingOn = document.body.classList.contains("typing-focus");
-  document.body.className = (view === "console" ? "term" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "");
+  document.body.className = (view === "console" ? "console" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "");
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
   const unlocked = paid();
@@ -4588,6 +4591,49 @@ startRefresh();
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) { probeAt = 0; paintMeters(); paintGraph(); paintHardware(); paintBattery(); }
 });
+function signalMark(on) {
+  return on ? "currentColor" : "var(--muted)";
+}
+function paintSignal(kind, level) {
+  const el = document.getElementById("signal");
+  if (!el) return;
+  const n = Math.max(0, Math.min(4, Number(level) || 0));
+  const mode = kind === "cell" || kind === "wifi" || kind === "ethernet" || kind === "vpn" ? kind : "none";
+  let label = "No signal";
+  if (mode === "wifi") label = "Wi-Fi signal, " + n + " of 4";
+  else if (mode === "cell") label = "Cellular signal, " + n + " of 4";
+  else if (mode === "ethernet") label = "Ethernet";
+  else if (mode === "vpn") label = "VPN signal, " + n + " of 4";
+  el.setAttribute("aria-label", label);
+  if (mode === "cell") {
+    el.innerHTML = [6, 10, 14, 18].map(function (h, i) {
+      const on = n > i;
+      return '<rect x="' + (3 + i * 5) + '" y="' + (20 - h) + '" width="3.2" height="' + h + '" rx="0.6" fill="' + signalMark(on) + '" opacity="' + (on ? "1" : "0.35") + '"/>';
+    }).join("");
+    return;
+  }
+  if (mode === "ethernet") {
+    el.innerHTML = '<rect x="3" y="8" width="18" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 8V5.5M12 8V5.5M17 8V5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>';
+    return;
+  }
+  el.innerHTML = '<path d="M4.2 9.2a11.2 11.2 0 0 1 15.6 0" fill="none" stroke="' + signalMark(n >= 4) + '" stroke-width="1.7" stroke-linecap="round" opacity="' + (n >= 4 ? "1" : "0.35") + '"/>'
+    + '<path d="M7 12a7.2 7.2 0 0 1 10 0" fill="none" stroke="' + signalMark(n >= 3) + '" stroke-width="1.7" stroke-linecap="round" opacity="' + (n >= 3 ? "1" : "0.35") + '"/>'
+    + '<path d="M9.6 14.6a3.6 3.6 0 0 1 4.8 0" fill="none" stroke="' + signalMark(n >= 2) + '" stroke-width="1.7" stroke-linecap="round" opacity="' + (n >= 2 ? "1" : "0.35") + '"/>'
+    + '<circle cx="12" cy="17.8" r="1.35" fill="' + signalMark(n >= 1) + '" opacity="' + (n >= 1 ? "1" : "0.35") + '"/>';
+}
+function tickSignal() {
+  let kind = "none";
+  let level = 0;
+  try {
+    if (typeof MeridianPhone !== "undefined" && MeridianPhone.signalBars) {
+      const j = JSON.parse(MeridianPhone.signalBars());
+      kind = j && j.kind ? String(j.kind) : "none";
+      level = j && j.level != null ? Number(j.level) : 0;
+    }
+  } catch (e) {}
+  paintSignal(kind, level);
+}
+window.meridianSignal = tickSignal;
 function tickClock() {
   const el = document.getElementById("clock");
   if (el) {
@@ -4596,9 +4642,10 @@ function tickClock() {
   }
   const carrier = document.getElementById("carrierline");
   if (carrier) carrier.textContent = carrierLabel();
+  tickSignal();
 }
 tickClock();
-setInterval(tickClock, 10000);
+setInterval(tickClock, 2000);
 </script>
 </body>
 </html>
