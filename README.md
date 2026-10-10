@@ -1,6 +1,6 @@
 # Meridian
 
-A dashboard for an Android phone, bonded to Termux. Version **2.3.22**.
+A dashboard for an Android phone, bonded to Termux. Version **2.3.23**.
 
 Readings come from the device. Commands run in Termux on that phone. There is no account and no server.
 
@@ -26,15 +26,15 @@ A GitHub zip of the source **does not contain an `.apk`**. That file is built, n
 [Meridian.apk on the v1.8.6 release](https://github.com/kukirin-ui/Meridian/releases/download/v1.8.6/Meridian.apk)
 or [meridian0.grok.me](https://meridian0.grok.me). That is the old app.
 
-**2.3.22 debug APK (this branch):** GitHub Actions builds it on every push.
+**2.3.23 debug APK (this branch):** GitHub Actions builds it on every push.
 1. Open the [Build APK workflow](https://github.com/kukirin-ui/Meridian/actions/workflows/build-apk.yml) (Actions → **Build APK**).
 2. Open the latest green run for this branch.
-3. Download the artifact **Meridian-2.3.22-debug** (a zip with `app-debug.apk` inside).
-4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.22** (versionCode 65). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
+3. Download the artifact **Meridian-2.3.23-debug** (a zip with `app-debug.apk` inside).
+4. Copy that APK to the phone, open it, allow install from this source. The version in About is **2.3.23** (versionCode 66). About also shows **Downloads**, the public total of `.apk` files on the GitHub releases page. The phone keeps the last number. A failed request shows that number, or **—** if it has never loaded.
 
 Free keeps a live Dashboard. Other pages are an imagined preview, pulse stays off, and colour does not stick. The gear offers Language, Plans, About, Privacy, and Documentation. Pro is the whole app. Premium adds Desk: run a whole plan, the scheduler, UFS, 32 API platforms, and a Markdown hardware report.
 
-Termux → Mesh is the wake-word screen: a saved name, a voice, a skill tree, and a revenue layer. A high-risk line asks for a hardware signature on this phone and does not run a shell command. The microphone listens only while that screen is open.
+Termux → Mesh saves the name you choose. Speech wakes listening only when that name is spoken. The name alone opens a short command window, then it returns to standby. A high-risk line asks for a hardware signature on this phone and does not run a shell command. The microphone listens only while that screen is open.
 
 A curl of `https://huggingface.co` saves the website, a few kilobytes. Build → Local model downloads Gemma 2 9B Q4 (about 5.4 GB) from the file address. The same command with that homepage and the file name `gemma-2-9b-it-Q4_K_M.gguf` uses the file address.
 

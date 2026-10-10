@@ -2568,7 +2568,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.22"; } catch (e) { return "2.3.22"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.23"; } catch (e) { return "2.3.23"; }
 }
 function savedDownloads() {
   try {
@@ -2705,6 +2705,7 @@ let meshSkill = "code";
 let meshRevenue = "disabled";
 let meshVoice = "0";
 let meshAwake = false;
+let meshArm = 0;
 let meshDraft = "";
 let meshNameDraft = "Meridian";
 let meshLines = ["Mesh is ready. The microphone listens only while this screen is open."];
@@ -2734,7 +2735,8 @@ function meshLog(line) {
   }
 }
 function meshStatusText() {
-  return (meshAwake ? "Listening" : "Standby") + " · wake word “" + meshName + "”";
+  if (meshAwake) return "Listening · “" + meshName + "” woke this. Say the command.";
+  return "Standby · say “" + meshName + "” to wake. Other speech is ignored.";
 }
 function meshPage() {
   return '<div class="stack">'
@@ -2771,6 +2773,48 @@ function meshSpeak(text) {
     speechSynthesis.speak(utter);
   } catch (e) {}
 }
+function meshFold(text) {
+  return String(text || "").toLowerCase().replace(/[.,!?;:'"“”‘’]+/g, " ").replace(/\s+/g, " ").trim();
+}
+function meshHeard(text) {
+  const spoken = meshFold(text);
+  const name = meshFold(meshName);
+  if (!name || !spoken) return { hit: false, command: "" };
+  const at = spoken.indexOf(name);
+  if (at < 0) return { hit: false, command: "" };
+  const before = at === 0 || spoken.charAt(at - 1) === " ";
+  const afterAt = at + name.length;
+  const after = afterAt === spoken.length || spoken.charAt(afterAt) === " ";
+  if (!before || !after) return { hit: false, command: "" };
+  return { hit: true, command: spoken.slice(afterAt).trim() };
+}
+function meshEcho(text) {
+  const spoken = meshFold(text);
+  return spoken === "yes i am listening" || spoken.indexOf("identity saved") === 0 || spoken.indexOf("i will now only respond") >= 0;
+}
+function meshRest() {
+  meshAwake = false;
+  if (meshArm) {
+    clearTimeout(meshArm);
+    meshArm = 0;
+  }
+  const status = document.getElementById("meshstatus");
+  if (status) status.textContent = meshStatusText();
+}
+function meshListen() {
+  meshAwake = true;
+  if (meshArm) clearTimeout(meshArm);
+  meshArm = setTimeout(function () {
+    meshArm = 0;
+    if (!meshAwake) return;
+    meshAwake = false;
+    const status = document.getElementById("meshstatus");
+    if (status) status.textContent = meshStatusText();
+    meshLog("Still on standby. Say “" + meshName + "” to wake.");
+  }, 8000);
+  const status = document.getElementById("meshstatus");
+  if (status) status.textContent = meshStatusText();
+}
 function meshHighRisk(text) {
   const node = document.getElementById("mesh-revenue");
   const rev = node && node.value ? node.value : meshRevenue;
@@ -2797,9 +2841,7 @@ function processMesh(commandText) {
   } else {
     meshLog("Verified. It stays on this phone.");
   }
-  meshAwake = false;
-  const status = document.getElementById("meshstatus");
-  if (status) status.textContent = meshStatusText();
+  meshRest();
 }
 function saveMeshIdentity() {
   const input = document.getElementById("mesh-name");
@@ -2820,10 +2862,9 @@ function saveMeshIdentity() {
     localStorage.setItem("m-mesh-revenue", meshRevenue);
     localStorage.setItem("m-mesh-voice", meshVoice);
   } catch (e) {}
-  meshLog("Wake word saved as " + meshName + ". Skill " + meshSkill + ". Revenue " + meshRevenue + ".");
-  const status = document.getElementById("meshstatus");
-  if (status) status.textContent = meshStatusText();
-  meshSpeak("Identity saved.");
+  meshRest();
+  meshLog("Wake word saved as " + meshName + ". I will now only respond to " + meshName + ".");
+  meshSpeak("Identity saved. I will now only respond to " + meshName);
 }
 function fireMeshCommand() {
   const box = document.getElementById("mesh-cmd");
@@ -2857,29 +2898,33 @@ function syncMeshMic() {
     } catch (e) {}
     try { MeridianPhone.startMeshListen(); } catch (e) {}
   } else {
-    meshAwake = false;
+    meshRest();
     try { MeridianPhone.stopMeshListen(); } catch (e) {}
   }
 }
 window.meridianMesh = {
   onSpeech: function (text, isFinal) {
     if (view !== "tools" || more !== "mesh") return;
-    const transcript = String(text || "").toLowerCase().trim();
-    const name = String(meshName || "").toLowerCase().trim();
-    if (!name || !transcript) return;
-    if (!meshAwake) {
-      if (transcript.indexOf(name) < 0) return;
-      meshAwake = true;
-      meshLog("Wake word " + name + " detected.");
-      const status = document.getElementById("meshstatus");
-      if (status) status.textContent = meshStatusText();
-      if (!isFinal) return;
-    }
     if (!isFinal) return;
-    const at = transcript.indexOf(name);
-    const command = at >= 0 ? transcript.slice(at + name.length).trim() : transcript;
-    if (command) processMesh(command);
-    else meshSpeak("Yes?");
+    if (meshEcho(text)) return;
+    const heard = meshHeard(text);
+    if (!meshAwake) {
+      if (!heard.hit) return;
+      meshLog("Wake word “" + meshName + "” detected.");
+      if (heard.command) processMesh(heard.command);
+      else {
+        meshListen();
+        meshSpeak("Yes? I am listening.");
+      }
+      return;
+    }
+    const command = heard.hit ? heard.command : meshFold(text);
+    if (!command) {
+      meshListen();
+      meshSpeak("Yes? I am listening.");
+      return;
+    }
+    processMesh(command);
   },
   onSignature: function (ok, detail) {
     meshLog(ok ? String(detail || "Signed on this phone.") : String(detail || "The signature was not confirmed."));
