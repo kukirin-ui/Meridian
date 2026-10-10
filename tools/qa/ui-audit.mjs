@@ -88,5 +88,13 @@ assert.match(java, /showSoftInput/);
 assert.match(java, /hideSoftInputFromWindow/);
 assert.equal(/setOnTouchListener/.test(java), false, "taps outside a text field must not focus the WebView");
 assert.match(java, /dev\.unlock/);
+assert.match(manifest, /android:configChanges="[^"]*orientation\|screenSize/);
+assert.match(java, /clipOut/);
+assert.match(java, /printf -- %s /);
+assert.match(java, /refuseCmd/);
+assert.match(html, /function clipOut/);
+assert.match(html, /\[earlier output trimmed\]/);
+assert.match(html, /m-draft/);
+assert.match(html, /m-goal/);
 
 console.log("ui audit ok");

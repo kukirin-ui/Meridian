@@ -66,6 +66,8 @@ public class MainActivity extends Activity {
     private WebView web;
     static final Object GATE = new Object();
     static volatile String pendingOut = "";
+    /** Hard cap for one job's text crossing into the WebView. The tail is what the console shows. */
+    static final int OUT_CAP = 24000;
     static volatile int jobGen = 0;
     static volatile int pendingCode = -1;
     private volatile String speedJson = "";
@@ -369,9 +371,9 @@ public class MainActivity extends Activity {
     /** Opens a visible Termux session running the command. Used for interactive programs (vim, btop, proot login) that cannot run headless. */
     private boolean openInTermux(String cmd) {
         if (cmd == null) cmd = "";
-        String tag = "MERIDIAN_" + randomToken();
-        String script = "cat > \"$HOME/.meridian/open.sh\" << '" + tag + "'\n" + cmd + "\n" + tag + "\n"
-            + "mkdir -p \"$HOME/.meridian\"; bash \"$HOME/.meridian/open.sh\"; echo; echo '[Meridian] Command finished. Press Enter to close.'; read -r _";
+        String script = "mkdir -p \"$HOME/.meridian\"\n"
+            + "printf -- %s " + sh(cmd) + " > \"$HOME/.meridian/open.sh\"\n"
+            + "bash \"$HOME/.meridian/open.sh\"; echo; echo '[Meridian] Command finished. Press Enter to close.'; read -r _";
         boolean sent = sendToTermux(termuxIntent(script, false));
         wakeTermux();
         return sent;
@@ -481,6 +483,8 @@ public class MainActivity extends Activity {
 
     private void readLive(java.net.ServerSocket sock) {
         StringBuilder sb = new StringBuilder();
+        boolean trimmed = false;
+        long lastPublish = 0;
         try {
             while (liveSock == sock && !sock.isClosed()) {
                 java.net.Socket client = sock.accept();
@@ -492,11 +496,17 @@ public class MainActivity extends Activity {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         sb.append(line).append('\n');
-                        if (sb.length() > 60000) sb.delete(0, sb.length() - 40000);
-                        synchronized (GATE) {
-                            if (!ready) pendingOut = sb.toString();
+                        if (sb.length() > OUT_CAP) {
+                            sb.delete(0, sb.length() - (OUT_CAP - 32));
+                            trimmed = true;
+                        }
+                        long now = android.os.SystemClock.uptimeMillis();
+                        if (now - lastPublish >= 250) {
+                            lastPublish = now;
+                            publishLive(sb, trimmed);
                         }
                     }
+                    publishLive(sb, trimmed);
                 } catch (Exception ignored) {
                 } finally {
                     try { client.close(); } catch (Exception ignored) {}
@@ -505,10 +515,27 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {}
     }
 
+    /** Publishes the tail of the live log. Called off the WebView thread. */
+    private void publishLive(StringBuilder sb, boolean trimmed) {
+        String text = sb.toString();
+        if (trimmed && !text.startsWith("[earlier output trimmed]")) text = "[earlier output trimmed]\n" + text;
+        text = clipOut(text);
+        synchronized (GATE) {
+            if (!ready) pendingOut = text;
+        }
+    }
+
+    /** Keeps the bridge payload inside OUT_CAP, preserving the newest text. */
+    static String clipOut(String out) {
+        if (out == null || out.length() <= OUT_CAP) return out == null ? "" : out;
+        String note = "[earlier output trimmed]\n";
+        int keep = OUT_CAP - note.length();
+        return note + out.substring(out.length() - keep);
+    }
+
     private String prepare(String cmd, int port) {
         if (cmd == null) cmd = "";
-        // Random heredoc tags: a user line equal to a fixed tag would end the heredoc early and run the rest as the outer script.
-        String cmdTag = "MERIDIAN_CMD_" + randomToken();
+        // The user's text is one quoted printf argument. This heredoc is only the fixed runner, so a line in the command cannot close it.
         String runTag = "MERIDIAN_RUN_" + randomToken();
         String tok = "printf '%s\\n' '" + liveToken + "'";
         String nc = "/system/bin/toybox nc 127.0.0.1 " + port;
@@ -527,9 +554,7 @@ public class MainActivity extends Activity {
             + "mkdir -p \"$PREFIX/etc/apt/apt.conf.d\" \"$PREFIX/etc/dpkg/dpkg.cfg.d\" \"$HOME/.meridian\" 2>/dev/null; "
             + "printf '%s\\n' 'Dpkg::Options {\"--force-confdef\";\"--force-confold\";};' > \"$PREFIX/etc/apt/apt.conf.d/99meridian\" 2>/dev/null; "
             + "printf '%s\\n' 'force-confdef' 'force-confold' > \"$PREFIX/etc/dpkg/dpkg.cfg.d/99meridian\" 2>/dev/null; "
-            + "cat > \"$HOME/.meridian/cmd.sh\" << '" + cmdTag + "'\n"
-            + cmd + "\n"
-            + cmdTag + "\n"
+            + "printf -- %s " + sh(cmd) + " > \"$HOME/.meridian/cmd.sh\"\n"
             + "cat > \"$HOME/.meridian/run.sh\" << '" + runTag + "'\n"
             // The command runs as a child whose PID is recorded, so Stop can kill exactly this job.
             + "bash \"$HOME/.meridian/cmd.sh\" </dev/null & p=$!\n"
@@ -547,7 +572,8 @@ public class MainActivity extends Activity {
                 : "if [ \"$alive\" = 0 ] && { [ -e \"$PREFIX/var/lib/dpkg/lock-frontend\" ] || [ -e \"$PREFIX/var/lib/dpkg/lock\" ]; }; then rm -f " + locks + "; fi\n")
             + ": > \"$HOME/.meridian/live.log\"\n"
             + run
-            + "cat \"$HOME/.meridian/live.log\" 2>/dev/null || true\n"
+            + "bytes=$(wc -c < \"$HOME/.meridian/live.log\" 2>/dev/null || echo 0)\n"
+            + "if [ \"$bytes\" -gt 40000 ]; then printf '%s\\n' '[earlier output trimmed]'; tail -c 40000 \"$HOME/.meridian/live.log\"; else cat \"$HOME/.meridian/live.log\"; fi\n"
             + "if [ -f \"$HOME/.meridian/code\" ]; then status=$(cat \"$HOME/.meridian/code\"); fi\n"
             + "exit ${status:-0}\n";
     }
@@ -568,12 +594,19 @@ public class MainActivity extends Activity {
                 }
             }
             if (!ready) return "still running";
-            return pendingOut + "\nexit " + pendingCode;
+            return clipOut(pendingOut) + "\nexit " + pendingCode;
         }
     }
 
     private String sh(String value) {
         return "'" + value.replace("'", "'\\''") + "'";
+    }
+
+    /** Rejects a command the shell cannot carry. Quotes, pipes, newlines, and emoji stay: they are the script. */
+    private String refuseCmd(String cmd) {
+        if (cmd != null && cmd.indexOf('\0') >= 0) return "That command contains a character the shell cannot run.";
+        if (cmd != null && cmd.length() > 100000) return "That command is too long to run from here.";
+        return null;
     }
 
     /** Quoted shell path, or null when the path is outside the Termux home or malformed. Callers must refuse to act on null. */
@@ -960,6 +993,8 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String run(String cmd) {
             if (!termuxInstalled()) return "Termux is not installed\nexit 1";
+            String refused = refuseCmd(cmd);
+            if (refused != null) return refused + "\nexit 1";
             if (jobLive) return "A command is already running\nexit 1";
             jobLive = true;
             try {
@@ -972,6 +1007,8 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String startJob(String cmd) {
+            String refused = refuseCmd(cmd);
+            if (refused != null) return refused;
             if (!termuxInstalled()) {
                 synchronized (GATE) {
                     pendingOut = "Termux is not installed";
@@ -996,6 +1033,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String openInTermux(String cmd) {
             if (!termuxInstalled()) return "missing";
+            if (refuseCmd(cmd) != null) return "refused";
             return MainActivity.this.openInTermux(cmd) ? "ok" : "asleep";
         }
 
@@ -1170,8 +1208,9 @@ public class MainActivity extends Activity {
                 }
                 if (done) jobLive = false;
                 o.put("done", done);
-                if (done) o.put("out", (out == null ? "" : out) + "\nexit " + code);
-                else o.put("out", out == null ? "" : out);
+                out = clipOut(out);
+                if (done) o.put("out", out + "\nexit " + code);
+                else o.put("out", out);
                 o.put("code", code);
                 return o.toString();
             } catch (Exception ex) {
