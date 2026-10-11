@@ -209,6 +209,57 @@ if [ -e "$HOME/meridian-sandbox/after.txt" ]; then bad "work after DONE"; else o
 
 if grep -n -E '(^|[^[:alnum:]_])eval([^[:alnum:]_]|$)' "$agent" >/dev/null; then bad "agent uses eval"; else ok "agent does not eval"; fi
 
+mkdir -p "$HOME/storage/downloads" "$HOME/models"
+printf 'short\n' > "$HOME/models/gemma-2-9b-it-Q4_K_M.gguf"
+head -c 1100000 /dev/zero > "$HOME/storage/downloads/gemma-local.gguf"
+adopt=$(agent_adopt_model "gemma-2-9b-it-Q4_K_M.gguf")
+has "adopt gemma from downloads" "$adopt" "Using the file already in Downloads: $HOME/storage/downloads/gemma-local.gguf"
+if [ -L "$HOME/models/gemma-2-9b-it-Q4_K_M.gguf" ]; then ok "adopt linked into models"; else bad "adopt did not link"; fi
+has "stub removed" "$adopt" "Removed a short file that was not the model."
+
+head -c 1100000 /dev/zero > "$HOME/models/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+adopt=$(agent_adopt_model "Qwen2.5-3B-Instruct-Q4_K_M.gguf")
+has "keep real model" "$adopt" "Using ~/models/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+if [ -L "$HOME/models/Qwen2.5-3B-Instruct-Q4_K_M.gguf" ]; then bad "replaced a real model"; else ok "real model stayed a file"; fi
+
+adopt=$(agent_adopt_model "Llama-3.2-1B-Instruct-Q4_K_M.gguf")
+has "missing download" "$adopt" "No model file in Downloads yet."
+if [ -e "$HOME/models/Llama-3.2-1B-Instruct-Q4_K_M.gguf" ]; then bad "missing model created a file"; else ok "missing model created nothing"; fi
+
+printf 'apk\n' > "$HOME/meridian-sandbox/app-debug.apk"
+printf 'apk\n' > "$HOME/notes/side.apk"
+ln -s "$HOME/notes/keep.txt" "$HOME/notes/fake.apk"
+: > "$HOME/rish-log"
+cat > "$HOME/rish" << 'EOF'
+#!/bin/bash
+printf '%s\n' "$*" >> "$HOME/rish-log"
+printf 'log line\n'
+EOF
+chmod +x "$HOME/rish"
+
+out=$(run_tool "TOOL INSTALL meridian-sandbox/app-debug.apk")
+has "install signs" "$out" "MERIDIAN_SIGN install"
+has "install path" "$out" "PATH=$HOME/meridian-sandbox/app-debug.apk"
+lacks "install does not run rish" "$(cat "$HOME/rish-log")" "pm install"
+if [ -s "$HOME/rish-log" ]; then bad "install wrote the rish log"; else ok "install left rish idle"; fi
+
+out=$(run_tool "TOOL INSTALL notes/keep.txt")
+has "non-apk refused" "$out" "refused"
+lacks "non-apk is not signed" "$out" "MERIDIAN_SIGN"
+
+out=$(run_tool "TOOL INSTALL notes/fake.apk")
+has "symlink apk refused" "$out" "refused"
+lacks "symlink apk is not signed" "$out" "MERIDIAN_SIGN"
+
+out=$(run_tool "TOOL LOGS")
+has "logs text" "$out" "log line"
+has "logs asked for logcat" "$(cat "$HOME/rish-log")" "logcat -d -t 80"
+lacks "logs did not install" "$(cat "$HOME/rish-log")" "pm install"
+
+out=$(run_tool "TOOL INSTALL notes/side.apk")
+has "home apk signs" "$out" "MERIDIAN_SIGN install"
+lacks "home apk did not install yet" "$(cat "$HOME/rish-log")" "pm install"
+
 if [ "$fail" -eq 0 ]; then say "sandbox gate ok"; exit 0; fi
 say "sandbox gate failed"
 exit 1

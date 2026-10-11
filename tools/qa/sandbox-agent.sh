@@ -5,6 +5,10 @@
 # a new file is written immediately. Deleting or replacing an existing file
 # prints MERIDIAN_SIGN and stops. The page asks for a fingerprint, then runs
 # a fresh command built from PATH, SRC, and DEST only.
+# Installing an apk prints MERIDIAN_SIGN install and stops, even inside the sandbox.
+# The page builds pm install from that PATH and runs it through Shizuku rish.
+# Reading the system log runs logcat through rish when that script is already exported.
+# A model already in Downloads is linked into ~/models.
 # A line that starts with TOOL is data. The shell does not run it.
 
 agent_need_box() {
@@ -350,6 +354,136 @@ agent_web() {
   agent_plain "$body"
 }
 
+agent_find_rish() {
+  local candidate
+  for candidate in "$HOME/rish" "$HOME/bin/rish" "$HOME/shizuku/rish"; do
+    if [ -f "$candidate" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  if [ -n "${PREFIX:-}" ] && [ -f "$PREFIX/bin/rish" ]; then
+    printf '%s\n' "$PREFIX/bin/rish"
+    return 0
+  fi
+  if command -v rish >/dev/null 2>&1; then
+    candidate=$(command -v rish)
+    if [ -n "$candidate" ] && [ -f "$candidate" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+agent_logs() {
+  local rish
+  rish=$(agent_find_rish) || {
+    echo "Shizuku is not in this shell yet."
+    echo "Open Shizuku, start it with Wireless debugging, choose Use Shizuku in terminal apps, and export rish into the Termux home folder."
+    echo "Termux alone cannot install an APK or read the system log."
+    return 0
+  }
+  sh "$rish" -c "logcat -d -t 80" | head -c 8000
+  echo
+}
+
+agent_install() {
+  local dest
+  dest=$(agent_resolve "$1") || { echo "That path was refused."; return; }
+  case "$dest" in
+    *.apk) ;;
+    *) echo "That path was refused."; return ;;
+  esac
+  case "$dest" in
+    "$HOME"/*) ;;
+    *) echo "That path was refused."; return ;;
+  esac
+  if [ -L "$dest" ]; then
+    echo "That path was refused."
+    return
+  fi
+  if [ ! -f "$dest" ]; then
+    echo "That apk is not on this phone."
+    return
+  fi
+  echo "MERIDIAN_SIGN install"
+  echo "PATH=$dest"
+  ls -lh -- "$dest"
+}
+
+agent_exact_model() {
+  local dir="$1" name="$2" n
+  [ -n "$name" ] || return 1
+  [ -f "$dir/$name" ] || return 1
+  [ -L "$dir/$name" ] && return 1
+  n=$(wc -c < "$dir/$name" | tr -d ' ')
+  [ "$n" -gt 1000000 ] || return 1
+  printf '%s\n' "$dir/$name"
+}
+
+agent_gemma_model() {
+  local dir="$1" candidate n
+  for candidate in "$dir"/gemma*.gguf "$dir"/Gemma*.gguf; do
+    [ -f "$candidate" ] || continue
+    [ -L "$candidate" ] && continue
+    n=$(wc -c < "$candidate" | tr -d ' ')
+    if [ "$n" -gt 1000000 ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+agent_adopt_model() {
+  local name="$1" dest found dir n
+  agent_charset "$name" 'A-Za-z0-9._+-' || { echo "That model name was refused."; return 1; }
+  case "$name" in
+    *.gguf) ;;
+    *) echo "That model name was refused."; return 1 ;;
+  esac
+  case "$name" in
+    */*|*..*) echo "That model name was refused."; return 1 ;;
+  esac
+  mkdir -p -- "$HOME/models" || { echo "Could not create ~/models."; return 1; }
+  dest="$HOME/models/$name"
+  if [ -f "$dest" ] && [ ! -L "$dest" ]; then
+    n=$(wc -c < "$dest" | tr -d ' ')
+    if [ "$n" -gt 1000000 ]; then
+      echo "Using ~/models/$name"
+      return 0
+    fi
+    rm -f -- "$dest"
+    echo "Removed a short file that was not the model."
+  fi
+  found=""
+  for dir in "$HOME/storage/downloads" "$HOME/storage/shared/Download" "$HOME/storage/shared/Downloads" "$HOME/downloads" "/sdcard/Download" "/sdcard/Downloads"; do
+    found=$(agent_exact_model "$dir" "$name") && break
+    found=""
+  done
+  if [ -z "$found" ]; then
+    case "$name" in
+      [Gg]emma*)
+        for dir in "$HOME/storage/downloads" "$HOME/storage/shared/Download" "$HOME/storage/shared/Downloads" "$HOME/downloads" "/sdcard/Download" "/sdcard/Downloads"; do
+          found=$(agent_gemma_model "$dir") && break
+          found=""
+        done
+        ;;
+    esac
+  fi
+  if [ -z "$found" ]; then
+    echo "No model file in Downloads yet."
+    return 1
+  fi
+  if ln -sfn -- "$found" "$dest"; then
+    echo "Using the file already in Downloads: $found"
+    return 0
+  fi
+  cp -f -- "$found" "$dest" || { echo "Could not copy the model."; return 1; }
+  echo "Using the file already in Downloads: $found"
+}
+
 agent_apply() {
   local src dest parent real landed
   src=$(agent_resolve "$1") || { echo "That path was refused."; return; }
@@ -420,6 +554,8 @@ agent_dispatch() {
       agent_edit "$path" "$old" "$new"
       ;;
     DELETE) agent_delete "$rest" ;;
+    LOGS) agent_logs ;;
+    INSTALL) agent_install "$rest" ;;
     SEARCH) agent_search "$rest" ;;
     WEB) agent_web "$rest" ;;
     APPLY)
