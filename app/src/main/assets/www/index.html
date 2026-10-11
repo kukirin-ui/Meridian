@@ -2569,7 +2569,7 @@ function supportPage() {
   return payPage();
 }
 function appVersion() {
-  try { return String(MeridianPhone.version() || "") || "2.3.27"; } catch (e) { return "2.3.27"; }
+  try { return String(MeridianPhone.version() || "") || "2.3.28"; } catch (e) { return "2.3.28"; }
 }
 function savedDownloads() {
   try {
@@ -2711,7 +2711,7 @@ const MESH_MODELS = {
 let meshName = "Meridian";
 let meshSkill = "code";
 let meshRevenue = "disabled";
-let meshTier = "mid";
+let meshTier = "premium";
 let meshLane = "cpu";
 let meshCard = "auto";
 let meshVoice = "";
@@ -2732,8 +2732,9 @@ function meshBoot() {
     if (skill === "code" || skill === "graphics" || skill === "understanding") meshSkill = skill;
     const rev = localStorage.getItem("m-mesh-revenue");
     if (rev === "disabled" || rev === "enabled") meshRevenue = rev;
+    const own = localStorage.getItem("m-mesh-tier-own") === "yes";
     const tier = localStorage.getItem("m-mesh-tier");
-    if (tier === "low" || tier === "mid" || tier === "high" || tier === "premium" || tier === "enterprise") meshTier = tier;
+    if (own && (tier === "low" || tier === "mid" || tier === "high" || tier === "premium" || tier === "enterprise")) meshTier = tier;
     const lane = localStorage.getItem("m-mesh-lane");
     if (lane === "cpu" || lane === "hybrid" || lane === "gpu") meshLane = lane;
     const card = localStorage.getItem("m-mesh-card");
@@ -2742,6 +2743,56 @@ function meshBoot() {
     if (voice && voice.length <= 120 && voice.indexOf("\n") < 0) meshVoice = voice;
   } catch (e) {}
   meshNameDraft = meshName;
+  meshLoadConfig();
+}
+function meshTierOwned() {
+  try { return localStorage.getItem("m-mesh-tier-own") === "yes"; } catch (e) { return false; }
+}
+function meshTierFromConfig(config) {
+  if (!config || typeof config !== "object") return "";
+  const tier = String(config.active_tier || "");
+  if (tier === "low" || tier === "mid" || tier === "high" || tier === "premium" || tier === "enterprise") return tier;
+  if (tier !== "custom") return "";
+  const path = String(config.custom_model_path || "");
+  if (!path || path.length > 300 || path.indexOf("..") >= 0 || path.indexOf("\n") >= 0) return "";
+  const file = path.split("/").pop();
+  const order = ["low", "mid", "high", "premium", "enterprise"];
+  for (let i = 0; i < order.length; i++) {
+    if (MESH_MODELS[order[i]].file === file) return order[i];
+  }
+  return "";
+}
+function meshApplyConfig(config) {
+  if (meshTierOwned()) return;
+  const tier = meshTierFromConfig(config);
+  if (!tier) return;
+  meshTier = tier;
+  const box = document.getElementById("mesh-model");
+  if (box && MESH_MODELS[tier]) box.value = tier;
+  paintMeshNotes();
+}
+function meshLoadConfig() {
+  if (meshTierOwned()) return;
+  let applied = false;
+  try {
+    if (window.MeridianPhone && MeridianPhone.meshConfig) {
+      const raw = String(MeridianPhone.meshConfig() || "");
+      if (raw.charAt(0) === "{") {
+        const config = JSON.parse(raw);
+        if (meshTierFromConfig(config)) {
+          meshApplyConfig(config);
+          applied = true;
+        }
+      }
+    }
+  } catch (e) {}
+  if (applied) return;
+  fetch("config.json").then(function (res) {
+    if (!res.ok) throw new Error("missing");
+    return res.json();
+  }).then(function (config) {
+    meshApplyConfig(config);
+  }).catch(function () {});
 }
 meshBoot();
 function meshLog(line) {
@@ -3363,11 +3414,13 @@ function saveMeshIdentity() {
     localStorage.setItem("m-mesh-skill", meshSkill);
     localStorage.setItem("m-mesh-revenue", meshRevenue);
     localStorage.setItem("m-mesh-tier", meshTier);
+    localStorage.setItem("m-mesh-tier-own", "yes");
     localStorage.setItem("m-mesh-card", meshCard);
     localStorage.setItem("m-mesh-lane", meshLane);
     localStorage.setItem("m-mesh-voice", meshVoice);
   } catch (e) {}
   meshRest();
+  paintMeshNotes();
   meshLog("Wake word saved as " + meshName + ". I will now only respond to " + meshName + ".");
   meshSpeak("Identity saved. I will now only respond to " + meshName);
 }

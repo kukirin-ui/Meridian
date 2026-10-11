@@ -1586,6 +1586,34 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Mesh model choice shipped with the app. The page applies it until a model is saved. */
+        @JavascriptInterface
+        public String meshConfig() {
+            InputStream in = null;
+            try {
+                in = getAssets().open("www/config.json");
+                byte[] buf = new byte[4096];
+                int off = 0;
+                while (off < buf.length) {
+                    int got = in.read(buf, off, buf.length - off);
+                    if (got < 0) break;
+                    if (got == 0) break;
+                    off += got;
+                }
+                if (off <= 0) return "{}";
+                return new String(buf, 0, off, StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                return "{}";
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+
         /** Reads a public web page as plain text. The address stays http or https. */
         @JavascriptInterface
         public String meshReadPage(String raw) {
@@ -1602,7 +1630,7 @@ public class MainActivity extends Activity {
                 conn.setConnectTimeout(8000);
                 conn.setReadTimeout(8000);
                 conn.setInstanceFollowRedirects(true);
-                conn.setRequestProperty("User-Agent", "Meridian/2.3.27");
+                conn.setRequestProperty("User-Agent", "Meridian/2.3.28");
                 int code = conn.getResponseCode();
                 URL landed = conn.getURL();
                 if (landed == null || !meshPublicHost(landed.getHost())) return "That page could not be read.";
