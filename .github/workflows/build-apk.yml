@@ -38,4 +38,5 @@ jobs:
         with:
           name: Meridian-sandbox-home
           path: dist/termux-home
+          include-hidden-files: true
           if-no-files-found: error
