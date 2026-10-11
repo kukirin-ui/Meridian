@@ -29,3 +29,14 @@ jobs:
           name: Meridian-2.3.28-debug
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Pack the Termux home sandbox
+        run: bash tools/qa/pack-sandbox-zip.sh
+
+      - name: Upload Meridian-sandbox-home
+        uses: actions/upload-artifact@v4
+        with:
+          name: Meridian-sandbox-home
+          path: dist/termux-home
+          include-hidden-files: true
+          if-no-files-found: error
