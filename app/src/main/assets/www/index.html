@@ -4163,6 +4163,9 @@ function render() {
   const prevBody = document.querySelector(".winbody");
   const savedBody = same && prevBody ? prevBody.scrollTop : 0;
   const savedMain = same && main ? main.scrollTop : 0;
+  const prevTerm = document.getElementById("term");
+  const savedTerm = same && prevTerm ? prevTerm.scrollTop : 0;
+  const termAtEnd = !prevTerm || (prevTerm.scrollHeight - prevTerm.scrollTop - prevTerm.clientHeight < 24);
   window.__place = place;
   const focused = document.activeElement && document.activeElement.id === "line";
   const pageBody = (map[view] || homePage)();
@@ -4203,7 +4206,17 @@ function render() {
     const end = document.getElementById("logend");
     if (end) end.scrollIntoView({ block: "end" });
   }
-  if (focused) { const input = document.getElementById("line"); if (input) input.focus(); }
+  if (view === "console") {
+    const stick = consoleStick || !same || termAtEnd;
+    const wantFocus = consoleStick;
+    consoleStick = false;
+    if (stick) consoleToEnd(wantFocus);
+    else {
+      const term = document.getElementById("term");
+      if (term) term.scrollTop = savedTerm;
+    }
+  }
+  if (focused) { const input = document.getElementById("line"); if (input) input.focus({ preventScroll: true }); }
   if (document.getElementById("dlcount")) refreshDownloads();
   if (!same && resolvedMotion() !== "reduce") {
     const nodes = document.querySelectorAll(".page .ico, .page .chip, .page .tile, .page .pack, .page .aboutbtn");
@@ -5243,7 +5256,23 @@ function finishExec(code) {
   const n = Number(code);
   if (cb) cb(Number.isFinite(n) ? n : 1);
 }
+let consoleStick = false;
+function consoleToEnd(focusInput) {
+  function go() {
+    const term = document.getElementById("term");
+    if (term) term.scrollTop = term.scrollHeight;
+    const body = document.querySelector(".winbody");
+    if (body) body.scrollTop = body.scrollHeight;
+    if (focusInput && !busy) {
+      const input = document.getElementById("line");
+      if (input && document.activeElement !== input) { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }
+    }
+  }
+  go();
+  if (typeof requestAnimationFrame === "function") requestAnimationFrame(go);
+}
 function pushBlock(log, block) {
+  consoleStick = true;
   log.push(block);
   while (log.length > MAX_BLOCKS) log.shift();
 }
@@ -5351,6 +5380,8 @@ function exec(title, cmd, done) {
             const term = document.getElementById("term");
             if (term) term.scrollTop = term.scrollHeight;
             else node.scrollTop = node.scrollHeight;
+            const body = document.querySelector(".winbody");
+            if (body) body.scrollTop = body.scrollHeight;
           }
           if (fixKind(text) && !document.getElementById("fixerr")) render();
         }
@@ -5366,6 +5397,7 @@ function exec(title, cmd, done) {
     const finalOut = cleanOut(clipOut(s.out || ""));
     log[log.length - 1].out = finalOut;
     busy = false;
+    consoleStick = true;
     try { MeridianPhone.keepAwake(false); } catch (e) {}
     const code = (finalOut.match(/exit (\d+)\s*$/) || [0, "0"])[1];
     announce(code === "0" ? "Command finished." : "Command finished with exit code " + code + ".");
