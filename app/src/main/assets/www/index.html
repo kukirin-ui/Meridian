@@ -337,8 +337,6 @@
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
     nav button { flex: 0 0 48px; min-height: 48px; }
     #main { padding: 8px 10px 10px 116px; }
-    body.console #main { padding-bottom: 70px; }
-    #dock { left: 116px; bottom: 12px; }
     .desk .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .filegrid, .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .pair, .modes { max-width: 720px; }
@@ -352,6 +350,12 @@
   #dock.on { display: flex; align-items: center; }
   #dock input { flex: 1; font-size: var(--term-size); }
   #dock .btn { width: auto; flex: none; height: 44px; min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--btn); color: var(--btnfg); box-shadow: none; }
+  @media (min-width: 720px) {
+    /* Wide/landscape: dock the command bar inside the main column, right of the side nav (must come after the base #dock rule) */
+    #dock { left: 116px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); }
+    body.console #main { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+    body.console .term { max-height: max(120px, calc(100dvh - 250px)); }
+  }
   .desk { border: 0; border-radius: 0; overflow: visible; background: transparent; animation: none; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 6px; padding: 12px; min-height: 0; align-content: start; }
   .deskbar { position: relative; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 10px; background: var(--header); border-bottom: 1px solid transparent; }
