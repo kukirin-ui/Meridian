@@ -1,81 +1,8 @@
-# Meridian 1.8.6 — audit and roadmap
+# Meridian — historical audit and roadmap
 
-Written against 1.8.6 (package `com.meridian.shell`, versionName `1.8.6`, versionCode `36`), the APK still listed at [meridian0.grok.me](https://meridian0.grok.me). **Superseded by the app in `app/`.** The 1.8.6 copy that used to live in `original/` and `meridian-source.zip` was removed in 2.3.0. The current phone UI is `app/src/main/assets/www/index.html` and the bridge is `app/src/main/java/com/meridian/shell/MainActivity.java`.
+Written against the 1.8.6 build (package `com.meridian.shell`). **Superseded by the app in `app/`.** Kept for reference. The licensing and monetization sections were removed when Meridian became open source under the MIT licence (see `LICENSE`).
 
-**Licence (from 2.3.4):** The MIT sentence in the next section describes that 1.8.6 tree. Current Meridian is proprietary. All rights reserved. See `LICENSE`.
-
-This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account. A Revolut WebView is the only checkout.
-
-Work in the order below. Each item names the file and the change. Nothing here is a generic “add tests” note without a target.
-
----
-
-## How money works today, and why it will not
-
-`MainActivity.OPEN` is `false`. `Deck.unlocked()` returns `"yes"` only when `files/full.key` exists. `showPay()` loads a fixed Revolut URL and, on every page finish, reads `document.body.innerText`. If that text contains `payment successful`, `thank you`, `you're all set`, `you are all set`, or `payment complete`, it writes `full.key` with the bytes `paid`.
-
-```java
-// MainActivity.java showPay(), onPageFinished
-if (text.contains("payment successful") || text.contains("thank you")
-    || text.contains("you're all set") || text.contains("you are all set")
-    || text.contains("payment complete")) {
-    markPaid();
-}
-```
-
-Three facts make this a bad cash register:
-
-1. The check is a substring of a page the user can influence inside that WebView (checkout copy, a redirect, a hosted “thank you” before money moves). Unlock and settlement are not the same event.
-2. `full.key` is an unsigned local file. Clearing app data deletes a real purchase. Creating the file grants one. `OPEN = true` at line 37 compiles a build that calls `markPaid()` on every `unlocked()` call.
-3. The repository is MIT. The people who use Termux can read this file. They will not pay to flip a boolean they can see.
-
-The paywall also blocks the activation path. `gate()` in `index.html` sends `setup`, `console`, `build`, `plan`, `tweaks`, `doctor`, and `commands` to the pay screen. The home Setup button is `data-go="setup"`, so a new user who has not paid cannot open the guided F-Droid / Termux steps. The dashboard is free. The thing that makes Meridian different from a battery widget is locked before the first successful command. That is the conversion bug.
-
-`exec()` calls `gate("build")` before every command, but `Deck.entries`, `readFile`, `writeFile`, `makeDir`, and `run` do not check `unlocked()`. Files stays usable unpaid. The lock is a JavaScript courtesy, not a product boundary.
-
-### What to sell instead
-
-Sell a service and a signed entitlement. Keep the instrument (dashboard, hardware, system, battery, connect, and the first setup steps) free. That is the demo.
-
-| Offer | Price shape | What is actually scarce |
-|---|---|---|
-| Meridian Pro, one time | €6.99 via Google Play Billing on the Play build, or a license key on the F-Droid / sideload build | Doctor, command library, build recipes, multi-session console, file move/delete, export |
-| Meridian Relay, optional monthly | €3.99 / month, cancel any time | Your server holds the provider key. The phone sends the goal, you call Groq or OpenRouter, you meter tokens. The user’s own key stays free forever |
-| Packs | €1.99 each, or included in Pro | Local model pack, SSH pack, proot Debian/Ubuntu pack. Each pack is a tested script plus a “what it will change” card |
-| Supporter | €3, no features | Separate from Pro, on the Support screen, so dashboard-only people can pay without hitting a wall |
-
-Do not paywall Setup, Connect, System check, or Copy the bond line. Those are the funnel. Paywall the library after the first command has printed `ok`.
-
-Play Store digital unlocks must use Play Billing. The Revolut WebView can stay on the sideload build only. Shipping the Revolut checkout inside a Play listing is a policy rejection, not a pricing choice.
-
-Receipt rule: the phone stores a Play purchase token or a signed license (`payload || ed25519(payload)`), not the word `paid`. Restore is a button on Support. A new phone restores. A text match never unlocks.
-
-```java
-private boolean entitlementOk(String payload, String sigB64) {
-    try {
-        byte[] pub = Base64.decode(LICENSE_PUB_B64, Base64.DEFAULT);
-        Signature sig = Signature.getInstance("Ed25519");
-        sig.initVerify(KeyFactory.getInstance("Ed25519")
-            .generatePublic(new X509EncodedKeySpec(pub)));
-        sig.update(payload.getBytes(StandardCharsets.UTF_8));
-        return sig.verify(Base64.decode(sigB64, Base64.DEFAULT));
-    } catch (GeneralSecurityException ex) {
-        return false;
-    }
-}
-```
-
-Generate the keypair off the phone. The APK holds only the public key. The private key stays on the machine that fulfills Play or the license site. `markPaid()` goes away.
-
-Relay (the monthly product) is a tiny HTTPS endpoint:
-
-- `POST /v1/plan` with the Play token or license, the goal string, and no provider key.
-- Server checks the entitlement, calls the provider, returns `{ answer, steps }`.
-- Rate limit per license (for example 40 plans / day).
-- Log tokens and cost, not the raw key.
-- The on-device `askNet` path remains for people who paste their own key, and it stays free. You make money when they would rather not create a Groq or OpenRouter account.
-
-Own-key users are not a leak. They are the free tier that makes the paid relay feel optional, which is what this audience will tolerate.
+This is a Termux command deck: live CPU, GPU, RAM, battery, and thermals on the phone, plus curated shell recipes (setup, doctor, build, plan) that run in Termux through `com.termux.app.RunCommandService`. There is no account.
 
 ---
 
@@ -296,7 +223,7 @@ Collapse to five:
 2. **Phone** — hardware + system + battery as three segments inside one screen, not three tabs.
 3. **Work** — Build and Plan, with Key and APIs as a single “Model” sheet reached from Plan when no key is saved.
 4. **Termux** — Files, Console, Setup, Doctor, Tweaks, Commands.
-5. **You** — theme, connection, license, restore, support, about.
+5. **You** — theme, connection, support, about.
 
 ```css
 nav button { flex: 1 0 0; min-height: 48px; font-size: 11px; }
@@ -381,7 +308,6 @@ Skip, on purpose: a social feed, accounts, cloud sync of shell history, a second
 | Confirm before Run | on for install/uninstall/sshd | P0 item 10 |
 | Keep screen on during a job | off | Calls the existing `termux-wake-lock` / `termux-wake-unlock` pair around `exec` |
 | Reduced motion | follow system | You already have a partial media query |
-| License | show last four of the order and Restore | Replaces “this phone is locked until you pay” |
 | Clear command log | button | Sessions are not persisted today; once they are, this is required |
 | Export readings | button | One JSON from the last `probe()` via the share sheet |
 
@@ -409,7 +335,7 @@ Implement with one `keydown` listener on `document`, ignore it when the target i
 - `configChanges` includes orientation, so the WebView is not recreated. Good. Persist `view`, `cwd`, and `sessions` anyway, because the process still dies.
 - `onRequestPermissionsResult` is missing. After the user answers `RUN_COMMAND`, nothing calls `bond()` again until they press Connect. Override it and `render()` from JS via `web.evaluateJavascript`.
 - Notification permission is not required for a low channel on 26+, but a foreground service is the right way to keep a long `pkg upgrade` alive. Termux already runs the command; Meridian only needs the ongoing notification so Android does not freeze the WebView timer.
-- Ship per-ABI or a universal APK plus a SHA-256 on meridian0.grok.me. The site currently has three steps and no version, no checksum, and no price. Put `2.0.0`, the hash, and “dashboard free, Pro €6.99” on that page before any redesign. The page is not in this repo; upload the APK there after `./gradlew assembleRelease`.
+- Ship per-ABI or a universal APK plus a SHA-256 checksum with each GitHub release.
 - `cpuCores()` stops at 16. Read `/sys/devices/system/cpu/present` instead of `for (i < 16)`.
 
 ### Not a desktop app, not an iOS app
@@ -418,7 +344,6 @@ The bridge is `com.termux.permission.RUN_COMMAND` and `/data/data/com.termux/fil
 
 Do this instead:
 
-- **Web:** keep meridian0.grok.me as the download page (it is not in this repo). After 2.0 ships, replace the APK, add the price, the checksum, and a short “free vs Pro” list. No account portal.
 - **Laptop:** the LAN snapshot in P2 item 5, plus the Remote shell recipe that already installs `sshd`. Document the port and that `sshd` with no password is a hole; the recipe should print “set a password or a key before you leave this screen” and refuse to start `sshd` until `passwd` has been run or an authorized key exists.
 - **iOS:** do not promise it. If you ever do a cousin app, it is a different shell (a-Shell or libssh to the Android phone), not a port of this Activity.
 
@@ -457,7 +382,7 @@ and set `healthtext.textContent` in `paintMeters`.
 
 ## Suggested build order
 
-1. **Trust and cash.** Receiver `exported=false`. Stop unlocking on page text. Free Setup and System check. Play Billing or signed licenses. Price and checksum on the download site. This is the only week that changes revenue.
+1. **Trust.** Receiver `exported=false`. Free Setup and System check. Checksums on GitHub releases.
 2. **Stop the dead ends.** `WebChromeClient` prompts, sticky `sick()`, persisted disconnect, recipe confirmations, heredoc/base64 runner, `startJob` overlap and timeout.
 3. **Five tabs and a command filter.** Same brass palette, fixed tokens, reduced motion that includes the orb.
 4. **Receipts, reattach, Test key.** Then Relay if own-key usage shows people actually press Plan.
