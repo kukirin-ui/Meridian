@@ -77,8 +77,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
-    /** Meridian is open source (MIT). Every feature is available to everyone. */
-    static final boolean OPEN = true;
     /** Optional donation / Premium support link. Paying never changes which features work. */
     private static final String PAY_URL = "https://checkout.revolut.com/pay/044a268e-4869-4708-9b0f-8e302cc28c37";
     private WebView web;
@@ -174,7 +172,6 @@ public class MainActivity extends Activity {
         fitKeyboard(web);
         concealStatusBar();
         watchSignal();
-        adoptLegacyUnlock();
         generateHardwareBoundKey();
         ensureMeshTts();
     }
@@ -1740,61 +1737,6 @@ public class MainActivity extends Activity {
             });
         }
 
-        /** Compatibility stub. Everything is already available. */
-        @JavascriptInterface
-        public String devUnlock(String pass) {
-            return "premium";
-        }
-
-        @JavascriptInterface
-        public String workspace() {
-            try {
-                JSONObject o = new JSONObject();
-                o.put("personal", claimsSku(readSmallText(slotFile("personal"), 12000)));
-                o.put("enterprise", claimsSku(readSmallText(slotFile("enterprise"), 12000)));
-                String active = readSmallText(new File(getFilesDir(), "slot-active"), 32);
-                if (!knownSlot(active)) active = "personal";
-                o.put("active", active);
-                return o.toString();
-            } catch (Exception ex) {
-                return "{\"personal\":\"\",\"enterprise\":\"\",\"active\":\"personal\"}";
-            }
-        }
-
-        @JavascriptInterface
-        public String saveWorkspace(String slot, String key) {
-            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
-            String result = activate(key);
-            try {
-                JSONObject o = new JSONObject(result);
-                if (!o.optBoolean("ok")) return result;
-                String normalized = key == null ? "" : key.trim().replace("\r", "").replace("\n", "").replace(" ", "");
-                writeText(slotFile(slot), normalized);
-                writeText(new File(getFilesDir(), "slot-active"), slot);
-                markTier(o.optString("sku", "pro"));
-                return result;
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The workspace could not be saved.\"}";
-            }
-        }
-
-        @JavascriptInterface
-        public String useWorkspace(String slot) {
-            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
-            String key = readSmallText(slotFile(slot), 12000);
-            if (key.length() == 0) return "{\"ok\":false,\"error\":\"That workspace has no key yet.\"}";
-            String result = activate(key);
-            try {
-                JSONObject o = new JSONObject(result);
-                if (!o.optBoolean("ok")) return result;
-                writeText(new File(getFilesDir(), "slot-active"), slot);
-                markTier(o.optString("sku", "pro"));
-                return result;
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The workspace could not be opened.\"}";
-            }
-        }
-
         @JavascriptInterface
         public void haptic() {
             runOnUiThread(new Runnable() {
@@ -1807,12 +1749,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void keepAwake(boolean on) {
             MainActivity.this.keepAwake(on);
-        }
-
-            /** Compatibility stub. Meridian is open source, so no key is needed. */
-        @JavascriptInterface
-        public String activate(String key) {
-            return "{\"ok\":true,\"sku\":\"premium\"}";
         }
 
         @JavascriptInterface
@@ -1842,17 +1778,6 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 return "{\"done\":true,\"out\":\"status error\",\"code\":1}";
             }
-        }
-
-        @JavascriptInterface
-        public String unlocked() {
-            return "yes";
-        }
-
-        /** Every install has the full feature set. Pro and Premium are the same level. */
-        @JavascriptInterface
-        public String tier() {
-            return "premium";
         }
 
         @JavascriptInterface
@@ -1910,28 +1835,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void stopSpeed() {
             if ("run".equals(speedJson)) speedJson = "{\"ok\":false,\"error\":\"The test timed out.\"}";
-        }
-
-        @JavascriptInterface
-        public String choosePlan(String sku) {
-            try {
-                if ("free".equals(sku)) {
-                    new File(getFilesDir(), "full.key").delete();
-                    new File(getFilesDir(), "dev.unlock").delete();
-                    return "{\"ok\":true,\"sku\":\"free\"}";
-                }
-                if ("pro".equals(sku)) {
-                    markTier("pro");
-                    return "{\"ok\":true,\"sku\":\"pro\"}";
-                }
-                if ("premium".equals(sku)) {
-                    markTier("premium");
-                    return "{\"ok\":true,\"sku\":\"premium\"}";
-                }
-                return "{\"ok\":false,\"error\":\"Unknown plan.\"}";
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The plan could not be changed.\"}";
-            }
         }
 
         @JavascriptInterface
@@ -2167,12 +2070,6 @@ public class MainActivity extends Activity {
                     });
                 }
             }, "meridian-ask").start();
-        }
-
-        /** Compatibility stub. There is no trial; every feature is always on. */
-        @JavascriptInterface
-        public int trialLeft() {
-            return 0;
         }
 
         /** Public GitHub .apk download total. Calls back with a number, or "" when the request fails. */
@@ -2414,36 +2311,8 @@ public class MainActivity extends Activity {
         return line.matches("(?i)^(?:(?:pkg|apt|apt-get|dpkg|curl|wget|getprop|termux-[a-z0-9-]+|python3?|pip3?|npm|npx|node|git|clang|gcc|cmake|make|ninja|ls|cat|free|df|du|uname|ping|ssh|ssh-keygen|sshd|vim|nvim|nano|cd|mkdir|echo|printf|export|chmod|chown|cp|mv|rm|tar|unzip|zip|sed|awk|grep|rg|find|which|source|bash|sh|proot-distro|cargo|rustc|go|java|javac|ruby|php|lua|perl|ffmpeg|sqlite3|rsync|tmux|nproc|env|test|llama-cli|llama-server)\\b|clang\\+\\+|g\\+\\+|\\[ |\\./).*");
     }
 
-    /** Legacy compatibility: records the plan name. Features never depend on it. */
-    private void markPaid(String sku) {
-        try {
-            java.io.File out = new java.io.File(getFilesDir(), "full.key");
-            String current = readSmallText(out, 32);
-            String next = ("premium".equals(sku) || "premium".equals(current)) ? "premium" : "pro";
-            writeText(out, next);
-            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
-        } catch (Exception ignored) {}
-    }
-
-    /** Legacy compatibility: records the plan name. Features never depend on it. */
-    private void markTier(String sku) {
-        try {
-            String next = "premium".equals(sku) ? "premium" : "pro";
-            writeText(new File(getFilesDir(), "full.key"), next);
-            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
-        } catch (Exception ignored) {}
-    }
-
     private boolean debuggable() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    }
-
-    private boolean knownSlot(String slot) {
-        return "personal".equals(slot) || "enterprise".equals(slot);
-    }
-
-    private File slotFile(String slot) {
-        return new File(getFilesDir(), "slot-" + slot + ".key");
     }
 
     private void writeText(File file, String text) throws Exception {
@@ -2454,20 +2323,6 @@ public class MainActivity extends Activity {
         } finally {
             stream.close();
         }
-    }
-
-    /** Legacy compatibility: display-only plan name from an old stored workspace value. */
-    private String claimsSku(String key) {
-        try {
-            String k = key == null ? "" : key.trim();
-            if (k.startsWith("MERIDIAN-")) k = k.substring(9);
-            int dot = k.indexOf('.');
-            if (dot <= 0) return "";
-            byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
-            String sku = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8)).optString("sku", "");
-            if ("pro".equals(sku) || "premium".equals(sku)) return sku;
-        } catch (Exception ignored) {}
-        return "";
     }
 
     private String readSmallText(File file, int max) {
@@ -2486,10 +2341,6 @@ public class MainActivity extends Activity {
         } catch (Exception ex) {
             return "";
         }
-    }
-
-    /** No-op. Meridian is open source and needs no key file. */
-    private void adoptLegacyUnlock() {
     }
 
     /** Opens the optional donation / Premium support page in the system browser. */
@@ -3331,15 +3182,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String effectiveTier() {
-        return "premium";
-    }
-
     private int platformCap() {
-        String tier = effectiveTier();
-        if ("premium".equals(tier)) return 32;
-        if ("pro".equals(tier)) return 8;
-        return 0;
+        return 32;
     }
 
     private File platformFile() {

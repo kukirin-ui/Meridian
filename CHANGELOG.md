@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - All features are available to everyone: no licence key, trial, or paywall. Pro and Premium are the same feature level; Premium is optional support aimed at businesses.
 - "Plans" is now **Support & Plans**, with a **Donate** button (same checkout link as before, now optional) and **Get support** (email) and **Source code** buttons.
 - About screen and Terms now show the MIT licence.
+- Removed all paywall, trial, preview, lock, and licence-key code paths (JS and Java bridge), including the imagined-preview mode.
 
 ### Added
 - Mesh v2 bundle (`mesh-v2/`: worker, router, Add links, `my-knowledge/`), sandbox sets, and the `setTimeout(meshBoot, 0)` startup fix from the v4 build.

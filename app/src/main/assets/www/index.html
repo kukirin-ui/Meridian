@@ -331,11 +331,8 @@
   nav button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   nav button.on { color: var(--accent); }
   nav button.on::before { content: ""; position: absolute; top: 2px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
-  nav button.lock::after { content: "PRO"; position: absolute; top: 4px; right: 6px; font-size: 7px; font-weight: 800; letter-spacing: .08em; padding: 1px 4px; border-radius: 6px; background: var(--accent); color: var(--btnfg); line-height: 1.2; }
   .probadge { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .08em; padding: 2px 6px; border-radius: 6px; background: var(--accent); color: var(--btnfg); vertical-align: middle; margin-left: 6px; }
   .meshlog { max-height: 220px; overflow: auto; white-space: pre-wrap; margin: 0; font: 0.8125rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .trialline { text-align: center; color: var(--muted); font-size: 0.75rem; margin: 0 0 8px; }
-  .trialline button { background: none; border: 0; padding: 0; min-height: 0; color: var(--accent); font: inherit; text-decoration: underline; }
   @media (min-width: 720px) {
     nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
     nav button { flex: 0 0 48px; min-height: 48px; }
@@ -464,7 +461,6 @@
   .introtitle { display: flex; align-items: center; gap: 12px; min-height: 52px; }
   .introtitle h2 { margin: 0; }
   .intromark { width: 44px; height: 44px; color: var(--icon); background: transparent; flex: none; display: block; }
-  .imagine { margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--accent); border-radius: 12px; color: var(--fg); font-size: 13px; line-height: 1.4; }
   .introprivacy { margin: 0; color: var(--fg); font-size: 1.05rem; line-height: 1.45; }
   .introslide .rowline { border: 1px solid var(--accent); border-radius: 14px; margin: 0; width: 100%; min-height: 48px; }
   .introslide .rowline::after { display: none; }
@@ -1085,10 +1081,7 @@ function resolvedTheme() {
   } catch (e) {}
   return "dark";
 }
-let lookPreviewAccent = "";
-let lookPreviewUntil = 0;
 function resolvedMotion() {
-  if (!paid()) return "reduce";
   if (prefs.motion === "reduce" || prefs.motion === "full") return prefs.motion;
   try {
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return "reduce";
@@ -1120,7 +1113,6 @@ function applySkin() {
   let chosen = prefs.theme || "oled";
   if (chosen !== "system" && chosen !== "dark" && chosen !== "light" && chosen !== "oled") chosen = "oled";
   let accent = prefs.accent || "pink";
-  if (!paid()) accent = (Date.now() < lookPreviewUntil && ACCENTS[lookPreviewAccent]) ? lookPreviewAccent : "pink";
   if (!ACCENTS[accent]) accent = "pink";
   const visual = chosen === "system" ? resolvedTheme() : chosen;
   const light = visual === "light";
@@ -1366,45 +1358,14 @@ function esc(s) {
   });
 }
 function phone() {
-  if (previewing()) return SAMPLE_PHONE;
   try { statusCache = JSON.parse(MeridianPhone.status()); } catch (e) {}
   return statusCache;
 }
 function live() {
-  if (previewing()) return SAMPLE_LIVE;
   const now = Date.now();
   if (now - probeAt < 240 && probeCache.memTotal) return probeCache;
   try { probeCache = JSON.parse(MeridianPhone.probe()); probeAt = now; } catch (e) {}
   return probeCache;
-}
-const SAMPLE_PHONE = {
-  product: "Preview", model: "Preview Phone", rawModel: "preview-phone", battery: 76,
-  temp: 31.4, tempKnown: true, voltage: 4.08, currentMa: -420, chargeMah: 3200,
-  state: "Discharging", power: "regular", release: "14", gpu: "Preview GPU",
-  chip: "Preview SoC", platform: "preview", width: 1080, height: 2400, hz: 120, dpi: 420, abi: "arm64-v8a"
-};
-const SAMPLE_LIVE = {
-  brand: "Sample", device: "preview", board: "preview-board", maker: "Sample",
-  soc: "Preview SoC", hardware: "preview-hw", cpuinfo: "8-core sample", cores: 8,
-  coresLive: [0, 1, 2, 3, 4, 5, 6, 7].map(function (id) { return { id: id, mhz: 1800 }; }),
-  load1: "0.40", memTotal: 8589934592, memFree: 3328599654, memCached: 1288490188, memRaw: 858993459,
-  diskTotal: 137438953472, diskFree: 57982058496, ramType: "LPDDR5", cpuPct: 18, gpuLoad: 11, gpuHz: 450,
-  renderer: "Preview GPU", egl: "OpenGL ES 3.2", sdk: "34", oneui: "", abi: "arm64-v8a",
-  patch: "2026-01-01", buildId: "PREVIEW", built: "1 Jan 2026", kernel: "6.1.0-preview", fingerprint: "",
-  clocks: [{ gov: "schedutil" }], rx: 24000, tx: 6000, linkDown: 0, linkUp: 0, netClosed: false,
-  swapTotal: 4294967296, swapFree: 4294967296, zramTotal: 0, zramOrig: 0, zramComp: 0, ramPlus: 0,
-  zones: [{ name: "battery", c: "31.4" }, { name: "soc", c: "33.0" }], ufs: ""
-};
-function previewing() {
-  if (paid()) return false;
-  if (view === "home" || view === "pay") return false;
-  if (view === "settings") return false;
-  if (view === "tools" && (more === "about" || more === "docs" || more === "privacy" || more === "language" || more === "mesh")) return false;
-  return true;
-}
-function imagineNote() {
-  if (!previewing()) return "";
-  return '<p class="imagine" role="note">Imagined preview. These numbers are not this phone.</p>';
 }
 function gb(n) { n = Number(n) || 0; if (n <= 0) return "0"; const g = n / 1073741824; return (g >= 10 ? g.toFixed(1) : g.toFixed(1)) + " GB"; }
 function pctOf(total, free) { total = Number(total) || 0; if (total <= 0) return "—"; return Math.round(100 * (total - Number(free || 0)) / total) + "%"; }
@@ -1826,7 +1787,7 @@ function systemPage() {
   html += row("Build", p.buildId);
   html += row("Built", p.built);
   html += row("Kernel", shortKernel(p.kernel));
-  const shellLine = previewing() ? "Linux preview 6.1.0-preview aarch64" : (senseText || (bond === "termux" ? "Reading the shell…" : "Connect Termux. This line is uname from that shell."));
+  const shellLine = (senseText || (bond === "termux" ? "Reading the shell…" : "Connect Termux. This line is uname from that shell."));
   html += '</article><p class="sec">Termux</p><article class="plate"><p id="senseline">' + esc(shellLine) + '</p></article>';
   if (p.fingerprint) html += '<article class="plate"><p class="muted">' + esc(p.fingerprint) + '</p></article>';
   return html + '</div>';
@@ -1887,7 +1848,7 @@ function hardwarePage() {
   html += '</article><p class="sec">Model fit</p><article class="plate"><p id="modelfit">' + esc(modelFitLine(p)) + '</p></article><p class="sec">Storage</p><article class="plate">';
   html += row("Size", gb(p.diskTotal));
   html += row("Free", gb(p.diskFree));
-  if (premium() && p.ufs) html += row("UFS", hw(p.ufs));
+  if (p.ufs) html += row("UFS", hw(p.ufs));
   const ratio = p.zramOrig > 0 && p.zramComp > 0 ? (p.zramOrig / p.zramComp).toFixed(1) + "×" : "";
   const zramLine = p.zramTotal ? gb(p.zramOrig) + " of " + gb(p.zramTotal) + (ratio ? " · " + ratio : "") : "No ZRAM reading on this phone.";
   html += '<button class="accordion" type="button" id="zramtoggle" aria-expanded="' + (zramOpen ? "true" : "false") + '"><span>ZRAM</span><i class="chev" aria-hidden="true"></i></button><div class="accordion-body" id="zrambody"' + (zramOpen ? "" : " hidden") + '><p class="hwmono">' + esc(zramLine) + '</p></div>';
@@ -1971,9 +1932,6 @@ function sessionLabel(i) {
   return name || ("Session " + (i + 1));
 }
 function consoleView() {
-  if (previewing()) {
-    return '<div class="stack"><div class="term" role="log" aria-label="Terminal output"><div class="line"><span class="ps">$</span> echo imagined</div><div class="out">This console is an imagined preview.\nexit 0</div></div></div>';
-  }
   let bar = '<div class="sessions" role="tablist" aria-label="Sessions">';
   sessions.forEach(function (_s, i) {
     bar += '<button class="ghost' + (i === sessionIx ? " on" : "") + '" type="button" role="tab" aria-selected="' + (i === sessionIx) + '" data-ses="' + i + '">' + esc(sessionLabel(i)) + '</button>';
@@ -2631,13 +2589,9 @@ function savedDownloads() {
 }
 function securityPage() {
   let n = {};
-  if (previewing()) {
-    n = { wifi: true, cell: false, vpn: false, iface: "wlan0", downKbps: 86600, upKbps: 43300, dns: ["1.1.1.1"], addrs: ["192.0.2.24"], listeners: ["127.0.0.1:8080"] };
-  } else {
-    let raw = "{}";
-    try { raw = MeridianPhone.networkPosture(); } catch (e) { raw = "{}"; }
-    try { n = JSON.parse(raw) || {}; } catch (e) { n = {}; }
-  }
+  let raw = "{}";
+  try { raw = MeridianPhone.networkPosture(); } catch (e) { raw = "{}"; }
+  try { n = JSON.parse(raw) || {}; } catch (e) { n = {}; }
   const p = live();
   const net = netView(p);
   const transport = uniqueParts([n.wifi ? "Wi-Fi" : "", n.cell ? "Cellular" : "", n.vpn ? "VPN" : ""]).join(" · ");
@@ -2700,7 +2654,6 @@ function languagePage() {
   return '<div class="stack"><article class="plate stack"><b>' + esc(t("language")) + '</b><div class="setrow"><div class="k">' + esc(t("language")) + '</div>' + seg("lang", LANGS) + '</div></article><p class="muted">Language is available on every plan.</p></div>';
 }
 function deskPage() {
-  if (!premium()) return '<div class="stack"><article class="plate stack"><b>Desk</b><p class="muted">Desk is part of Premium.</p></article></div>';
   const p = live();
   const s = phone();
   let html = '<div class="stack"><article class="plate stack"><b>Desk</b><p class="muted">' + esc(t("agentHint")) + '</p></article>';
@@ -2715,7 +2668,6 @@ function deskPage() {
   return html + '</div>';
 }
 function settingsPage() {
-  if (!paid()) return languagePage();
   let html = '<div class="stack"><article class="plate stack"><b>' + esc(t("look")) + '</b>';
   html += '<div class="setrow"><div class="k">' + esc(t("theme")) + '</div>' + seg("theme", [["system", t("themeSystem")], ["dark", t("themeDark")], ["light", t("themeLight")], ["oled", t("themeOled")]]) + '</div>';
   html += '<div class="setrow"><div class="k">' + esc(t("accent")) + '</div><div class="accentrow">';
@@ -2996,7 +2948,7 @@ function meshPullLocalConfig(done) {
     + "  echo MERIDIAN_WWW_FILES_END\n"
     + "fi\n"
     + "echo MERIDIAN_LOCAL_READ_END\n";
-  if (typeof MeridianPhone === "undefined" || !paid()) {
+  if (typeof MeridianPhone === "undefined") {
     if (done) done(null);
     return;
   }
@@ -3050,7 +3002,7 @@ function meshLoadConfig() {
     applyAsset(config);
   }).catch(function () {});
 }
-setTimeout(meshBoot, 0); // defer: paidAt/paidCache are declared later (TDZ)
+setTimeout(meshBoot, 0); // defer until the rest of the script has loaded
 function meshLog(line) {
   const stamp = new Date().toLocaleTimeString();
   meshLines.push("[" + stamp + "] " + line);
@@ -3431,7 +3383,7 @@ function meshPrefetchCard(id) {
   if (skill) meshLoadCard(skill);
 }
 function meshPhoneReady() {
-  return typeof MeridianPhone !== "undefined" && !!paid();
+  return typeof MeridianPhone !== "undefined";
 }
 function meshDryRun(question, skill) {
   const scout = QWEN_MESH.scout;
@@ -4100,7 +4052,7 @@ function toolsPage() {
     + '<button class="ico" type="button" data-more="mesh">' + mark("wake") + '<em>Mesh</em></button>'
     + (linked ? setup : "")
     + '</div>';
-  if (premium()) {
+  {
     html += '<div class="bend"></div><p class="sec">Desk</p><div class="grid">'
       + '<button class="ico" type="button" data-more="desk">' + mark("readout") + '<em>Desk</em></button>'
       + '</div>';
@@ -4144,21 +4096,9 @@ function windowTitle() {
   }
   return t("titleHome");
 }
-let paidAt = 0;
-let paidCache = false;
-let tierAt = 0;
-let tierCache = "free";
 let logoPressed = false;
 // Meridian is open source (MIT). Every feature is available to everyone, with no key and no payment.
 // Pro and Premium are the same feature level; Premium is the optional business support tier.
-function licensed() { paidCache = true; paidAt = Date.now(); return true; }
-function tier() { tierCache = "premium"; tierAt = Date.now(); return "premium"; }
-function premium() { return true; }
-function trialDays() { return 0; }
-function paid() { return true; }
-const PRO = { tweaks: 1, "files-write": 1, pc: 1 };
-// Batch scripts and UFS follow premium(), which is always true.
-const PREMIUM_ON = false;
 function payNote() {
   return "";
 }
@@ -4195,7 +4135,6 @@ function payPage() {
   html += tierCard("Business", "Premium", "Optional support", "The same features as Pro, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="premiumsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and use Get support for priority help.</p>', "biz");
   return html + '</div>';
 }
-window.onPaid = function () { paidAt = 0; goNav({ view: "build", more: "menu", openCmd: "" }); };
 function render() {
   const main = document.getElementById("main");
   const map = { home: homePage, hardware: hardwarePage, system: systemPage, battery: batteryPage, security: securityPage, build: buildPage, plan: planPage, key: keyPage, apis: apisPage, tools: toolsPage, console: consoleView, files: filesPage, setup: setupPage, pay: payPage, settings: settingsPage };
@@ -4206,7 +4145,7 @@ function render() {
   const savedMain = same && main ? main.scrollTop : 0;
   window.__place = place;
   const focused = document.activeElement && document.activeElement.id === "line";
-  const pageBody = imagineNote() + (map[view] || homePage)();
+  const pageBody = (map[view] || homePage)();
   const readings = /<button\b/i.test(pageBody) ? "" : " readings";
   main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
@@ -4236,10 +4175,9 @@ function render() {
   } else {
     putScroll(0, 0);
   }
-  if (!previewing() && (view === "system" || view === "home") && bond === "termux" && !senseAsked) setTimeout(loadSense, 40);
+  if ((view === "system" || view === "home") && bond === "termux" && !senseAsked) setTimeout(loadSense, 40);
   if (view === "files") {
-    if (previewing()) setTimeout(imaginedFiles, 0);
-    else loadFiles();
+    loadFiles();
   }
   if (!same && (view === "console" || view === "build")) {
     const end = document.getElementById("logend");
@@ -4279,11 +4217,8 @@ window.onDownloads = function (n) {
   const node = document.getElementById("dlcount");
   if (node) node.textContent = s;
 };
-function gate(name) {
-  return false;
-}
 function paintGear() {
-  const free = !paid();
+  const free = false;
   document.querySelectorAll("#setmenu [data-device]").forEach(function (b) { b.hidden = free; });
   const prefsBtn = document.querySelector("#setmenu [data-go='settings']");
   if (prefsBtn) prefsBtn.hidden = free;
@@ -4339,7 +4274,7 @@ function hardwareFacts() {
   if (p.glVersion && !sameText(p.glVersion, p.egl)) rows.push(["Driver", p.glVersion]);
   if (p.glVendor && !sameText(hw(p.glVendor), hw(p.maker)) && !/^samsung/i.test(String(p.glVendor))) rows.push(["Vendor", hw(p.glVendor)]);
   if (p.vulkan && !sameText(p.vulkan, p.renderer || s.gpu)) rows.push(["Vulkan", hw(p.vulkan)]);
-  if (premium() && p.ufs) rows.push(["UFS", hw(p.ufs)]);
+  if (p.ufs) rows.push(["UFS", hw(p.ufs)]);
   const seen = {};
   return rows.filter(function (row) {
     const value = String(row[1] || "").trim();
@@ -4371,7 +4306,7 @@ function hardwareReportHtml() {
   return "<!doctype html><meta charset=utf-8><title>Meridian hardware report</title><pre style='font:14px/1.45 ui-monospace,monospace;padding:24px'>" + esc(text) + "</pre>";
 }
 function shareReport() {
-  const text = hardwareReport({ footer: !premium() });
+  const text = hardwareReport({ footer: false });
   const html = hardwareReportHtml();
   try { MeridianPhone.clip(text); } catch (e) {}
   try { if (MeridianPhone.share) MeridianPhone.share("Meridian hardware report", text); } catch (e) {}
@@ -4379,7 +4314,6 @@ function shareReport() {
   toast("Report copied. Share sheet opened if this phone allows it.");
 }
 function copyMarkdownReport() {
-  if (!premium()) { goNav({ view: "pay", more: "menu", openCmd: "" }); return; }
   const text = hardwareMarkdown();
   try { MeridianPhone.clip(text); } catch (e) {}
   toast(t("copyMarkdown"));
@@ -4617,7 +4551,6 @@ function bind() {
   });
   const newses = document.getElementById("newses");
   if (newses) newses.onclick = function () {
-    if (!paid()) { goNav({ view: "pay", more: "menu", openCmd: "" }); return; }
     if (sessions.length >= 4) { toast("Four sessions is the most."); return; }
     sessions.push([]);
     sessionNames.push("Session " + sessions.length);
@@ -4691,10 +4624,6 @@ function bind() {
   };
   document.querySelectorAll("[data-power]").forEach(function (b) {
     b.onclick = function () {
-      if (!paid()) {
-        toast("Imagined preview.");
-        return;
-      }
       const mode = b.getAttribute("data-power");
       let r = "open";
       try { r = MeridianPhone.powerMode(mode); } catch (e) {}
@@ -4835,7 +4764,6 @@ function bind() {
   };
   const filedel = document.getElementById("filedel");
   if (filedel) filedel.onclick = function () {
-    if (gate("files-write")) return;
     const list = selectedList();
     if (!list.length) { toast("Select a file first."); return; }
     if (!confirm("Delete " + list.length + " item" + (list.length === 1 ? "" : "s") + "? This cannot be undone.")) return;
@@ -4853,7 +4781,6 @@ function bind() {
   };
   const filezip = document.getElementById("filezip");
   if (filezip) filezip.onclick = function () {
-    if (gate("files-write")) return;
     const list = selectedList();
     if (!list.length) { toast("Select a file first."); return; }
     const quoted = [];
@@ -5067,7 +4994,6 @@ function bind() {
   }
   const nf = document.getElementById("newfile");
   if (nf) nf.onclick = function () {
-    if (gate("files-write")) return;
     const name = goodName(prompt("File name"));
     if (!name) return;
     let raw = "";
@@ -5077,7 +5003,6 @@ function bind() {
   };
   const nd = document.getElementById("newdir");
   if (nd) nd.onclick = function () {
-    if (gate("files-write")) return;
     const name = goodName(prompt("Folder name"));
     if (!name) return;
     let raw = "";
@@ -5089,14 +5014,12 @@ function bind() {
   if (rf) rf.onclick = function () { render(); };
   const save = document.getElementById("savefile");
   if (save) save.onclick = function () {
-    if (gate("files-write")) return;
     let raw = "";
     try { raw = MeridianPhone.writeFile(picked, document.getElementById("editor").value); } catch (e) { raw = String(e) + "\nexit 1"; }
     if (fileResult(raw, "")) { save.textContent = "Saved"; tap(); }
   };
   const rename = document.getElementById("renamefile");
   if (rename) rename.onclick = function () {
-    if (gate("files-write")) return;
     const old = picked.split("/").pop();
     const name = goodName(prompt("New name", old));
     if (!name || name === old) return;
@@ -5107,7 +5030,6 @@ function bind() {
   };
   const del = document.getElementById("deletefile");
   if (del) del.onclick = function () {
-    if (gate("files-write")) return;
     const name = picked.split("/").pop();
     if (!confirm("Delete " + name + "? This cannot be undone.")) return;
     let raw = "";
@@ -5165,13 +5087,6 @@ function applyTheme(next) {
 function join(name) {
   if (cwd === "$HOME") return "$HOME/" + name;
   return cwd.replace(/\/$/, "") + "/" + name;
-}
-function imaginedFiles() {
-  const box = document.getElementById("filelist");
-  if (!box) return;
-  box.innerHTML = '<p class="sec">Folders</p><div class="filegrid"><button class="ico" type="button" disabled><i class="glyph dir"></i><em>projects</em></button><button class="ico" type="button" disabled><i class="glyph dir"></i><em>notes</em></button></div><p class="sec">Files</p><div class="filegrid"><button class="ico" type="button" disabled><i class="glyph file"></i><em>readme.txt</em></button></div>';
-  const foot = document.getElementById("filefoot");
-  if (foot) foot.textContent = "3 items";
 }
 function loadFiles() {
   const box = document.getElementById("filelist");
@@ -5334,11 +5249,6 @@ function expandModelFetch(cmd) {
   });
 }
 function exec(title, cmd, done) {
-  if (!paid()) {
-    toast("Imagined preview.");
-    if (typeof done === "function") done(1);
-    return;
-  }
   cmd = answerLine(cmd);
   const fetched = expandModelFetch(cmd);
   if (fetched !== cmd) {
@@ -5521,14 +5431,12 @@ function nextAgent() {
   });
 }
 function startAgent() {
-  if (!premium()) return;
   const cmds = planCommands();
   if (!cmds.length) { toast(t("noSteps")); return; }
   agentLeft = cmds.slice();
   nextAgent();
 }
 function agentBar() {
-  if (!premium()) return "";
   return '<button class="btn" type="button" id="runplan">' + esc(t("runThePlan")) + '</button>';
 }
 function showSteps(steps) {
@@ -5579,7 +5487,6 @@ function paintScheduler() {
   if (pre) pre.textContent = schedulerCommand();
 }
 function schedulerCard() {
-  if (!premium()) return "";
   let options = "";
   IDEAS.forEach(function (idea) { options += '<option value="' + esc(idea[0]) + '">' + esc(idea[0]) + '</option>'; });
   const last = localStorage.getItem("m-sched-status") || "—";
@@ -5605,7 +5512,6 @@ function apiModel() {
   return String((platforms.active && platforms.active.model) || "");
 }
 function apiSecret() {
-  if (!paid()) return "";
   return String((platforms.active && platforms.active.key) || "");
 }
 function persistPlatforms() {
@@ -5619,12 +5525,8 @@ function persistPlatforms() {
   return result;
 }
 function rememberPlatform(base, model, key) {
-  if (!paid()) {
-    toast("Imagined preview. That platform could not be saved.");
-    return "preview";
-  }
   const item = { base: normalizeBase(base), model: String(model || "").trim(), key: String(key || "").trim() };
-  const cap = premium() ? 32 : (paid() ? 8 : 1);
+  const cap = 32;
   const items = (platforms.items || []).filter(function (it) {
     return !(it && normalizeBase(it.base) === item.base && String(it.model || "") === item.model);
   });
@@ -5676,10 +5578,6 @@ function planGoal() {
   const box = document.getElementById("steps");
   if (!goal) {
     showPlanNote("Write a job first.");
-    return;
-  }
-  if (!paid()) {
-    showSteps(["echo imagined preview", "echo done"]);
     return;
   }
   const key = apiSecret();

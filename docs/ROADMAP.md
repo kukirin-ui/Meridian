@@ -293,7 +293,7 @@ Relay customers skip this sheet. Own-key customers need it to work the first tim
 
 ### 5. Paired read-only status on the LAN
 
-A checkbox in You: “Share readings on this Wi-Fi.” Bind `127.0.0.1` only unless the box is on, then bind the Wi-Fi address, one JSON snapshot from `status()` + `probe()`, no shell, no key, token in the path (`/s/<16 random bytes>`). The laptop opens it. This is the cross-device story that does not pretend Meridian is an iOS app. Pro feature. Off by default. The current `ServerSocket` in `openLive()` is the pattern; do not reuse that port for the public snapshot.
+A checkbox in You: “Share readings on this Wi-Fi.” Bind `127.0.0.1` only unless the box is on, then bind the Wi-Fi address, one JSON snapshot from `status()` + `probe()`, no shell, no key, token in the path (`/s/<16 random bytes>`). The laptop opens it. This is the cross-device story that does not pretend Meridian is an iOS app. Off by default. The current `ServerSocket` in `openLive()` is the pattern; do not reuse that port for the public snapshot.
 
 Skip, on purpose: a social feed, accounts, cloud sync of shell history, a second theme pack store, RAM booster marketing. They fight the “no account, runs on this phone” sentence the about page already uses. That sentence is the brand. Bend money around it, do not delete it.
 
