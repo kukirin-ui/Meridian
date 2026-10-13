@@ -3,6 +3,7 @@ build/
 local.properties
 *.keystore
 *.jks
-tools/license/private.pem
-tools/license/keys/
-tools/license/RESTORE-KEY.txt
+.env
+*.env
+.idea/
+*.iml

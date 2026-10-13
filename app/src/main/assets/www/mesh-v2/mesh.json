@@ -1,0 +1,16 @@
+{
+  "name": "meridian-mesh-v2",
+  "device": {"soc": "Exynos 2600", "usable_ram_gb": "5-7", "runtime": "termux llama.cpp llama-server"},
+  "models_dir": "~/models2",
+  "rules": {"no_gemma": true, "icm": ["CONTEXT.md", "references/", "output/"], "tree": "INDEX.md thin index only"},
+  "thermal": {"pause_c": 69, "resume_c": 49, "poll_s": 10},
+  "roles": {
+    "scout":  {"port": 8081, "model": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "ctx": 2048, "threads": 2, "job": "fetch links, extract facts as data"},
+    "scribe": {"port": 8082, "model": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "ctx": 2048, "threads": 2, "job": "write short recipe .md into references/"},
+    "mid":    {"port": 8083, "model": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf", "ctx": 2048, "threads": 2, "job": "verify and score against E-E-A-T rules"},
+    "lead":   {"port": 8084, "model": "Qwen3-4B-Q4_K_M.gguf", "ctx": 4096, "threads": 2, "job": "plan, split tasks, final output/"}
+  },
+  "pipeline": ["scout", "scribe", "mid", "lead"],
+  "queue": {"dir": "queue/", "commands": ["new", "split", "claim", "done"], "chunk_max_tokens": 1500},
+  "eeat": {"min_score": 7, "checks": ["source link present", "author or org named", "date present", "claim matches source", "no invented numbers"]}
+}

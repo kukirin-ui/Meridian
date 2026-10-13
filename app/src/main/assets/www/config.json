@@ -1,11 +1,93 @@
 {
   "agent_name": "Meridian",
-  "active_tier": "custom",
-  "execution_mode": "hybrid",
+  "active_tier": "mesh",
+  "execution_mode": "scout-scribe-mid-lead",
   "active_skill_tree": "code",
   "revenue_layer": "disabled",
   "api_key_override": "",
-  "custom_model_path": "/data/data/com.termux/files/home/models/gemma-2-9b-it-Q4_K_M.gguf",
+  "custom_model_path": "/data/data/com.termux/files/home/models/cpu_scout_0b5.gguf",
+  "scribe_model_path": "/data/data/com.termux/files/home/models/cpu_scribe_0b5.gguf",
+  "mid_model_path": "/data/data/com.termux/files/home/models/mid_3b.gguf",
+  "lead_model_path": "/data/data/com.termux/files/home/models/gpu_lead_7B.gguf",
   "selected_local_voice_index": 0,
-  "installed_at": 1791657908598
+  "installed_at": 1791657908598,
+  "mesh": {
+    "roster": "qwen",
+    "chain": "0.5B x2, then 3B, then 7B on a hard file",
+    "scout": {
+      "role": "Scout",
+      "device": "cpu",
+      "file": "cpu_scout_0b5.gguf",
+      "source": "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf",
+      "context": 1024,
+      "quant": "Q4_K_M"
+    },
+    "scribe": {
+      "role": "Scribe",
+      "device": "cpu",
+      "file": "cpu_scribe_0b5.gguf",
+      "source": "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf",
+      "context": 1024,
+      "quant": "Q4_K_M",
+      "speech_face": true
+    },
+    "mid": {
+      "role": "Mid",
+      "device": "cpu",
+      "file": "mid_3b.gguf",
+      "source": "Qwen2.5-3B-Instruct-Q4_K_M.gguf",
+      "context": 2048,
+      "quant": "Q4_K_M",
+      "owns": "sorting and routing"
+    },
+    "lead": {
+      "role": "Lead",
+      "device": "gpu",
+      "file": "gpu_lead_7B.gguf",
+      "source": "Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+      "context": 2048,
+      "quant": "Q4_K_M",
+      "opt_in_below_bytes": 7516192768
+    },
+    "thermal": {
+      "policy": "pause-69-resume-49",
+      "pause_c": 69,
+      "resume_c": 49,
+      "downshift_threads": 2
+    },
+    "presets": {
+      "cpu_mesh": {
+        "ngl": 0,
+        "roles": [
+          "scout",
+          "scribe",
+          "mid"
+        ],
+        "files": [
+          "cpu_scout_0b5.gguf",
+          "cpu_scribe_0b5.gguf",
+          "mid_3b.gguf"
+        ]
+      },
+      "gpu_lead": {
+        "ngl": 99,
+        "fallback_ngl": 0,
+        "roles": [
+          "lead"
+        ],
+        "file": "gpu_lead_7B.gguf"
+      }
+    },
+    "fit": {
+      "usable_gb_low": 5,
+      "usable_gb_high": 7,
+      "daily": "mid_3b.gguf",
+      "rare": "gpu_lead_7B.gguf",
+      "scout": "cpu_scout_0b5.gguf",
+      "scribe": "cpu_scribe_0b5.gguf"
+    },
+    "scribe_is_speech_face": true,
+    "serial": true,
+    "r0": "never dual-load Lead with another model at or above 7B; unload Lead after the hard file"
+  }
 }

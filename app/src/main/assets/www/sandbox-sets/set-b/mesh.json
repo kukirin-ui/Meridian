@@ -1,0 +1,30 @@
+{
+  "set": "set-b",
+  "name": "Set B",
+  "models_dir": "$HOME/models2",
+  "task_template": "sets/set-b/task-template.txt",
+  "queue": "sets/set-b/queue.txt",
+  "agent_name": "Meridian",
+  "active_tier": "mesh",
+  "execution_mode": "scout-scribe-mid-lead",
+  "custom_model_path": "$HOME/models2/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "scribe_model_path": "$HOME/models2/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+  "mid_model_path": "$HOME/models2/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf",
+  "lead_model_path": "$HOME/models2/Qwen3-4B-Q4_K_M.gguf",
+  "links": [
+    "Scout extract -> Scribe recipe",
+    "Scribe recipe -> Mid E-E-A-T verify",
+    "Mid score under 7 -> Scribe",
+    "Then Lead plan"
+  ],
+  "mesh": {
+    "roster": "set-b",
+    "chain": "Scout extract, Scribe recipe, Mid E-E-A-T, Lead plan",
+    "pipeline": "Scout extract, Scribe recipe, Mid E-E-A-T verify, score under 7 back to Scribe, Lead plan",
+    "scout": {"role": "Scout", "device": "cpu", "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "context": 2048, "job": "extract"},
+    "scribe": {"role": "Scribe", "device": "cpu", "file": "qwen2.5-0.5b-instruct-q4_k_m.gguf", "context": 2048, "job": "recipe"},
+    "mid": {"role": "Mid", "device": "cpu", "file": "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf", "context": 2048, "job": "E-E-A-T verify"},
+    "lead": {"role": "Lead", "device": "cpu", "file": "Qwen3-4B-Q4_K_M.gguf", "context": 4096, "job": "plan"},
+    "thermal": {"policy": "pause-69-resume-49", "pause_c": 69, "resume_c": 49, "downshift_threads": 2}
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "set": "set-a",
+  "name": "Set A",
+  "models_dir": "$HOME/models",
+  "task_template": "sets/set-a/task-template.txt",
+  "queue": "sets/set-a/queue.txt",
+  "agent_name": "Meridian",
+  "active_tier": "mesh",
+  "execution_mode": "scout-scribe-mid-lead",
+  "custom_model_path": "$HOME/models/cpu_scout_0b5.gguf",
+  "scribe_model_path": "$HOME/models/cpu_scribe_0b5.gguf",
+  "mid_model_path": "$HOME/models/mid_3b.gguf",
+  "lead_model_path": "$HOME/models/gpu_lead_7B.gguf",
+  "links": [
+    "Scout facts -> Scribe stubs",
+    "Scribe stubs -> Mid sort",
+    "Mid hard file -> Lead"
+  ],
+  "mesh": {
+    "roster": "qwen",
+    "chain": "0.5B x2, then 3B, then 7B on a hard file",
+    "pipeline": "Scout facts, Scribe stubs, Mid sort, Lead on a hard file",
+    "scout": {"role": "Scout", "device": "cpu", "file": "cpu_scout_0b5.gguf", "context": 1024},
+    "scribe": {"role": "Scribe", "device": "cpu", "file": "cpu_scribe_0b5.gguf", "context": 1024},
+    "mid": {"role": "Mid", "device": "cpu", "file": "mid_3b.gguf", "context": 2048},
+    "lead": {"role": "Lead", "device": "gpu", "file": "gpu_lead_7B.gguf", "context": 2048},
+    "thermal": {"policy": "pause-69-resume-49", "pause_c": 69, "resume_c": 49, "downshift_threads": 2}
+  }
+}

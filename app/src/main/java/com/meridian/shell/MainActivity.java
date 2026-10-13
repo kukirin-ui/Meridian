@@ -77,16 +77,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
-    static final boolean OPEN = false;
-    /** Where "Buy" sends people. Use a merchant-of-record that emails a licence key (Lemon Squeezy, Paddle, Gumroad). */
+    /** Optional donation / Premium support link. Paying never changes which features work. */
     private static final String PAY_URL = "https://checkout.revolut.com/pay/044a268e-4869-4708-9b0f-8e302cc28c37";
-    /**
-     * P-256 public key (X.509 SubjectPublicKeyInfo, base64) that signs licence keys.
-     * Generate your own pair with tools/license/keygen.mjs and paste the public half here.
-     */
-    private static final String LICENSE_PUBKEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0kg0I0zYe441u6+ko7KBk9PRZ7W1+8LQlc6y3OdXuqZtJnFMvbqQT00Jr7zLjYlLa2ZMKhKLFtBBstjter7WCg==";
-    /** Length of the free trial that unlocks Pro pages before a licence key is entered. */
-    private static final int TRIAL_DAYS = 7;
     private WebView web;
     /** Hardware key used only to sign a high-risk Mesh line on this phone. */
     private static final String KEY_ALIAS = "meridian_tee_key";
@@ -180,7 +172,6 @@ public class MainActivity extends Activity {
         fitKeyboard(web);
         concealStatusBar();
         watchSignal();
-        adoptLegacyUnlock();
         generateHardwareBoundKey();
         ensureMeshTts();
     }
@@ -1746,65 +1737,6 @@ public class MainActivity extends Activity {
             });
         }
 
-        /** Debug builds only. A release build returns no. paid, full, and unlocked are not accepted. */
-        @JavascriptInterface
-        public String devUnlock(String pass) {
-            if (!debuggable()) return "no";
-            String p = pass == null ? "" : pass.trim().replace("\r", "").replace("\n", "").replace(" ", "");
-            if (!"MERIDIAN-DEV".equals(p)) return "no";
-            markTier("premium");
-            return "premium";
-        }
-
-        @JavascriptInterface
-        public String workspace() {
-            try {
-                JSONObject o = new JSONObject();
-                o.put("personal", claimsSku(readSmallText(slotFile("personal"), 12000)));
-                o.put("enterprise", claimsSku(readSmallText(slotFile("enterprise"), 12000)));
-                String active = readSmallText(new File(getFilesDir(), "slot-active"), 32);
-                if (!knownSlot(active)) active = "personal";
-                o.put("active", active);
-                return o.toString();
-            } catch (Exception ex) {
-                return "{\"personal\":\"\",\"enterprise\":\"\",\"active\":\"personal\"}";
-            }
-        }
-
-        @JavascriptInterface
-        public String saveWorkspace(String slot, String key) {
-            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
-            String result = activate(key);
-            try {
-                JSONObject o = new JSONObject(result);
-                if (!o.optBoolean("ok")) return result;
-                String normalized = key == null ? "" : key.trim().replace("\r", "").replace("\n", "").replace(" ", "");
-                writeText(slotFile(slot), normalized);
-                writeText(new File(getFilesDir(), "slot-active"), slot);
-                markTier(o.optString("sku", "pro"));
-                return result;
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The workspace could not be saved.\"}";
-            }
-        }
-
-        @JavascriptInterface
-        public String useWorkspace(String slot) {
-            if (!knownSlot(slot)) return "{\"ok\":false,\"error\":\"Unknown workspace.\"}";
-            String key = readSmallText(slotFile(slot), 12000);
-            if (key.length() == 0) return "{\"ok\":false,\"error\":\"That workspace has no key yet.\"}";
-            String result = activate(key);
-            try {
-                JSONObject o = new JSONObject(result);
-                if (!o.optBoolean("ok")) return result;
-                writeText(new File(getFilesDir(), "slot-active"), slot);
-                markTier(o.optString("sku", "pro"));
-                return result;
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The workspace could not be opened.\"}";
-            }
-        }
-
         @JavascriptInterface
         public void haptic() {
             runOnUiThread(new Runnable() {
@@ -1817,40 +1749,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void keepAwake(boolean on) {
             MainActivity.this.keepAwake(on);
-        }
-
-        /**
-         * Activates a licence key of the form MERIDIAN-<payload>.<signature> where payload is
-         * base64url JSON {"sku":"pro"|"premium","iat":...,"ref":"..."} and signature is a P-256
-         * ECDSA (SHA-256) signature over the raw payload bytes. Verified offline against LICENSE_PUBKEY.
-         * The words paid, full, and unlocked are not keys and do not unlock.
-         */
-        @JavascriptInterface
-        public String activate(String key) {
-            if (LICENSE_PUBKEY.length() == 0) return "{\"ok\":false,\"error\":\"This build has no licence public key. See tools/license.\"}";
-            try {
-                String k = key == null ? "" : key.trim();
-                if (k.length() > 0 && k.charAt(0) == '\uFEFF') k = k.substring(1).trim();
-                k = k.replace("\r", "").replace("\n", "").replace(" ", "");
-                if (k.startsWith("MERIDIAN-")) k = k.substring(9);
-                int dot = k.indexOf('.');
-                if (dot <= 0) return "{\"ok\":false,\"error\":\"That is not a Meridian key. It should start with MERIDIAN-\"}";
-                byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
-                byte[] sig = android.util.Base64.decode(k.substring(dot + 1), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
-                byte[] der = android.util.Base64.decode(LICENSE_PUBKEY, android.util.Base64.DEFAULT);
-                java.security.PublicKey pub = java.security.KeyFactory.getInstance("EC").generatePublic(new java.security.spec.X509EncodedKeySpec(der));
-                java.security.Signature verifier = java.security.Signature.getInstance("SHA256withECDSA");
-                verifier.initVerify(pub);
-                verifier.update(payload);
-                if (!verifier.verify(sig)) return "{\"ok\":false,\"error\":\"The key did not verify.\"}";
-                JSONObject claims = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8));
-                String sku = claims.optString("sku", "");
-                if (!"pro".equals(sku) && !"premium".equals(sku)) return "{\"ok\":false,\"error\":\"That key is for a different product.\"}";
-                markPaid(sku);
-                return "{\"ok\":true,\"sku\":" + JSONObject.quote(sku) + "}";
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The key could not be read.\"}";
-            }
         }
 
         @JavascriptInterface
@@ -1880,35 +1778,6 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 return "{\"done\":true,\"out\":\"status error\",\"code\":1}";
             }
-        }
-
-        @JavascriptInterface
-        public String unlocked() {
-            File licence = new File(getFilesDir(), "full.key");
-            if (OPEN) {
-                if (!licence.isFile() || licence.length() == 0) markPaid("pro");
-                return "yes";
-            }
-            if (licence.isFile() && licence.length() > 0) return "yes";
-            if (debuggable()) {
-                String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
-                if ("pro".equals(dev) || "premium".equals(dev)) return "yes";
-            }
-            return "no";
-        }
-
-        /** free, pro, or premium. An existing full.key from this install stays pro unless it says premium. */
-        @JavascriptInterface
-        public String tier() {
-            if (debuggable()) {
-                String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
-                if ("premium".equals(dev)) return "premium";
-                if ("pro".equals(dev)) return "pro";
-            }
-            File licence = new File(getFilesDir(), "full.key");
-            if (!licence.isFile() || licence.length() == 0) return "free";
-            if ("premium".equals(readSmallText(licence, 32))) return "premium";
-            return "pro";
         }
 
         @JavascriptInterface
@@ -1966,33 +1835,6 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void stopSpeed() {
             if ("run".equals(speedJson)) speedJson = "{\"ok\":false,\"error\":\"The test timed out.\"}";
-        }
-
-        @JavascriptInterface
-        public String choosePlan(String sku) {
-            try {
-                if ("free".equals(sku)) {
-                    new File(getFilesDir(), "full.key").delete();
-                    new File(getFilesDir(), "dev.unlock").delete();
-                    return "{\"ok\":true,\"sku\":\"free\"}";
-                }
-                if ("pro".equals(sku)) {
-                    String now = tier();
-                    if (!"pro".equals(now) && !"premium".equals(now)) {
-                        return "{\"ok\":false,\"error\":\"Pro needs a licence key.\"}";
-                    }
-                    markTier("pro");
-                    return "{\"ok\":true,\"sku\":\"pro\"}";
-                }
-                if ("premium".equals(sku)) {
-                    String key = readSmallText(slotFile("enterprise"), 12000);
-                    if (key.length() == 0) return "{\"ok\":false,\"error\":\"Paste a Premium key into Premium Enterprise.\"}";
-                    return useWorkspace("enterprise");
-                }
-                return "{\"ok\":false,\"error\":\"Unknown plan.\"}";
-            } catch (Exception ex) {
-                return "{\"ok\":false,\"error\":\"The plan could not be changed.\"}";
-            }
         }
 
         @JavascriptInterface
@@ -2228,27 +2070,6 @@ public class MainActivity extends Activity {
                     });
                 }
             }, "meridian-ask").start();
-        }
-
-        /** Days left in the 7-day trial, 0 when over. The first-run stamp lives in filesDir so clearing WebView storage does not restart it. */
-        @JavascriptInterface
-        public int trialLeft() {
-            try {
-                File stamp = new File(getFilesDir(), "first.run");
-                long first;
-                if (stamp.isFile()) {
-                    first = stamp.lastModified();
-                } else {
-                    new java.io.FileOutputStream(stamp).close();
-                    first = System.currentTimeMillis();
-                    stamp.setLastModified(first);
-                }
-                long elapsedDays = (System.currentTimeMillis() - first) / 86400000L;
-                long left = TRIAL_DAYS - elapsedDays;
-                return left < 0 ? 0 : (int) left;
-            } catch (Exception ex) {
-                return 0;
-            }
         }
 
         /** Public GitHub .apk download total. Calls back with a number, or "" when the request fails. */
@@ -2490,36 +2311,8 @@ public class MainActivity extends Activity {
         return line.matches("(?i)^(?:(?:pkg|apt|apt-get|dpkg|curl|wget|getprop|termux-[a-z0-9-]+|python3?|pip3?|npm|npx|node|git|clang|gcc|cmake|make|ninja|ls|cat|free|df|du|uname|ping|ssh|ssh-keygen|sshd|vim|nvim|nano|cd|mkdir|echo|printf|export|chmod|chown|cp|mv|rm|tar|unzip|zip|sed|awk|grep|rg|find|which|source|bash|sh|proot-distro|cargo|rustc|go|java|javac|ruby|php|lua|perl|ffmpeg|sqlite3|rsync|tmux|nproc|env|test|llama-cli|llama-server)\\b|clang\\+\\+|g\\+\\+|\\[ |\\./).*");
     }
 
-    /** Writes pro or premium into files/full.key. Never writes the four letters paid. Does not downgrade premium. */
-    private void markPaid(String sku) {
-        try {
-            java.io.File out = new java.io.File(getFilesDir(), "full.key");
-            String current = readSmallText(out, 32);
-            String next = ("premium".equals(sku) || "premium".equals(current)) ? "premium" : "pro";
-            writeText(out, next);
-            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
-        } catch (Exception ignored) {}
-    }
-
-    /** Writes the exact sku. Used when a verified workspace is selected, including a step down from Premium to Pro. */
-    private void markTier(String sku) {
-        try {
-            String next = "premium".equals(sku) ? "premium" : "pro";
-            writeText(new File(getFilesDir(), "full.key"), next);
-            if (debuggable()) writeText(new File(getFilesDir(), "dev.unlock"), next);
-        } catch (Exception ignored) {}
-    }
-
     private boolean debuggable() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    }
-
-    private boolean knownSlot(String slot) {
-        return "personal".equals(slot) || "enterprise".equals(slot);
-    }
-
-    private File slotFile(String slot) {
-        return new File(getFilesDir(), "slot-" + slot + ".key");
     }
 
     private void writeText(File file, String text) throws Exception {
@@ -2530,20 +2323,6 @@ public class MainActivity extends Activity {
         } finally {
             stream.close();
         }
-    }
-
-    /** Display-only sku from a stored key. Unlocking still goes through activate(). */
-    private String claimsSku(String key) {
-        try {
-            String k = key == null ? "" : key.trim();
-            if (k.startsWith("MERIDIAN-")) k = k.substring(9);
-            int dot = k.indexOf('.');
-            if (dot <= 0) return "";
-            byte[] payload = android.util.Base64.decode(k.substring(0, dot), android.util.Base64.URL_SAFE | android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING);
-            String sku = new JSONObject(new String(payload, java.nio.charset.StandardCharsets.UTF_8)).optString("sku", "");
-            if ("pro".equals(sku) || "premium".equals(sku)) return sku;
-        } catch (Exception ignored) {}
-        return "";
     }
 
     private String readSmallText(File file, int max) {
@@ -2564,36 +2343,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * Keeps files/full.key when this install already unlocked. Does not copy a Downloads
-     * file whose body is the four letters paid, full, or unlocked. A MERIDIAN- file in
-     * Downloads is adopted only after the same signature check as activate().
-     */
-    private void adoptLegacyUnlock() {
-        File local = new File(getFilesDir(), "full.key");
-        if (local.isFile() && local.length() > 0) return;
-        File[] guesses = new File[] {
-            new File("/storage/emulated/0/Download/full.key"),
-            new File("/storage/emulated/0/Download/full.key.txt"),
-            new File("/sdcard/Download/full.key"),
-            new File("/sdcard/Download/full.key.txt")
-        };
-        for (File guess : guesses) {
-            if (guess == null || !guess.isFile()) continue;
-            String text = readSmallText(guess, 8192);
-            if (text.equals("paid") || text.equalsIgnoreCase("full") || text.equalsIgnoreCase("unlocked")) continue;
-            if (!text.startsWith("MERIDIAN-")) continue;
-            new Deck().activate(text);
-            if (local.isFile() && local.length() > 0) return;
-        }
-    }
-
-    /**
-     * The original embedded the checkout in a WebView and unlocked when the page text contained
-     * "thank you". That is both spoofable (any page saying thank you) and fragile (a wording change
-     * on the merchant side breaks every sale). Checkout now opens in the system browser and the
-     * merchant emails a signed licence key that Deck.activate() verifies offline.
-     */
+    /** Opens the optional donation / Premium support page in the system browser. */
     private void showPay() {
         try {
             Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(PAY_URL));
@@ -2604,6 +2354,7 @@ public class MainActivity extends Activity {
 
     private boolean knownLink(String target) {
         if ("mailto:Pozun.alen96@gmail.com".equals(target)) return true;
+        if ("mailto:Pozun.alen96@gmail.com?subject=Meridian%20support".equals(target)) return true;
         if (!target.startsWith("https://")) return false;
         String host;
         try {
@@ -3431,25 +3182,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String effectiveTier() {
-        File licence = new File(getFilesDir(), "full.key");
-        if (licence.isFile() && licence.length() > 0) {
-            if ("premium".equals(readSmallText(licence, 32))) return "premium";
-            return "pro";
-        }
-        if (debuggable()) {
-            String dev = readSmallText(new File(getFilesDir(), "dev.unlock"), 32);
-            if ("premium".equals(dev)) return "premium";
-            if ("pro".equals(dev)) return "pro";
-        }
-        return "free";
-    }
-
     private int platformCap() {
-        String tier = effectiveTier();
-        if ("premium".equals(tier)) return 32;
-        if ("pro".equals(tier)) return 8;
-        return 0;
+        return 32;
     }
 
     private File platformFile() {
@@ -3513,7 +3247,7 @@ public class MainActivity extends Activity {
             int cap = platformCap();
             if (count > cap) {
                 return cap <= 0
-                    ? "A saved platform unlocks after you upgrade."
+                    ? "That platform could not be saved."
                     : "This plan keeps " + cap + " API platforms.";
             }
             if (items != null) {
@@ -3530,7 +3264,7 @@ public class MainActivity extends Activity {
             if (active != null) {
                 String base = active.optString("base", "");
                 String activeKey = active.optString("key", "").trim();
-                if (cap <= 0 && activeKey.length() > 0) return "A saved platform unlocks after you upgrade.";
+                if (cap <= 0 && activeKey.length() > 0) return "That platform could not be saved.";
                 if (base.length() > 0 && !base.startsWith("https://")) return "The address must start with https://";
                 if (active.optString("key", "").length() > 512) return "That field is too long.";
             }
