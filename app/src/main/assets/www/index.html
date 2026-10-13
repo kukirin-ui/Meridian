@@ -630,6 +630,22 @@
   .planpage .chip { font-size: 0.75rem; padding: 0 6px; }
   .planhead b { display: block; }
   .planhead p { margin: 2px 0 0; }
+  .contools { display: flex; flex-direction: column; gap: 10px; }
+  /* Console: long echoed commands wrap cleanly instead of running off-screen */
+  .term .line { white-space: pre-wrap; overflow-wrap: anywhere; width: auto; }
+  /* Phone landscape: compact Console so output gets most of the height */
+  @media (orientation: landscape) and (max-height: 600px) {
+    body.console .wintop { height: 34px; }
+    body.console .wintop > b { font-size: 16px; }
+    body.console .winbody { padding: 6px 8px 8px; }
+    body.console #log { gap: 6px; }
+    body.console .contools { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; flex: none; }
+    body.console .contools::-webkit-scrollbar { display: none; }
+    body.console .contools .sessions { flex-wrap: nowrap; flex: none; gap: 4px; }
+    body.console .contools button { min-height: 30px; height: 30px; padding: 0 10px; font-size: 12px; border-radius: 999px; white-space: nowrap; flex: none; }
+    body.console .term { max-height: none; height: max(140px, calc(100dvh - 66px - 34px - 30px - 70px - 40px)); padding: 8px 10px; font-size: 12px; line-height: 1.4; }
+    body.console .term .out { margin-bottom: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -1936,7 +1952,7 @@ function sessionLabel(i) {
   return name || ("Session " + (i + 1));
 }
 function consoleView() {
-  let bar = '<div class="sessions" role="tablist" aria-label="Sessions">';
+  let bar = '<div class="contools"><div class="sessions" role="tablist" aria-label="Sessions">';
   sessions.forEach(function (_s, i) {
     bar += '<button class="ghost' + (i === sessionIx ? " on" : "") + '" type="button" role="tab" aria-selected="' + (i === sessionIx) + '" data-ses="' + i + '">' + esc(sessionLabel(i)) + '</button>';
   });
@@ -1945,7 +1961,7 @@ function consoleView() {
   bar += '<button class="ghost" type="button" id="renameses">Rename</button>';
   bar += '<button class="ghost" type="button" id="wrapout" aria-pressed="' + termWrap + '">' + (termWrap ? "Wrapped" : "Wrap") + '</button>';
   bar += '<button class="ghost" type="button" id="clearses" aria-label="Clear this session">Clear</button></div>';
-  bar += '<div class="sessions"><button class="btn" type="button" id="syscheck">System check</button><button class="ghost" type="button" id="termuxbat">Termux battery</button><button class="ghost" type="button" id="opentermux">Open Termux</button></div>';
+  bar += '<div class="sessions"><button class="btn" type="button" id="syscheck">System check</button><button class="ghost" type="button" id="termuxbat">Termux battery</button><button class="ghost" type="button" id="opentermux">Open Termux</button></div></div>';
   return '<div class="stack" id="log">' + bar + termTranscript() + '<div id="logend"></div></div>';
 }
 function showPath(p) {
