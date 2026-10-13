@@ -29,7 +29,7 @@ Every feature is available to everyone. There is no licence key, no trial, and n
 Pro and Premium have **the same feature level**, and both are free. Premium is aimed at businesses and teams that want to back the project and get priority help. Paying is optional and never changes what the app can do.
 
 - **Donate / Premium support:** the in-app **Support & Plans** screen has a **Donate** button that opens the project's checkout page.
-- **Support:** questions, bugs, and feature requests go to [GitHub Issues](https://github.com/kukirin-ui/Meridian/issues).
+- **Support:** the **Get support** button emails the developer (Pozun.alen96@gmail.com). Bugs and feature requests are also welcome in [GitHub Issues](https://github.com/kukirin-ui/Meridian/issues).
 
 ## Install
 

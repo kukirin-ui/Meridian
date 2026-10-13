@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 - **Meridian is now open source under the MIT License.** The repository was private during development and is public again now that v1 is finished.
 - All features are available to everyone: no licence key, trial, or paywall. Pro and Premium are the same feature level; Premium is optional support aimed at businesses.
-- "Plans" is now **Support & Plans**, with a **Donate** button (same checkout link as before, now optional) and **Get support** (GitHub Issues) and **Source code** buttons.
+- "Plans" is now **Support & Plans**, with a **Donate** button (same checkout link as before, now optional) and **Get support** (email) and **Source code** buttons.
 - About screen and Terms now show the MIT licence.
 
 ### Added

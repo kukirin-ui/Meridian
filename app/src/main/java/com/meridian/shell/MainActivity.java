@@ -2503,6 +2503,7 @@ public class MainActivity extends Activity {
 
     private boolean knownLink(String target) {
         if ("mailto:Pozun.alen96@gmail.com".equals(target)) return true;
+        if ("mailto:Pozun.alen96@gmail.com?subject=Meridian%20support".equals(target)) return true;
         if (!target.startsWith("https://")) return false;
         String host;
         try {

@@ -4178,12 +4178,12 @@ function tierCard(role, name, price, keeps, action, klass) {
 }
 let slotChoice = "";
 const REPO_URL = "https://github.com/kukirin-ui/Meridian";
-const ISSUES_URL = REPO_URL + "/issues";
+const SUPPORT_MAIL = "mailto:Pozun.alen96@gmail.com?subject=Meridian%20support";
 function supportCard() {
   let html = '<article class="tiercard support" id="support"><div class="tierhead"><div><p class="priceem">Open source</p><h2>Support Meridian</h2></div><p class="tierprice">MIT</p></div>';
   html += '<p class="muted">Meridian is free and open source under the MIT licence. Every feature works for everyone, with no key, no trial, and no account. If it helps you, a donation keeps development going.</p>';
   html += '<div class="tools supportbtns"><button class="btn pay tierbtn" id="pay" type="button">Donate</button><button class="ghost tierbtn" id="supportbtn" type="button">Get support</button><button class="ghost tierbtn" id="sourcebtn" type="button">Source code</button></div>';
-  html += '<p class="muted">Donate opens the existing checkout page in your browser. It is optional and changes nothing in the app. Get support opens GitHub Issues for bug reports, questions, and feature ideas.</p>';
+  html += '<p class="muted">Donate opens the existing checkout page in your browser. It is optional and changes nothing in the app. Get support opens an email to the developer. Bug reports and feature ideas are also welcome on GitHub Issues.</p>';
   return html + '</article>';
 }
 function payPage() {
@@ -4192,7 +4192,7 @@ function payPage() {
   html += supportCard();
   const on = '<button class="ghost tierbtn" type="button" disabled>All features on</button>';
   html += tierCard("Personal", "Pro", "Free", "Every feature with no limits, Live readings, Build and Plan, Up to 32 API platforms, Termux tools and Linux PC, Desk and the scheduler, Colour, themes, and pulse.", on, "pro");
-  html += tierCard("Business", "Premium", "Optional support", "The same features as Pro, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="premiumsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and open an issue for priority help.</p>', "biz");
+  html += tierCard("Business", "Premium", "Optional support", "The same features as Pro, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="premiumsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and use Get support for priority help.</p>', "biz");
   return html + '</div>';
 }
 window.onPaid = function () { paidAt = 0; goNav({ view: "build", more: "menu", openCmd: "" }); };
@@ -4206,21 +4206,18 @@ function render() {
   const savedMain = same && main ? main.scrollTop : 0;
   window.__place = place;
   const focused = document.activeElement && document.activeElement.id === "line";
-  let trial = "";
   const pageBody = imagineNote() + (map[view] || homePage)();
-  const readings = /<button\b/i.test(trial + pageBody) ? "" : " readings";
-  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + trial + pageBody + '</div></div></section>';
+  const readings = /<button\b/i.test(pageBody) ? "" : " readings";
+  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
   const typingOn = document.body.classList.contains("typing-focus");
   document.body.className = (view === "console" ? "console" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "");
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
-  const unlocked = paid();
   document.querySelectorAll("nav button").forEach(function (b) {
     const name = b.getAttribute("data-view");
     b.className = name === tab ? "on" : "";
     b.setAttribute("aria-current", name === tab ? "page" : "false");
-    if (!unlocked && PRO[name]) b.className += " lock";
   });
   const line = document.getElementById("bondline");
   line.textContent = bond === "termux" ? t("connected") : bond === "ask" ? t("allowTermux") : bond === "missing" ? t("noTermux") : t("notConnected");
@@ -5009,7 +5006,7 @@ function bind() {
   const premiumsupport = document.getElementById("premiumsupport");
   if (premiumsupport) premiumsupport.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
   const supportbtn = document.getElementById("supportbtn");
-  if (supportbtn) supportbtn.onclick = function () { try { MeridianPhone.open(ISSUES_URL); } catch (e) {} };
+  if (supportbtn) supportbtn.onclick = function () { try { MeridianPhone.open(SUPPORT_MAIL); } catch (e) {} };
   const sourcebtn = document.getElementById("sourcebtn");
   if (sourcebtn) sourcebtn.onclick = function () { try { MeridianPhone.open(REPO_URL); } catch (e) {} };
   const openhelp = document.getElementById("openhelp");
