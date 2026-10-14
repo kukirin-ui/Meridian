@@ -207,9 +207,24 @@ public class MainActivity extends Activity {
                     @Override
                     public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
                         // The hidden navigation bar is not reserved. Only the keyboard moves the page.
+                        // Shrink the WebView itself (padding does not resize WebView content), so the
+                        // page viewport ends at the top of the keyboard and restores fully when it closes.
                         int bottom = insets.getInsets(WindowInsets.Type.ime()).bottom;
-                        if (v.getPaddingLeft() != 0 || v.getPaddingTop() != 0 || v.getPaddingRight() != 0 || v.getPaddingBottom() != bottom) {
-                            v.setPadding(0, 0, 0, bottom);
+                        if (v.getPaddingLeft() != 0 || v.getPaddingTop() != 0 || v.getPaddingRight() != 0 || v.getPaddingBottom() != 0) {
+                            v.setPadding(0, 0, 0, 0);
+                        }
+                        android.view.ViewGroup.LayoutParams lp = v.getLayoutParams();
+                        if (lp instanceof android.view.ViewGroup.MarginLayoutParams) {
+                            android.view.ViewGroup.MarginLayoutParams mp = (android.view.ViewGroup.MarginLayoutParams) lp;
+                            if (mp.bottomMargin != bottom) {
+                                mp.bottomMargin = bottom;
+                                v.setLayoutParams(mp);
+                            }
+                        }
+                        final int css = Math.round(bottom / v.getResources().getDisplayMetrics().density);
+                        if (css != lastImeCss && web != null) {
+                            lastImeCss = css;
+                            web.evaluateJavascript("window.meridianKeyboard&&window.meridianKeyboard(" + css + ")", null);
                         }
                         return WindowInsets.CONSUMED;
                     }
@@ -233,6 +248,8 @@ public class MainActivity extends Activity {
             });
         }
     }
+
+    private int lastImeCss = -1;
 
     /** Pushes a fresh signal glyph when the active network changes. */
     private void watchSignal() {

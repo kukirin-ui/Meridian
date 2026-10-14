@@ -646,6 +646,14 @@
     body.console .term { max-height: none; height: max(140px, calc(100dvh - 66px - 34px - 30px - 70px - 40px)); padding: 8px 10px; font-size: 12px; line-height: 1.4; }
     body.console .term .out { margin-bottom: 8px; }
   }
+  /* Soft keyboard open: keep the command bar right above the keyboard, output above it */
+  body.kbopen.console #dock { bottom: calc(6px + var(--kb, 0px)); }
+  body.kbopen.console #main { padding-bottom: calc(62px + var(--kb, 0px)); }
+  body.kbopen.console .term { height: auto; max-height: max(72px, calc(100dvh - var(--kb, 0px) - 200px)); }
+  @media (max-width: 719px) { body.kbopen.console nav { display: none; } }
+  @media (orientation: landscape) and (max-height: 600px) {
+    body.kbopen.console .term { height: auto; max-height: max(60px, calc(100dvh - var(--kb, 0px) - 150px)); }
+  }
 </style>
 </head>
 <body>
@@ -4173,7 +4181,8 @@ function render() {
   main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
   const typingOn = document.body.classList.contains("typing-focus");
-  document.body.className = (view === "console" ? "console" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "");
+  const kbOn = document.body.classList.contains("kbopen");
+  document.body.className = (view === "console" ? "console" : "") + (imeOn ? " ime" : "") + (typingOn ? " typing-focus" : "") + (kbOn ? " kbopen" : "");
   document.getElementById("dock").className = view === "console" ? "on" : "";
   const tab = (view === "console" || view === "files" || view === "setup" || view === "tools" || view === "pay" || view === "settings") ? "tools" : view === "key" ? "apis" : view;
   document.querySelectorAll("nav button").forEach(function (b) {
@@ -4462,6 +4471,23 @@ function textField(node) {
   return field;
 }
 
+let nativeKb = 0;
+const baseHeights = {};
+function orientKey() { return window.innerWidth > window.innerHeight ? "l" : "p"; }
+function keyboardOpen(field) {
+  if (nativeKb > 0) return true;
+  if (keyboardInset() > 48) return true;
+  const key = orientKey();
+  const h = window.innerHeight;
+  if (!field) { baseHeights[key] = h; return false; }
+  if (!baseHeights[key] || h > baseHeights[key]) baseHeights[key] = h;
+  return baseHeights[key] - h > 120;
+}
+window.meridianKeyboard = function (px) {
+  nativeKb = Math.max(0, Number(px) || 0);
+  revealField(document.activeElement);
+  setTimeout(function () { revealField(document.activeElement); }, 120);
+};
 function keyboardInset() {
   const vv = window.visualViewport;
   if (!vv) return 0;
@@ -4472,6 +4498,18 @@ function revealField(node) {
   const inset = keyboardInset();
   document.documentElement.style.setProperty("--kb", inset + "px");
   document.body.classList.toggle("ime", inset > 48);
+  const wasOpen = document.body.classList.contains("kbopen");
+  const open = keyboardOpen(field);
+  document.body.classList.toggle("kbopen", open);
+  if (view === "console" && (open || wasOpen)) {
+    if (typeof consoleToEnd === "function") consoleToEnd(false);
+    if (!open && wasOpen) {
+      const main = document.getElementById("main");
+      if (main) main.scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+  }
+  if (field && field.id === "line") return;
   const planField = field && field.id === "goal";
   document.body.classList.toggle("typing-focus", !!planField);
   if (!field) return;
@@ -4531,6 +4569,7 @@ function armKeyboard() {
     if (active && active.blur && textField(active)) active.blur();
     try { MeridianPhone.hideKeyboard(); } catch (e) {}
     document.body.classList.remove("ime");
+    document.body.classList.remove("kbopen");
     document.body.classList.remove("typing-focus");
     document.documentElement.style.setProperty("--kb", "0px");
   }, true);
