@@ -544,6 +544,8 @@
   .sheet { position: fixed; inset: 0; z-index: 40; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + var(--kb, 0px) + env(safe-area-inset-bottom)); overflow: auto; }
   .sheet[hidden] { display: none !important; }
   .sheet h2 { margin: 8px 0; }
+  .sheet .plate.runsheet { border: var(--frame-w, 1px) solid var(--frame-c, var(--accent)); border-radius: var(--frame-r, 16px); padding: 14px; background: var(--header, transparent); }
+  .sheet .plate.runsheet textarea.cmd { width: 100%; box-sizing: border-box; }
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
   .sheet .tiny { margin-top: auto; color: var(--muted); font-size: 11px; text-align: center; }
   .desk .grid { padding: 16px; }
@@ -1156,6 +1158,9 @@ agentHint:"Pro lance une étape quand vous appuyez sur Exécuter. Premium peut e
 every15:"Toutes les 15 min",everyHour:"Toutes les heures",every6:"Toutes les 6 heures",everyDay:"Chaque jour"
 }
 };
+// Run sheet strings: every button that runs something opens askRun() first.
+const RUNSHEET_I18N = {"en": {"runSheetNote": "Read the command below. You can change it. Nothing runs until you press Run.", "runCmdLabel": "Command", "runEmpty": "The command is empty.", "fixTermuxWhy": "This line turns on allow-external-apps in Termux so Meridian may send commands. Run copies it and opens Termux; paste it there and press Enter.", "tuneApplyWhy": "Writes this value to the phone through root or Shizuku. The original value is saved first so Reset can bring it back.", "tuneResetWhy": "Puts the value Meridian saved before the first change back.", "planRunWhy": "Every step of the plan, in order. They run one after another and stop at the first error.", "schedWhy": "Registers this job with the Termux job scheduler. After that it runs on its own at the chosen interval.", "stopJobTitle": "Stop job", "stopJobWhy": "Removes this job from the Termux job scheduler. It will not run again."}, "hr": {"runSheetNote": "Pročitaj naredbu ispod. Možeš je promijeniti. Ništa se ne pokreće dok ne pritisneš Pokreni.", "runCmdLabel": "Naredba", "runEmpty": "Naredba je prazna.", "fixTermuxWhy": "Ovaj redak uključuje allow-external-apps u Termuxu kako bi Meridian smio slati naredbe. Pokreni ga kopira i otvara Termux; zalijepi ga ondje i pritisni Enter.", "tuneApplyWhy": "Upisuje ovu vrijednost u telefon preko roota ili Shizukua. Izvorna vrijednost se prvo spremi kako bi je Vrati mogao vratiti.", "tuneResetWhy": "Vraća vrijednost koju je Meridian spremio prije prve promjene.", "planRunWhy": "Svi koraci plana redom. Pokreću se jedan za drugim i staju na prvoj pogrešci.", "schedWhy": "Prijavljuje ovaj posao Termux rasporedu poslova. Nakon toga se sam pokreće u odabranom razmaku.", "stopJobTitle": "Zaustavi posao", "stopJobWhy": "Uklanja ovaj posao iz Termux rasporeda poslova. Više se neće pokrenuti."}, "de": {"runSheetNote": "Lies den Befehl unten. Du kannst ihn ändern. Nichts läuft, bis du Ausführen drückst.", "runCmdLabel": "Befehl", "runEmpty": "Der Befehl ist leer.", "fixTermuxWhy": "Diese Zeile schaltet allow-external-apps in Termux ein, damit Meridian Befehle senden darf. Ausführen kopiert sie und öffnet Termux; füge sie dort ein und drücke Enter.", "tuneApplyWhy": "Schreibt diesen Wert über Root oder Shizuku ins Telefon. Der ursprüngliche Wert wird vorher gespeichert, damit Zurücksetzen ihn wiederherstellen kann.", "tuneResetWhy": "Stellt den Wert wieder her, den Meridian vor der ersten Änderung gespeichert hat.", "planRunWhy": "Alle Schritte des Plans in Reihenfolge. Sie laufen nacheinander und stoppen beim ersten Fehler.", "schedWhy": "Meldet diesen Job beim Termux-Jobplaner an. Danach läuft er von selbst im gewählten Abstand.", "stopJobTitle": "Job stoppen", "stopJobWhy": "Entfernt diesen Job aus dem Termux-Jobplaner. Er läuft nicht mehr."}, "ja": {"runSheetNote": "下のコマンドを確認してください。編集できます。実行を押すまで何も動きません。", "runCmdLabel": "コマンド", "runEmpty": "コマンドが空です。", "fixTermuxWhy": "この行は Termux の allow-external-apps をオンにし、Meridian がコマンドを送れるようにします。実行するとコピーして Termux を開きます。そこに貼り付けて Enter を押してください。", "tuneApplyWhy": "root または Shizuku でこの値を書き込みます。元の値は先に保存されるので、リセットで戻せます。", "tuneResetWhy": "最初の変更前に Meridian が保存した値に戻します。", "planRunWhy": "プランの全ステップを順番に表示しています。順に実行され、最初のエラーで止まります。", "schedWhy": "このジョブを Termux のジョブスケジューラーに登録します。その後は選んだ間隔で自動的に実行されます。", "stopJobTitle": "ジョブを停止", "stopJobWhy": "このジョブを Termux のジョブスケジューラーから削除します。今後は実行されません。"}, "hi": {"runSheetNote": "नीचे दिया कमांड पढ़ें। आप इसे बदल सकते हैं। चलाएँ दबाने तक कुछ नहीं चलता।", "runCmdLabel": "कमांड", "runEmpty": "कमांड खाली है।", "fixTermuxWhy": "यह लाइन Termux में allow-external-apps चालू करती है ताकि Meridian कमांड भेज सके। चलाएँ इसे कॉपी करके Termux खोलता है; वहाँ पेस्ट करें और Enter दबाएँ।", "tuneApplyWhy": "यह मान root या Shizuku से फ़ोन में लिखता है। मूल मान पहले सहेजा जाता है ताकि रीसेट उसे वापस ला सके।", "tuneResetWhy": "पहले बदलाव से पहले Meridian ने जो मान सहेजा था, उसे वापस रखता है।", "planRunWhy": "योजना के सभी चरण क्रम से। वे एक के बाद एक चलते हैं और पहली त्रुटि पर रुकते हैं।", "schedWhy": "यह काम Termux जॉब शेड्यूलर में दर्ज करता है। उसके बाद यह चुने गए अंतराल पर अपने आप चलता है।", "stopJobTitle": "काम रोकें", "stopJobWhy": "यह काम Termux जॉब शेड्यूलर से हटाता है। यह फिर नहीं चलेगा।"}, "es": {"runSheetNote": "Lee el comando de abajo. Puedes cambiarlo. Nada se ejecuta hasta que pulses Ejecutar.", "runCmdLabel": "Comando", "runEmpty": "El comando está vacío.", "fixTermuxWhy": "Esta línea activa allow-external-apps en Termux para que Meridian pueda enviar comandos. Ejecutar la copia y abre Termux; pégala allí y pulsa Enter.", "tuneApplyWhy": "Escribe este valor en el teléfono con root o Shizuku. Antes se guarda el valor original para que Restablecer pueda devolverlo.", "tuneResetWhy": "Devuelve el valor que Meridian guardó antes del primer cambio.", "planRunWhy": "Todos los pasos del plan, en orden. Se ejecutan uno tras otro y se detienen en el primer error.", "schedWhy": "Registra esta tarea en el programador de tareas de Termux. Después se ejecuta sola en el intervalo elegido.", "stopJobTitle": "Detener tarea", "stopJobWhy": "Quita esta tarea del programador de Termux. No volverá a ejecutarse."}, "fr": {"runSheetNote": "Lisez la commande ci-dessous. Vous pouvez la modifier. Rien ne s'exécute avant d'appuyer sur Exécuter.", "runCmdLabel": "Commande", "runEmpty": "La commande est vide.", "fixTermuxWhy": "Cette ligne active allow-external-apps dans Termux pour que Meridian puisse envoyer des commandes. Exécuter la copie et ouvre Termux ; collez-la puis appuyez sur Entrée.", "tuneApplyWhy": "Écrit cette valeur dans le téléphone via root ou Shizuku. La valeur d'origine est d'abord enregistrée pour que Réinitialiser puisse la remettre.", "tuneResetWhy": "Remet la valeur que Meridian a enregistrée avant la première modification.", "planRunWhy": "Toutes les étapes du plan, dans l'ordre. Elles s'exécutent l'une après l'autre et s'arrêtent à la première erreur.", "schedWhy": "Enregistre cette tâche dans le planificateur de Termux. Ensuite, elle s'exécute seule à l'intervalle choisi.", "stopJobTitle": "Arrêter la tâche", "stopJobWhy": "Retire cette tâche du planificateur de Termux. Elle ne s'exécutera plus."}};
+Object.keys(RUNSHEET_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, RUNSHEET_I18N[l]); });
 function t(key) {
   const extra = EXTRA[prefs.lang] || EXTRA.en;
   if (extra && extra[key]) return extra[key];
@@ -2269,12 +2274,36 @@ function cmdField(cmd, attrs) {
   const h = rows * 22 + 24;
   return '<textarea class="cmd"' + (attrs || "") + ' rows="' + rows + '" style="height:' + h + 'px">' + esc(cmd) + '</textarea>';
 }
-function sheet(title, note, cmd, link) {
-  let html = '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button><article class="plate stack"><b>' + esc(title) + "</b>";
+function sheet(title, note, cmd, link, pre) {
+  const id = pre || "shelf";
+  let html = '<div class="stack"><button class="ghost" type="button" id="' + id + 'back">' + esc(t("back")) + '</button><article class="plate stack' + (pre ? " runsheet" : "") + '"><b>' + esc(title) + "</b>";
   if (note) html += '<p class="muted">' + esc(note) + "</p>";
-  if (cmd) html += cmdField(cmd, ' id="shelfcmd"') + '<button class="btn" type="button" id="shelfrun">Run</button>';
+  if (cmd) html += cmdField(cmd, ' id="' + id + 'cmd" aria-label="' + esc(t("runCmdLabel")) + '"') + '<button class="btn" type="button" id="' + id + 'run">' + esc(t("run")) + '</button>';
   if (link) html += '<button class="ghost" type="button" data-open="' + esc(link) + '">Open link</button>';
   return html + "</article></div>";
+}
+// No button runs a command straight away. It opens this sheet first: what it does, the full command
+// (editable), and a Run button. Nothing reaches Termux until Run is pressed. runner gets the edited text;
+// without one the text goes to exec(), like a recipe step.
+function askRun(title, cmd, done, why, runner) {
+  const el = document.getElementById("sheet");
+  if (!el) return;
+  cmd = String(cmd || "");
+  const what = why || whyFor(cmd) || "";
+  el.innerHTML = sheet(title, (what ? what + " " : "") + t("runSheetNote"), cmd, "", "ask");
+  el.hidden = false;
+  el.scrollTop = 0;
+  function close() { el.hidden = true; el.innerHTML = ""; }
+  const back = document.getElementById("askback");
+  if (back) back.onclick = close;
+  const run = document.getElementById("askrun");
+  if (run) run.onclick = function () {
+    const box = document.getElementById("askcmd");
+    const line = box ? box.value : cmd;
+    if (!line.trim()) { toast(t("runEmpty")); return; }
+    close();
+    if (runner) runner(line); else exec(title, line, done);
+  };
 }
 // Termux link: Setup shows it first, the console offers the same fix when a command is refused.
 let termuxLink = { state: "unknown", detail: "", at: 0 };
@@ -2327,11 +2356,13 @@ function fixTermux(kind) {
     try { MeridianPhone.askTermuxPermission(); } catch (e) {}
     return;
   }
-  let r = "";
-  try { r = String(MeridianPhone.fixTermux(BOND_LINE, t("fixTermuxToast"))); } catch (e) { r = ""; }
-  if (!r) { try { MeridianPhone.clip(BOND_LINE); } catch (e) {} }
-  toast(t("fixTermuxToast"));
-  termuxLink.state = "unknown";
+  askRun(t("fixTermux"), BOND_LINE, null, t("fixTermuxWhy"), function (line) {
+    let r = "";
+    try { r = String(MeridianPhone.fixTermux(line, t("fixTermuxToast"))); } catch (e) { r = ""; }
+    if (!r) { try { MeridianPhone.clip(line); } catch (e) {} }
+    toast(t("fixTermuxToast"));
+    termuxLink.state = "unknown";
+  });
 }
 function bindTermuxFix(root) {
   (root || document).querySelectorAll("[data-termuxfix]").forEach(function (b) {
@@ -2827,13 +2858,15 @@ function tuneApply(id) {
   let cmd;
   if (c.action) cmd = c.action(val);
   else cmd = tuneWrite(c.level, c.node, val, c.node);
-  const ok = quietJob(cmd, function (o) {
-    const now = parseNow(o);
-    const el = document.getElementById("cur-" + id);
-    if (el && c.node) el.textContent = now ? (c.curfmt ? c.curfmt(now) : now) : el.textContent;
-    if (note) note.textContent = String(o || "").indexOf("MERIDIAN_NOACCESS") >= 0 ? t("tuneFailAccess") : t("tuneApplied");
+  askRun(t("apply") + ": " + (c.name || id), cmd, null, t("tuneApplyWhy"), function (line) {
+    const ok = quietJob(line, function (o) {
+      const now = parseNow(o);
+      const el = document.getElementById("cur-" + id);
+      if (el && c.node) el.textContent = now ? (c.curfmt ? c.curfmt(now) : now) : el.textContent;
+      if (note) note.textContent = String(o || "").indexOf("MERIDIAN_NOACCESS") >= 0 ? t("tuneFailAccess") : t("tuneApplied");
+    });
+    if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
   });
-  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
 }
 function tuneResetOne(id) {
   const c = tuneCtlById(id); if (!c || !accOk(c.level)) return;
@@ -2842,15 +2875,16 @@ function tuneResetOne(id) {
   if (c.reset) cmd = c.reset();
   else if (c.node) cmd = tuneRestore(c.level, c.node, c.node);
   else return;
-  const ok = quietJob(cmd, function (o) {
-    const now = parseNow(o); const el = document.getElementById("cur-" + id);
-    if (el && c.node && now) el.textContent = c.curfmt ? c.curfmt(now) : now;
-    if (note) note.textContent = t("tuneResetDone");
+  askRun(t("resetOne") + ": " + (c.name || id), cmd, null, t("tuneResetWhy"), function (line) {
+    const ok = quietJob(line, function (o) {
+      const now = parseNow(o); const el = document.getElementById("cur-" + id);
+      if (el && c.node && now) el.textContent = c.curfmt ? c.curfmt(now) : now;
+      if (note) note.textContent = t("tuneResetDone");
+    });
+    if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
   });
-  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
 }
 function tuneResetAll() {
-  if (!confirm(t("tuneResetAllAsk"))) return;
   const note = document.getElementById("tunenote");
   // Prefer su for sysfs restores when present, fall back to rish. Reset thermal and power to default too.
   const cmd = 'R(){ if command -v su >/dev/null 2>&1; then su -c "$1"; elif [ -x "$HOME/rish" ]; then "$HOME/rish" -c "$1"; elif command -v rish >/dev/null 2>&1; then rish -c "$1"; else echo MERIDIAN_NOACCESS; fi; }\n'
@@ -2859,8 +2893,10 @@ function tuneResetAll() {
     + 'R "cmd power set-mode 0" >/dev/null 2>&1\n'
     + 'if [ -f "$O/.index" ]; then while read k p; do [ -n "$p" ] && [ -f "$O/$k" ] && R "echo $(cat \"$O/$k\") > $p"; done < "$O/.index"; fi\n'
     + 'echo "NOW=done"\n';
-  const ok = quietJob(cmd, function () { if (note) note.textContent = t("tuneResetAllDone"); setTimeout(function () { refreshTune(true); }, 300); });
-  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
+  askRun(t("tuneResetAll"), cmd, null, t("tuneResetAllAsk"), function (line) {
+    const ok = quietJob(line, function () { if (note) note.textContent = t("tuneResetAllDone"); setTimeout(function () { refreshTune(true); }, 300); });
+    if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
+  });
 }
 function bindTune() {
   const scan = document.getElementById("tunescan");
@@ -3890,8 +3926,10 @@ function saveHeat(reset) {
   ["heat-pause", "heat-resume", "heat-threads"].forEach(function (id, i) { const el = document.getElementById(id); if (el) el.value = [pause, resume, threads][i]; });
   // The mesh workers read pause_c and resume_c from their mesh.json.
   const cmd = "for f in \"$HOME/meridian-mesh-v2/mesh.json\" \"$HOME/meridian-sandbox/mesh/mesh.json\"; do [ -f \"$f\" ] || continue; sed -i -E 's/\"pause_c\": *[0-9]+/\"pause_c\": " + pause + "/; s/\"resume_c\": *[0-9]+/\"resume_c\": " + resume + "/' \"$f\"; done; echo saved";
-  const ok = quietJob(cmd, function () { if (note) note.textContent = "Saved."; });
-  if (note) note.textContent = ok ? "Saving" : "Saved on this phone. It reaches Termux the next time it is free.";
+  askRun(reset ? "Use phone defaults" : "Save heat limits", cmd, null, "Writes Pause " + pause + " °C and Start again " + resume + " °C into the mesh.json files in Termux. The mesh workers read them on their next start.", function (line) {
+    const ok = quietJob(line, function () { if (note) note.textContent = "Saved."; });
+    if (note) note.textContent = ok ? "Saving" : "Saved on this phone. It reaches Termux the next time it is free.";
+  });
 }
 function meshTreePack() {
   return (typeof SKILL_TREES !== "undefined" && SKILL_TREES[meshSkill]) || { name: "Code Master", shape: "", start: [], skills: [] };
@@ -4087,7 +4125,7 @@ function meshReadLocal(path) {
     + "head -c 20000 \"$f\"\n";
   meshLog("Reading " + path);
   meshRest();
-  exec("Read file", cmd);
+  askRun("Read file", cmd, null, "Prints the start of " + path + " from Termux. Nothing is changed.");
 }
 const MESH_ORCH_B64 = "IyEvYmluL2Jhc2gKIyBNZXJpZGlhbiBRd2VuIG1lc2guIE9uZSBvcmNoZXN0cmF0b3IuIE9uZSBsbGFtYS1jbGkgYXQgYSB0aW1lLgojIENQVTogU2NvdXQgMC41QiB3cml0ZXMgdGhlIFBhY2tldC4gU2NyaWJlIDAuNUIgZm9ybWF0cyBzdHVicyBhbmQgaXMgdGhlIHNwZWVjaCBmYWNlLgojIE1pZCAzQiByZWFkcyBib3RoLCBvd25zIHNvcnRpbmcsIGFuZCBtYXkgc2VuZCBvbmUgcGFzcyBiYWNrIHRvIFNjb3V0IG9yIFNjcmliZS4KIyBHUFU6IExlYWQgaXMgb25lIFF3ZW4gN0IsIGxvYWRlZCBvbmx5IHdoZW4gTWlkIHN0cnVnZ2xlcyB3aXRoIGEgaGFyZCBmaWxlLCB0aGVuIHVubG9hZGVkLgojIFIwOiBuZXZlciBydW4gbGxhbWEtY2xpIHR3aWNlLCBhbmQgbmV2ZXIgbG9hZCBhIHNlY29uZCBtb2RlbCBhdCBvciBhYm92ZSA3Qi4KIyBUaGVybWFsOiBvbmUgcG9saWN5LCBwYXVzZS02OS1yZXN1bWUtNDkuIFBhdXNlIGF0IDY5QywgcmVzdW1lIGF0IDQ5QywgZG93bnNoaWZ0IHRvIDIgdGhyZWFkcyBpbiBiZXR3ZWVuLgojIFByZXNldCBjcHVfbWVzaDogU2NvdXQsIFNjcmliZSwgYW5kIE1pZCBhbHdheXMgcGFzcyBuZ2wgMC4KIyBQcmVzZXQgZ3B1X2xlYWQ6IExlYWQgdHJpZXMgbmdsIDk5LCB0aGVuIG5nbCAwIGlmIHRoZSBHUFUgcnVuIGZhaWxzIG9yIHRoZSB0ZXh0IGlzIHVudXNhYmxlLgoKYm94PSIke0hPTUV9L21lcmlkaWFuLXNhbmRib3giCnNjb3V0PSIkSE9NRS9tb2RlbHMvJHtTQ09VVF9GSUxFOi19IgpzY3JpYmU9IiRIT01FL21vZGVscy8ke1NDUklCRV9GSUxFOi19IgptaWQ9IiRIT01FL21vZGVscy8ke01JRF9GSUxFOi19IgpsZWFkPSIkSE9NRS9tb2RlbHMvJHtMRUFEX0ZJTEU6LX0iCm1pZF9vcHQ9IiR7TUlEX09QVF9JTjotYXV0b30iCmxlYWRfb3B0PSIke0xFQURfT1BUX0lOOi1hdXRvfSIKZm9yY2VfbWlkPSIke01FU0hfRk9SQ0VfTUlEOi1ub30iCmZvcmNlX2xlYWQ9IiR7TUVTSF9GT1JDRV9MRUFEOi1ub30iCm1lc2hfaGFyZD0iJHtNRVNIX0hBUkQ6LW5vfSIKCm1lc2hfYnVzeSgpIHsKICBpZiBwaWRvZiBsbGFtYS1jbGkgPi9kZXYvbnVsbCAyPiYxOyB0aGVuCiAgICByZXR1cm4gMAogIGZpCiAgaWYgcHMgLUEgLW8gY29tbT0gMj4vZGV2L251bGwgfCBncmVwIC14IGxsYW1hLWNsaSA+L2Rldi9udWxsIDI+JjE7IHRoZW4KICAgIHJldHVybiAwCiAgZmkKICByZXR1cm4gMQp9CgptZXNoX3JhbV9rYigpIHsKICBsb2NhbCByYW0KICByYW09JChhd2sgJy9NZW1BdmFpbGFibGU6LyB7cHJpbnQgJDJ9JyAvcHJvYy9tZW1pbmZvIDI+L2Rldi9udWxsKQogIGlmIFsgLXogIiRyYW0iIF07IHRoZW4KICAgIHJhbT0kKGF3ayAnL01lbVRvdGFsOi8ge3ByaW50ICQyfScgL3Byb2MvbWVtaW5mbyAyPi9kZXYvbnVsbCkKICBmaQogIHByaW50ZiAnJXMnICIkcmFtIgp9CgptZXNoX29rX25hbWUoKSB7CiAgY2FzZSAiJDEiIGluCiAgICAiInwqWyFBLVphLXowLTkuXystXSp8Ki8qfCouLiopIHJldHVybiAxIDs7CiAgZXNhYwogIHJldHVybiAwCn0KCm1lc2hfcmVmdXNlZCgpIHsKICBjYXNlICIkMSIgaW4KICAgICoxNEIqfCozMkIqfCo3MkIqfCpnZW1tYSp8KkdlbW1hKnwqTGxhbWEqfCpsbGFtYSopIHJldHVybiAwIDs7CiAgZXNhYwogIHJldHVybiAxCn0KCm1lc2hfZm9sZF9leGNlcnB0KCkgewogIGxvY2FsIGZpbGU9IiQxIiBsaW1pdD0iJDIiCiAgWyAtZiAiJGZpbGUiIF0gfHwgcmV0dXJuIDAKICBbIC1MICIkZmlsZSIgXSAmJiByZXR1cm4gMAogIGhlYWQgLWMgIiRsaW1pdCIgLS0gIiRmaWxlIiAyPi9kZXYvbnVsbCB8fCB0cnVlCiAgcHJpbnRmICdcbicKfQoKbWVzaF9mb2xkX2RpcigpIHsKICBsb2NhbCBkaXI9IiQxIiBsYWJlbD0iJDIiIG9uZSBjb3VudD0wCiAgWyAtZCAiJGRpciIgXSB8fCByZXR1cm4gMAogIFsgLUwgIiRkaXIiIF0gJiYgcmV0dXJuIDAKICBjb21tYW5kIC12IGZpbmQgPi9kZXYvbnVsbCAyPiYxIHx8IHJldHVybiAwCiAgY291bnQ9MAogIHdoaWxlIElGUz0gcmVhZCAtciBvbmU7IGRvCiAgICBbIC1uICIkb25lIiBdIHx8IGNvbnRpbnVlCiAgICBbIC1mICIkb25lIiBdIHx8IGNvbnRpbnVlCiAgICBbIC1MICIkb25lIiBdICYmIGNvbnRpbnVlCiAgICBjb3VudD0kKChjb3VudCArIDEpKQogICAgWyAiJGNvdW50IiAtbGUgNCBdIHx8IGJyZWFrCiAgICBleHRyYT0iJHtleHRyYX1Mb2NhbCAke2xhYmVsfSAkKGJhc2VuYW1lIC0tICIkb25lIik6CiQobWVzaF9mb2xkX2V4Y2VycHQgIiRvbmUiIDQwMCkKIgogIGRvbmUgPDxFT0YKJChmaW5kICIkZGlyIiAtdHlwZSBmIFwoIC1uYW1lICcqLm1kJyAtbyAtbmFtZSAnKi50eHQnIFwpIDI+L2Rldi9udWxsIHwgaGVhZCAtbiA0KQpFT0YKfQoKbWVzaF9mb2xkX2xvY2FsKCkgewogIGxvY2FsIGV4dHJhPSIiCiAgWyAtZCAiJGJveC9tZXNoIiBdIHx8IHJldHVybiAwCiAgaWYgWyAtcyAiJGJveC9tZXNoL1JPVVRFUi5tZCIgXSAmJiBbICEgLUwgIiRib3gvbWVzaC9ST1VURVIubWQiIF07IHRoZW4KICAgIGV4dHJhPSIke2V4dHJhfUxvY2FsIFJPVVRFUjoKJChtZXNoX2ZvbGRfZXhjZXJwdCAiJGJveC9tZXNoL1JPVVRFUi5tZCIgMTIwMCkKIgogIGZpCiAgbWVzaF9mb2xkX2RpciAiJGJveC9tZXNoL2Rlc2lnbiIgImRlc2lnbiIKICBtZXNoX2ZvbGRfZGlyICIkYm94L21lc2gvYXJjaGl0ZWN0dXJlIiAiYXJjaGl0ZWN0dXJlIgogIGlmIFsgLXMgIiRib3gvbWVzaC9QT0xJQ1kubWQiIF0gJiYgWyAhIC1MICIkYm94L21lc2gvUE9MSUNZLm1kIiBdOyB0aGVuCiAgICBleHRyYT0iJHtleHRyYX1Mb2NhbCBQT0xJQ1k6CiQobWVzaF9mb2xkX2V4Y2VycHQgIiRib3gvbWVzaC9QT0xJQ1kubWQiIDgwMCkKIgogIGZpCiAgaWYgWyAtcyAiJGJveC9tZXNoL2FnZW50Lm1kIiBdICYmIFsgISAtTCAiJGJveC9tZXNoL2FnZW50Lm1kIiBdOyB0aGVuCiAgICBleHRyYT0iJHtleHRyYX1Mb2NhbCBhZ2VudDoKJChtZXNoX2ZvbGRfZXhjZXJwdCAiJGJveC9tZXNoL2FnZW50Lm1kIiA4MDApCiIKICBmaQogIFsgLW4gIiRleHRyYSIgXSB8fCByZXR1cm4gMAogIFsgLWYgIiRib3gvbWVzaC9zY291dC50eHQiIF0gfHwgcmV0dXJuIDAKICBlY2hvICJMb2NhbCBub3RlcyBmb2xkZWQgaW50byBTY291dC4iCiAgewogICAgcHJpbnRmICclc1xuJyAiJGV4dHJhIgogICAgZWNobwogICAgY2F0IC0tICIkYm94L21lc2gvc2NvdXQudHh0IgogIH0gPiAiJGJveC9tZXNoL3Njb3V0LmxvY2FsLnR4dCIgfHwgcmV0dXJuIDAKICBtdiAtZiAtLSAiJGJveC9tZXNoL3Njb3V0LmxvY2FsLnR4dCIgIiRib3gvbWVzaC9zY291dC50eHQiIHx8IHRydWUKfQoKIyBCRUdJTiBUSEVSTUFMIFBPTElDWQojIE1lcmlkaWFuIHRoZXJtYWwgcG9saWN5LiBPbmUgcG9saWN5LCBzaGFyZWQgYnkgdGhlIG1lc2ggb3JjaGVzdHJhdG9yIGFuZCB0aGVybWFsLXJ1bm5lci5zaC4KIyBOYW1lOiBwYXVzZS02OS1yZXN1bWUtNDkuCiMgUGF1c2UgbGxhbWEtY2xpIGF0IDY5Qy4gUmVzdW1lIGF0IDQ5Qy4gRnJvbSA1MEMgdGhyb3VnaCA2OEMsIGEgbmV3IHN0ZXAgdXNlcyAyIHRocmVhZHMuCiMgcXdlbi1tZXNoLnNoIGNhcnJpZXMgdGhpcyBmaWxlIGlubGluZSBiZXR3ZWVuIFRIRVJNQUwgUE9MSUNZIG1hcmtlcnMgc28gYSBkZWNvZGVkIHJ1bi5zaCBzdGlsbCBoYXMgdGhlIGdhdGUuCgpUSEVSTUFMX1BPTElDWT1wYXVzZS02OS1yZXN1bWUtNDkKVEhFUk1BTF9QQVVTRV9DPTY5ClRIRVJNQUxfUkVTVU1FX0M9NDkKVEhFUk1BTF9ET1dOU0hJRlRfVEhSRUFEUz0yCgptZXNoX3RlbXBfYygpIHsKICBsb2NhbCBtYXg9MCBnb3Q9MCB0IHJhdwogIGZvciByYXcgaW4gL3N5cy9jbGFzcy9wb3dlcl9zdXBwbHkvYmF0dGVyeS90ZW1wIC9zeXMvY2xhc3MvcG93ZXJfc3VwcGx5L0JhdHRlcnkvdGVtcDsgZG8KICAgIFsgLXIgIiRyYXciIF0gfHwgY29udGludWUKICAgIHQ9JCh0ciAtY2QgJzAtOScgPCAiJHJhdyIgMj4vZGV2L251bGwgfHwgdHJ1ZSkKICAgIFsgLW4gIiR0IiBdIHx8IGNvbnRpbnVlCiAgICBpZiBbICIkdCIgLWd0IDIwMCBdOyB0aGVuCiAgICAgIHQ9JCgodCAvIDEwKSkKICAgIGZpCiAgICBpZiBbICIkdCIgLWx0IDEwIF0gfHwgWyAiJHQiIC1ndCAxMjAgXTsgdGhlbgogICAgICBjb250aW51ZQogICAgZmkKICAgIGdvdD0xCiAgICBpZiBbICIkdCIgLWd0ICIkbWF4IiBdOyB0aGVuCiAgICAgIG1heD0kdAogICAgZmkKICBkb25lCiAgZm9yIHJhdyBpbiAvc3lzL2NsYXNzL3RoZXJtYWwvdGhlcm1hbF96b25lKi90ZW1wOyBkbwogICAgWyAtciAiJHJhdyIgXSB8fCBjb250aW51ZQogICAgdD0kKHRyIC1jZCAnMC05JyA8ICIkcmF3IiAyPi9kZXYvbnVsbCB8fCB0cnVlKQogICAgWyAtbiAiJHQiIF0gfHwgY29udGludWUKICAgIGlmIFsgIiR0IiAtZ3QgMTAwMCBdOyB0aGVuCiAgICAgIHQ9JCgodCAvIDEwMDApKQogICAgZmkKICAgIGlmIFsgIiR0IiAtbHQgMTAgXSB8fCBbICIkdCIgLWd0IDEyMCBdOyB0aGVuCiAgICAgIGNvbnRpbnVlCiAgICBmaQogICAgZ290PTEKICAgIGlmIFsgIiR0IiAtZ3QgIiRtYXgiIF07IHRoZW4KICAgICAgbWF4PSR0CiAgICBmaQogIGRvbmUKICBpZiBbICIkZ290IiA9IDEgXTsgdGhlbgogICAgcHJpbnRmICclcycgIiRtYXgiCiAgZmkKfQoKbWVzaF90aGVybWFsX2dhdGUoKSB7CiAgbG9jYWwgdGVtcAogIE1FU0hfVEhSRUFEUz0kKG5wcm9jIDI+L2Rldi9udWxsIHx8IHByaW50ZiAnJXMnIDQpCiAgdGVtcD0kKG1lc2hfdGVtcF9jKQogIGlmIFsgLXogIiR0ZW1wIiBdOyB0aGVuCiAgICBlY2hvICJUaGVybWFsIHBvbGljeSAke1RIRVJNQUxfUE9MSUNZfTogbm8gem9uZSByZWFkaW5nLiBDb250aW51aW5nIGF0ICR7TUVTSF9USFJFQURTfSB0aHJlYWRzLiIKICAgIHJldHVybiAwCiAgZmkKICBpZiBbICIkdGVtcCIgLWdlICIkVEhFUk1BTF9QQVVTRV9DIiBdOyB0aGVuCiAgICBlY2hvICJUaGVybWFsIHBvbGljeSAke1RIRVJNQUxfUE9MSUNZfTogJHt0ZW1wfUMuIFdhaXRpbmcgdG8gc3RhcnQgdW50aWwgJHtUSEVSTUFMX1JFU1VNRV9DfUMuIgogICAgd2hpbGUgdHJ1ZTsgZG8KICAgICAgc2xlZXAgMTUKICAgICAgdGVtcD0kKG1lc2hfdGVtcF9jKQogICAgICBpZiBbIC1uICIkdGVtcCIgXSAmJiBbICIkdGVtcCIgLWxlICIkVEhFUk1BTF9SRVNVTUVfQyIgXTsgdGhlbgogICAgICAgIGJyZWFrCiAgICAgIGZpCiAgICAgIGVjaG8gIlRoZXJtYWwgcG9saWN5ICR7VEhFUk1BTF9QT0xJQ1l9OiAke3RlbXA6LXVua25vd259Qy4gU3RpbGwgd2FpdGluZyB0byBzdGFydC4iCiAgICBkb25lCiAgICBNRVNIX1RIUkVBRFM9JChucHJvYyAyPi9kZXYvbnVsbCB8fCBwcmludGYgJyVzJyA0KQogICAgZWNobyAiVGhlcm1hbCBwb2xpY3kgJHtUSEVSTUFMX1BPTElDWX06ICR7dGVtcH1DLiBTdGFydGluZyBhdCAke01FU0hfVEhSRUFEU30gdGhyZWFkcy4iCiAgICByZXR1cm4gMAogIGZpCiAgaWYgWyAiJHRlbXAiIC1ndCAiJFRIRVJNQUxfUkVTVU1FX0MiIF07IHRoZW4KICAgIE1FU0hfVEhSRUFEUz0kVEhFUk1BTF9ET1dOU0hJRlRfVEhSRUFEUwogICAgZWNobyAiVGhlcm1hbCBwb2xpY3kgJHtUSEVSTUFMX1BPTElDWX06ICR7dGVtcH1DLiBEb3duc2hpZnQgdG8gJHtNRVNIX1RIUkVBRFN9IHRocmVhZHMuIgogICAgcmV0dXJuIDAKICBmaQogIGVjaG8gIlRoZXJtYWwgcG9saWN5ICR7VEhFUk1BTF9QT0xJQ1l9OiAke3RlbXB9Qy4gRnVsbCB0aHJlYWRzICgke01FU0hfVEhSRUFEU30pLiIKfQoKbWVzaF9zaWduYWxfdHJlZSgpIHsKICBsb2NhbCBzaWc9IiQxIiByb290PSIkMiIgcGlkCiAga2lsbCAiLSRzaWciICIkcm9vdCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogIGZvciBwaWQgaW4gJChwaWRvZiBsbGFtYS1jbGkgMj4vZGV2L251bGwgfHwgdHJ1ZSk7IGRvCiAgICBraWxsICItJHNpZyIgIiRwaWQiIDI+L2Rldi9udWxsIHx8IHRydWUKICBkb25lCn0KCm1lc2hfdGhlcm1hbF93YXRjaCgpIHsKICBsb2NhbCBjaGlsZD0iJDEiIHRlbXAKICB3aGlsZSBraWxsIC0wICIkY2hpbGQiIDI+L2Rldi9udWxsOyBkbwogICAgdGVtcD0kKG1lc2hfdGVtcF9jKQogICAgaWYgWyAtbiAiJHRlbXAiIF0gJiYgWyAiJHRlbXAiIC1nZSAiJFRIRVJNQUxfUEFVU0VfQyIgXTsgdGhlbgogICAgICBlY2hvICJUaGVybWFsIHBvbGljeSAke1RIRVJNQUxfUE9MSUNZfTogJHt0ZW1wfUMuIFBhdXNpbmcgbGxhbWEtY2xpIHVudGlsICR7VEhFUk1BTF9SRVNVTUVfQ31DLiIKICAgICAgbWVzaF9zaWduYWxfdHJlZSBTVE9QICIkY2hpbGQiCiAgICAgIHdoaWxlIGtpbGwgLTAgIiRjaGlsZCIgMj4vZGV2L251bGw7IGRvCiAgICAgICAgc2xlZXAgMTUKICAgICAgICB0ZW1wPSQobWVzaF90ZW1wX2MpCiAgICAgICAgaWYgWyAtbiAiJHRlbXAiIF0gJiYgWyAiJHRlbXAiIC1sZSAiJFRIRVJNQUxfUkVTVU1FX0MiIF07IHRoZW4KICAgICAgICAgIG1lc2hfc2lnbmFsX3RyZWUgQ09OVCAiJGNoaWxkIgogICAgICAgICAgZWNobyAiVGhlcm1hbCBwb2xpY3kgJHtUSEVSTUFMX1BPTElDWX06ICR7dGVtcH1DLiBSZXN1bWVkLiIKICAgICAgICAgIGJyZWFrCiAgICAgICAgZmkKICAgICAgICBlY2hvICJUaGVybWFsIHBvbGljeSAke1RIRVJNQUxfUE9MSUNZfTogJHt0ZW1wOi11bmtub3dufUMuIFN0aWxsIHBhdXNlZC4iCiAgICAgIGRvbmUKICAgIGZpCiAgICBzbGVlcCA1CiAgZG9uZQp9CiMgRU5EIFRIRVJNQUwgUE9MSUNZCgpydW5fb25lKCkgewogIGxvY2FsIG1vZGVsPSIkMSIgcHJvbXB0PSIkMiIgbnRvaz0iJDMiIGN0eD0iJDQiIGxheWVycz0iJDUiIGRlc3Q9IiQ2IiBtb2RlIGNoaWxkIHRocmVhZHMKICBpZiBtZXNoX2J1c3k7IHRoZW4KICAgIGVjaG8gIlIwOiBsbGFtYS1jbGkgaXMgYWxyZWFkeSBydW5uaW5nLiBOb3QgbG9hZGluZyBhbm90aGVyIG1vZGVsLiIKICAgIHJldHVybiAxCiAgZmkKICBpZiBbICEgLWYgIiRtb2RlbCIgXTsgdGhlbgogICAgZWNobyAiTWlzc2luZyBtb2RlbDogJG1vZGVsIgogICAgcmV0dXJuIDEKICBmaQogIG1lc2hfdGhlcm1hbF9nYXRlIHx8IHJldHVybiAxCiAgdGhyZWFkcz0iJHtNRVNIX1RIUkVBRFM6LTR9IgogIG1vZGU9JChhZ2VudF9sbGFtYV9tb2RlIDI+L2Rldi9udWxsIHx8IHByaW50ZiAnJXNcbicgcCkKICBpZiBbICIkbW9kZSIgPSAiZiIgXTsgdGhlbgogICAgbGxhbWEtY2xpIC1tICIkbW9kZWwiIC1mICIkcHJvbXB0IiAtbiAiJG50b2siIC1jICIkY3R4IiAtbmdsICIkbGF5ZXJzIiAtdCAiJHRocmVhZHMiID4iJGRlc3QiIDI+JjEgJgogIGVsc2UKICAgIGxsYW1hLWNsaSAtbSAiJG1vZGVsIiAtcCAiJChjYXQgLS0gIiRwcm9tcHQiKSIgLW4gIiRudG9rIiAtYyAiJGN0eCIgLW5nbCAiJGxheWVycyIgLXQgIiR0aHJlYWRzIiA+IiRkZXN0IiAyPiYxICYKICBmaQogIGNoaWxkPSQhCiAgbWVzaF90aGVybWFsX3dhdGNoICIkY2hpbGQiCiAgd2FpdCAiJGNoaWxkIiB8fCB0cnVlCiAgY2F0IC0tICIkZGVzdCIKfQoKbWVzaF9sZWFkX3VudXNhYmxlKCkgewogIGxvY2FsIGRlc3Q9IiQxIiBib2R5IGxldHRlcnMgdG90YWwKICBbIC1zICIkZGVzdCIgXSB8fCByZXR1cm4gMAogIGlmIGdyZXAgLUVpcSAnZ2dtbF92dWxrYW58dnVsa2FuIGVycm9yfGZhaWxlZCB0byBhbGxvY2F0ZXxvdXQgb2YgbWVtb3J5fGVycm9yIGxvYWRpbmcgbW9kZWx8R0dNTF9BU1NFUlR8bm8gZGV2aWNlcyBmb3VuZHxnZ21sX2JhY2tlbmRfZGV2X2J5X3R5cGV8Q1VEQSBlcnJvcnxpbGxlZ2FsIGluc3RydWN0aW9ufENBTk5PVCBMSU5LIEVYRUNVVEFCTEUnICIkZGVzdCI7IHRoZW4KICAgIHJldHVybiAwCiAgZmkKICBib2R5PSQoYXdrICdCRUdJTntJR05PUkVDQVNFPTF9IC9sbGFtYV9wZXJmfGxsYW1hX3xnZ21sX3xsb2FkIHRpbWV8ZXZhbCB0aW1lfHNhbXBsaW5nIHRpbWV8XmJ1aWxkOi8ge25leHR9IHtwcmludH0nICIkZGVzdCIgfCB0ciAtZCAnWzpzcGFjZTpdJykKICB0b3RhbD0keyNib2R5fQogIGlmIFsgIiR0b3RhbCIgLWx0IDQwIF07IHRoZW4KICAgIHJldHVybiAwCiAgZmkKICBsZXR0ZXJzPSQocHJpbnRmICclcycgIiRib2R5IiB8IHRyIC1jZCAnQS1aYS16JyB8IHdjIC1jIHwgdHIgLWQgJyAnKQogIGlmIFsgJCgobGV0dGVycyAqIDEwMCAvIHRvdGFsKSkgLWx0IDM1IF07IHRoZW4KICAgIHJldHVybiAwCiAgZmkKICByZXR1cm4gMQp9CgptZXNoX3J1bl9sZWFkKCkgewogIGxvY2FsIGNoaWxkCiAgZWNobyAiUHJlc2V0IGdwdV9sZWFkLiBUcnlpbmcgbmdsIDk5LiIKICBpZiBbICEgLWYgIiRib3gvLmFnZW50LnNoIiBdOyB0aGVuCiAgICBlY2hvICJBZ2VudCBzY3JpcHQgaXMgbWlzc2luZy4gTGVhZCBDUFUgcGF0aCwgbmdsIDAuIgogICAgcnVuX29uZSAiJGxlYWQiICIkYm94Ly5wcm9tcHQiIDIyMCAyMDQ4IDAgIiRib3gvbWVzaC9sZWFkLW91dC50eHQiCiAgICByZXR1cm4gJD8KICBmaQogIGlmIG1lc2hfYnVzeTsgdGhlbgogICAgZWNobyAiUjA6IGxsYW1hLWNsaSBpcyBhbHJlYWR5IHJ1bm5pbmcuIE5vdCBsb2FkaW5nIExlYWQuIgogICAgcmV0dXJuIDEKICBmaQogIG1lc2hfdGhlcm1hbF9nYXRlIHx8IHJldHVybiAxCiAgYmFzaCAiJGJveC8uYWdlbnQuc2giICIkbGVhZCIgOTkgPiAiJGJveC9tZXNoL2xlYWQtb3V0LnR4dCIgMj4mMSAmCiAgY2hpbGQ9JCEKICBtZXNoX3RoZXJtYWxfd2F0Y2ggIiRjaGlsZCIKICB3YWl0ICIkY2hpbGQiIHx8IHRydWUKICBpZiBtZXNoX2J1c3k7IHRoZW4KICAgIGVjaG8gIlIwOiBsbGFtYS1jbGkgaXMgc3RpbGwgcnVubmluZy4gQ1BVIGZhbGxiYWNrIHdhcyBub3Qgc3RhcnRlZC4iCiAgICBjYXQgLS0gIiRib3gvbWVzaC9sZWFkLW91dC50eHQiCiAgICByZXR1cm4gMAogIGZpCiAgaWYgbWVzaF9sZWFkX3VudXNhYmxlICIkYm94L21lc2gvbGVhZC1vdXQudHh0IjsgdGhlbgogICAgZWNobyAiR1BVIExlYWQgd2FzIHVudXNhYmxlLiBDUFUgZmFsbGJhY2ssIG5nbCAwLiIKICAgIHJ1bl9vbmUgIiRsZWFkIiAiJGJveC8ucHJvbXB0IiAyMjAgMjA0OCAwICIkYm94L21lc2gvbGVhZC1vdXQudHh0IgogICAgcmV0dXJuICQ/CiAgZmkKICBjYXQgLS0gIiRib3gvbWVzaC9sZWFkLW91dC50eHQiCn0KCm1lc2hfZmFjZSgpIHsKICBsb2NhbCBzcmM9IiQxIgogIFsgLWYgIiRzcmMiIF0gfHwgcmV0dXJuIDAKICBhd2sgJ0JFR0lOe0lHTk9SRUNBU0U9MX0gL2xsYW1hX3BlcmZ8bG9hZCB0aW1lfGV2YWwgdGltZXxzYW1wbGluZyB0aW1lLyB7bmV4dH0ge3ByaW50fScgIiRzcmMiIHwgdGFpbCAtYyA3MDAKfQoKbWVzaF9qc29uKCkgewogIGdyZXAgLW8gJ3tbXn1dKn0nICIkMSIgMj4vZGV2L251bGwgfCB0YWlsIC1uIDEgfHwgdHJ1ZQp9CgptZXNoX3J1bl9zZXRfYigpIHsKICBsb2NhbCBzY3R4PSIke1NDT1VUX0NUWDotMjA0OH0iIGJjdHg9IiR7U0NSSUJFX0NUWDotMjA0OH0iIG1jdHg9IiR7TUlEX0NUWDotMjA0OH0iIGxjdHg9IiR7TEVBRF9DVFg6LTQwOTZ9IiBzY29yZSByZWNpcGUKICBlY2hvICJTZXQgQi4gTW9kZWxzIGluIH4vbW9kZWxzMi4gU2NvdXQgZXh0cmFjdCwgU2NyaWJlIHJlY2lwZSwgTWlkIEUtRS1BLVQsIExlYWQgcGxhbi4iCiAgZWNobyAiVGhlcm1hbCBwb2xpY3kgcGF1c2UtNjktcmVzdW1lLTQ5LiIKICBtZXNoX29rX25hbWUgIiRTQ09VVF9GSUxFIiB8fCB7IGVjaG8gIkEgU2V0IEIgZmlsZSBuYW1lIHdhcyByZWZ1c2VkLiI7IGVjaG8gRE9ORTsgcmV0dXJuIDA7IH0KICBtZXNoX29rX25hbWUgIiRTQ1JJQkVfRklMRSIgfHwgeyBlY2hvICJBIFNldCBCIGZpbGUgbmFtZSB3YXMgcmVmdXNlZC4iOyBlY2hvIERPTkU7IHJldHVybiAwOyB9CiAgbWVzaF9va19uYW1lICIkTUlEX0ZJTEUiIHx8IHsgZWNobyAiQSBTZXQgQiBmaWxlIG5hbWUgd2FzIHJlZnVzZWQuIjsgZWNobyBET05FOyByZXR1cm4gMDsgfQogIG1lc2hfb2tfbmFtZSAiJExFQURfRklMRSIgfHwgeyBlY2hvICJBIFNldCBCIGZpbGUgbmFtZSB3YXMgcmVmdXNlZC4iOyBlY2hvIERPTkU7IHJldHVybiAwOyB9CiAgaWYgbWVzaF9yZWZ1c2VkICIkU0NPVVRfRklMRSIgfHwgbWVzaF9yZWZ1c2VkICIkU0NSSUJFX0ZJTEUiIHx8IG1lc2hfcmVmdXNlZCAiJE1JRF9GSUxFIiB8fCBtZXNoX3JlZnVzZWQgIiRMRUFEX0ZJTEUiOyB0aGVuCiAgICBlY2hvICJSMDogdGhhdCBtb2RlbCBpcyBub3Qgb24gU2V0IEIuIgogICAgZWNobyBET05FCiAgICByZXR1cm4gMAogIGZpCiAgY2FzZSAiJFNDT1VUX0ZJTEUiIGluCiAgICBxd2VuMi41LTAuNWItaW5zdHJ1Y3QtcTRfa19tLmdndWYpIDs7CiAgICAqKSBlY2hvICJTY291dCBtdXN0IGJlIHF3ZW4yLjUtMC41Yi1pbnN0cnVjdC1xNF9rX20uZ2d1Zi4iOyBlY2hvIERPTkU7IHJldHVybiAwIDs7CiAgZXNhYwogIGNhc2UgIiRTQ1JJQkVfRklMRSIgaW4KICAgIHF3ZW4yLjUtMC41Yi1pbnN0cnVjdC1xNF9rX20uZ2d1ZikgOzsKICAgICopIGVjaG8gIlNjcmliZSBtdXN0IGJlIHF3ZW4yLjUtMC41Yi1pbnN0cnVjdC1xNF9rX20uZ2d1Zi4iOyBlY2hvIERPTkU7IHJldHVybiAwIDs7CiAgZXNhYwogIGNhc2UgIiRNSURfRklMRSIgaW4KICAgIG1pY3Jvc29mdF9QaGktNC1taW5pLWluc3RydWN0LVE0X0tfTS5nZ3VmKSA7OwogICAgKikgZWNobyAiTWlkIG11c3QgYmUgbWljcm9zb2Z0X1BoaS00LW1pbmktaW5zdHJ1Y3QtUTRfS19NLmdndWYuIjsgZWNobyBET05FOyByZXR1cm4gMCA7OwogIGVzYWMKICBjYXNlICIkTEVBRF9GSUxFIiBpbgogICAgUXdlbjMtNEItUTRfS19NLmdndWYpIDs7CiAgICAqKSBlY2hvICJMZWFkIG11c3QgYmUgUXdlbjMtNEItUTRfS19NLmdndWYuIjsgZWNobyBET05FOyByZXR1cm4gMCA7OwogIGVzYWMKICBpZiAhIGNvbW1hbmQgLXYgbGxhbWEtY2xpID4vZGV2L251bGwgMj4mMTsgdGhlbgogICAgZWNobyAibGxhbWEuY3BwIGlzIG5vdCBpbnN0YWxsZWQgeWV0LiBQcmVzcyBEb3dubG9hZCBtb2RlbCBvbiBNZXNoLiIKICAgIGVjaG8gRE9ORQogICAgcmV0dXJuIDAKICBmaQogIGlmIFsgISAtZiAiJHNjb3V0IiBdIHx8IFsgISAtZiAiJHNjcmliZSIgXTsgdGhlbgogICAgZWNobyAiU2V0IEIgU2NvdXQgYW5kIFNjcmliZSBhcmUgbm90IGluIH4vbW9kZWxzMiB5ZXQuIgogICAgZWNobyBET05FCiAgICByZXR1cm4gMAogIGZpCiAgbWVzaF9mb2xkX2xvY2FsIHx8IHRydWUKICB7CiAgICBlY2hvICJJQ00gaXMgbWFuZGF0b3J5LiBEbyBub3QgaW52ZW50IGEgZmFjdC4gTGFiZWwgdGhlIHVua25vd24uIgogICAgZWNobyAiWW91IGFyZSBTY291dC4gRXh0cmFjdCBvbmx5LiBQYWNrZXQgaGVhZGluZ3M6IEZBQ1RTLCBVTktOT1dOUywgUEFUSFMsIFJJU0tTLiIKICAgIGVjaG8gIlF1ZXN0aW9uIGFuZCBsb2NhbCBub3RlczoiCiAgICBoZWFkIC1jIDE2MDAgLS0gIiRib3gvbWVzaC9zY291dC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICB9ID4gIiRib3gvbWVzaC9zY291dC1leHRyYWN0LnR4dCIKICBlY2hvICJTVEVQIFNjb3V0IGV4dHJhY3QiCiAgcnVuX29uZSAiJHNjb3V0IiAiJGJveC9tZXNoL3Njb3V0LWV4dHJhY3QudHh0IiA0MDAgIiRzY3R4IiAwICIkYm94L21lc2gvcGFja2V0LnR4dCIgfHwgdHJ1ZQogIHsKICAgIGVjaG8gIklDTSBpcyBtYW5kYXRvcnkuIERvIG5vdCBpbnZlbnQgYSBmYWN0LiBEbyBub3QgYWRkIGEgc291cmNlLiIKICAgIGVjaG8gIllvdSBhcmUgU2NyaWJlLiBXcml0ZSBhIHJlY2lwZSBmcm9tIHRoZSBleHRyYWN0LiIKICAgIGVjaG8gIkV4dHJhY3Q6IgogICAgaGVhZCAtYyAxNjAwIC0tICIkYm94L21lc2gvcGFja2V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogIH0gPiAiJGJveC9tZXNoL3NjcmliZS1yZWNpcGUtcHJvbXB0LnR4dCIKICBlY2hvICJTVEVQIFNjcmliZSByZWNpcGUiCiAgcnVuX29uZSAiJHNjcmliZSIgIiRib3gvbWVzaC9zY3JpYmUtcmVjaXBlLXByb21wdC50eHQiIDMyMCAiJGJjdHgiIDAgIiRib3gvbWVzaC9yZWNpcGUudHh0IiB8fCB0cnVlCiAgcmVjaXBlPSIkYm94L21lc2gvcmVjaXBlLnR4dCIKICBpZiBbIC1mICIkbWlkIiBdOyB0aGVuCiAgICB7CiAgICAgIGVjaG8gIklDTSBpcyBtYW5kYXRvcnkuIERvIG5vdCBpbnZlbnQgYSBmYWN0LiIKICAgICAgZWNobyAiWW91IGFyZSBNaWQuIFZlcmlmeSBFLUUtQS1ULiBQcmludCBvbmUgbGluZSBTQ09SRTogTiB3aGVyZSBOIGlzIDAgdG8gMTAuIgogICAgICBlY2hvICJBIHNjb3JlIHVuZGVyIDcgc2VuZHMgdGhlIHJlY2lwZSBiYWNrIHRvIFNjcmliZS4iCiAgICAgIGVjaG8gIlJlY2lwZToiCiAgICAgIGhlYWQgLWMgMTQwMCAtLSAiJHJlY2lwZSIgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgfSA+ICIkYm94L21lc2gvbWlkLXZlcmlmeS50eHQiCiAgICBlY2hvICJTVEVQIE1pZCB2ZXJpZnkiCiAgICBydW5fb25lICIkbWlkIiAiJGJveC9tZXNoL21pZC12ZXJpZnkudHh0IiAyMjAgIiRtY3R4IiAwICIkYm94L21lc2gvbWlkLW91dC50eHQiIHx8IHRydWUKICAgIHNjb3JlPSQoZ3JlcCAtbyAtRSAnU0NPUkU6W1s6c3BhY2U6XV0qWzAtOV0rJyAiJGJveC9tZXNoL21pZC1vdXQudHh0IiAyPi9kZXYvbnVsbCB8IGhlYWQgLW4gMSB8IHRyIC1jZCAnMC05JykKICAgIGlmIFsgLXogIiRzY29yZSIgXSB8fCBbICIkc2NvcmUiIC1sdCA3IF07IHRoZW4KICAgICAgZWNobyAiU2NvcmUgdW5kZXIgNy4gT25lIHBhc3MgYmFjayB0byBTY3JpYmUuIgogICAgICB7CiAgICAgICAgZWNobyAiSUNNIGlzIG1hbmRhdG9yeS4gRG8gbm90IGludmVudCBhIGZhY3QuIERvIG5vdCBhZGQgYSBzb3VyY2UuIgogICAgICAgIGVjaG8gIllvdSBhcmUgU2NyaWJlLiBSZXZpc2UgdGhlIHJlY2lwZS4gVGhlIHZlcmlmeSBzY29yZSB3YXMgdW5kZXIgNy4iCiAgICAgICAgZWNobyAiVmVyaWZ5IG5vdGU6IgogICAgICAgIGhlYWQgLWMgODAwIC0tICIkYm94L21lc2gvbWlkLW91dC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgICBlY2hvICJSZWNpcGU6IgogICAgICAgIGhlYWQgLWMgMTIwMCAtLSAiJHJlY2lwZSIgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgICB9ID4gIiRib3gvbWVzaC9zY3JpYmUtcmV2aXNlLXByb21wdC50eHQiCiAgICAgIHJ1bl9vbmUgIiRzY3JpYmUiICIkYm94L21lc2gvc2NyaWJlLXJldmlzZS1wcm9tcHQudHh0IiAzMjAgIiRiY3R4IiAwICIkYm94L21lc2gvcmVjaXBlLnR4dCIgfHwgdHJ1ZQogICAgZmkKICBlbHNlCiAgICBlY2hvICJTZXQgQiBNaWQgaXMgbm90IGluIH4vbW9kZWxzMiB5ZXQuIFZlcmlmeSB3YXMgc2tpcHBlZC4iCiAgZmkKICBpZiBbIC1mICIkbGVhZCIgXTsgdGhlbgogICAgZWNobyAiU1RFUCBMZWFkIHBsYW4iCiAgICB7CiAgICAgIGVjaG8gIklDTSBpcyBtYW5kYXRvcnkuIERvIG5vdCBpbnZlbnQgYSBmYWN0IG9yIGEgc291cmNlLiIKICAgICAgZWNobyAiWW91IGFyZSBMZWFkLiBXcml0ZSB0aGUgcGxhbiBmcm9tIHRoZSByZWNpcGUgYW5kIHRoZSB2ZXJpZnkgbm90ZS4iCiAgICAgIGVjaG8gIlJlY2lwZToiCiAgICAgIGhlYWQgLWMgMTQwMCAtLSAiJGJveC9tZXNoL3JlY2lwZS50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICAgICAgZWNobyAiVmVyaWZ5OiIKICAgICAgaGVhZCAtYyA4MDAgLS0gIiRib3gvbWVzaC9taWQtb3V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgfSA+ICIkYm94L21lc2gvbGVhZC1wbGFuLnR4dCIKICAgIHJ1bl9vbmUgIiRsZWFkIiAiJGJveC9tZXNoL2xlYWQtcGxhbi50eHQiIDQwMCAiJGxjdHgiIDAgIiRib3gvbWVzaC9sZWFkLW91dC50eHQiIHx8IHRydWUKICAgIGVjaG8gIkxlYWQgdW5sb2FkZWQuIgogIGVsc2UKICAgIGVjaG8gIlNldCBCIExlYWQgaXMgbm90IGluIH4vbW9kZWxzMiB5ZXQuIgogIGZpCiAgZmFjZT0kKG1lc2hfZmFjZSAiJGJveC9tZXNoL2xlYWQtb3V0LnR4dCIpCiAgaWYgWyAteiAiJGZhY2UiIF07IHRoZW4KICAgIGZhY2U9JChtZXNoX2ZhY2UgIiRib3gvbWVzaC9yZWNpcGUudHh0IikKICBmaQogIGlmIFsgLXogIiRmYWNlIiBdOyB0aGVuCiAgICBmYWNlPSJTZXQgQi4gVGhlIGV4dHJhY3QgaXMgc2F2ZWQuIE5vIHNwZWVjaCBsaW5lIHdhcyBwcm9kdWNlZC4iCiAgZmkKICBwcmludGYgJ01FUklESUFOX1NDUklCRVxuJXNcbk1FUklESUFOX1NDUklCRV9FTkRcbicgIiRmYWNlIgogIGVjaG8gRE9ORQp9Cgpta2RpciAtcCAtLSAiJGJveC9tZXNoIiB8fCBleGl0IDAKaWYgWyAtcyAiJGJveC9tZXNoL2ljbS1oZWFsLnNoIiBdICYmIFsgISAtTCAiJGJveC9tZXNoL2ljbS1oZWFsLnNoIiBdOyB0aGVuCiAgYmFzaCAiJGJveC9tZXNoL2ljbS1oZWFsLnNoIiB8fCB0cnVlCmVsaWYgWyAtcyAiJEhPTUUvbWVyaWRpYW4tcHJvL2ljbS1oZWFsLnNoIiBdICYmIFsgISAtTCAiJEhPTUUvbWVyaWRpYW4tcHJvL2ljbS1oZWFsLnNoIiBdOyB0aGVuCiAgYmFzaCAiJEhPTUUvbWVyaWRpYW4tcHJvL2ljbS1oZWFsLnNoIiB8fCB0cnVlCmZpCmlmIFsgLXMgIiRib3gvbWVzaC9yb3N0ZXIuZW52IiBdICYmIFsgISAtTCAiJGJveC9tZXNoL3Jvc3Rlci5lbnYiIF07IHRoZW4KICAuICIkYm94L21lc2gvcm9zdGVyLmVudiIKZmkKbW9kZWxzX2Rpcj0iJHtNT0RFTFNfRElSOi0kSE9NRS9tb2RlbHN9IgpjYXNlICIkbW9kZWxzX2RpciIgaW4KICAiJEhPTUUvbW9kZWxzInwiJEhPTUUvbW9kZWxzMiIpIDs7CiAgKikgbW9kZWxzX2Rpcj0iJEhPTUUvbW9kZWxzIiA7Owplc2FjCnNjb3V0PSIkbW9kZWxzX2Rpci8ke1NDT1VUX0ZJTEU6LX0iCnNjcmliZT0iJG1vZGVsc19kaXIvJHtTQ1JJQkVfRklMRTotfSIKbWlkPSIkbW9kZWxzX2Rpci8ke01JRF9GSUxFOi19IgpsZWFkPSIkbW9kZWxzX2Rpci8ke0xFQURfRklMRTotfSIKaWYgWyAtZiAiJGJveC8uYWdlbnQuc2giIF07IHRoZW4KICBNRVJJRElBTl9BR0VOVF9TT1VSQ0U9MSAuICIkYm94Ly5hZ2VudC5zaCIKZmkKCm1lc2hfaWNtKCkgewogIHByaW50ZiAnJXNcbicgIklDTSBpcyBtYW5kYXRvcnkuIE9uZSBza2lsbCBmb2xkZXIgaGFzIENPTlRFWFQubWQgd2l0aCBJbnB1dHMsIFByb2Nlc3MsIGFuZCBPdXRwdXRzLCB0aGUgY2FyZCBpbiByZWZlcmVuY2VzLywgYW5kIHByYWN0aWNlIGluIG91dHB1dC8uIE9uZSBiaWJsaW9ncmFwaHkubWQgYW5kIG9uZSByb3V0aW5nIENPTlRFWFQubWQgcGVyIHRyZWUuIEtlZXAgdGhlIHNpeCBmaWVsZHMgdG9nZXRoZXIuIERvIG5vdCBpbnZlbnQgYSBmYWN0LiBMYWJlbCB0aGUgdW5rbm93bi4gVGhlIGFjdGl2ZSBzZXQgcm9zdGVyIGlzIHRoZSBvbmUgaW4gcm9zdGVyLmVudi4iCn0KCmlmIFsgIiR7TUVTSF9TRVQ6LX0iID0gInNldC1iIiBdOyB0aGVuCiAgbWVzaF9ydW5fc2V0X2IKICBleGl0IDAKZmkKCmVjaG8gIlF3ZW4gbWVzaC4gU2NvdXQsIHRoZW4gU2NyaWJlLCB0aGVuIE1pZC4gTGVhZCBsb2FkcyBvbmx5IGZvciBhIGhhcmQgZmlsZSwgdGhlbiB1bmxvYWRzLiBTY3JpYmUgaXMgdGhlIHNwZWVjaCBmYWNlLiIKZWNobyAiUHJlc2V0czogY3B1X21lc2ggaXMgU2NvdXQsIFNjcmliZSwgYW5kIE1pZCBhdCBuZ2wgMC4gZ3B1X2xlYWQgdHJpZXMgbmdsIDk5LCB0aGVuIG5nbCAwIGlmIHRoZSBHUFUgcnVuIGZhaWxzLiIKc3dhcD0kKGF3ayAnL1N3YXBUb3RhbDovIHtwcmludCAkMn0nIC9wcm9jL21lbWluZm8gMj4vZGV2L251bGwgfHwgdHJ1ZSkKaWYgWyAiJHtzd2FwOi0wfSIgLWd0IDAgXTsgdGhlbgogIGVjaG8gIlN3YXAgaXMgb24uIERlY29kZSBpcyBoYXBwaWVyIHdpdGggc3dhcCBvZmYuIFRoaXMgcGhvbmUgaXMgbm90IHJvb3RlZCwgc28gTWVyaWRpYW4gbGVhdmVzIHN3YXAgYWxvbmUuIgpmaQoKZm9yIG1lc2hfbmFtZSBpbiAiJFNDT1VUX0ZJTEUiICIkU0NSSUJFX0ZJTEUiICIkTUlEX0ZJTEUiICIkTEVBRF9GSUxFIjsgZG8KICBtZXNoX29rX25hbWUgIiRtZXNoX25hbWUiIHx8IHsgZWNobyAiQSBRd2VuIGZpbGUgbmFtZSB3YXMgcmVmdXNlZC4iOyBleGl0IDA7IH0KICBpZiBtZXNoX3JlZnVzZWQgIiRtZXNoX25hbWUiOyB0aGVuCiAgICBlY2hvICJSMDogdGhhdCBtb2RlbCBpcyBub3Qgb24gdGhlIFF3ZW4gbWVzaC4iCiAgICBleGl0IDAKICBmaQpkb25lCmNhc2UgIiRTQ09VVF9GSUxFIiBpbgogIGNwdV9zY291dF8wYjUuZ2d1ZnwqMC41Qip8KjAuNkIqfCowYjUqKSA7OwogICopIGVjaG8gIlNjb3V0IG11c3QgYmUgUXdlbiAwLjVCLiI7IGV4aXQgMCA7Owplc2FjCmNhc2UgIiRTQ1JJQkVfRklMRSIgaW4KICBjcHVfc2NyaWJlXzBiNS5nZ3VmfCowLjVCKnwqMC42Qip8KjBiNSopIDs7CiAgKikgZWNobyAiU2NyaWJlIG11c3QgYmUgUXdlbiAwLjVCLiI7IGV4aXQgMCA7Owplc2FjCmNhc2UgIiRNSURfRklMRSIgaW4KICBtaWRfM2IuZ2d1ZnxjcHVfbWlkXzNiLmdndWZ8KlF3ZW4yLjUtM0IqfCpxd2VuMi41LTNiKikgOzsKICAqKSBlY2hvICJNaWQgbXVzdCBiZSBRd2VuIDNCLiI7IGV4aXQgMCA7Owplc2FjCmNhc2UgIiRMRUFEX0ZJTEUiIGluCiAgZ3B1X2xlYWRfN0IuZ2d1ZnwqN0IqfCo4Qip8KjlCKikgOzsKICAqKSBlY2hvICJSMDogTGVhZCBpcyBvbmUgUXdlbiA3Qi4iOyBleGl0IDAgOzsKZXNhYwoKaWYgISBjb21tYW5kIC12IGxsYW1hLWNsaSA+L2Rldi9udWxsIDI+JjE7IHRoZW4KICBlY2hvICJsbGFtYS5jcHAgaXMgbm90IGluc3RhbGxlZCB5ZXQuIFByZXNzIERvd25sb2FkIG1vZGVsIG9uIE1lc2guIgogIGV4aXQgMApmaQppZiBbICEgLWYgIiRzY291dCIgXTsgdGhlbgogIGVjaG8gIlNjb3V0IFF3ZW4gaXMgbm90IG9uIHRoZSBwaG9uZSB5ZXQuIFByZXNzIERvd25sb2FkIG1vZGVsIG9uIE1lc2guIgogIGV4aXQgMApmaQppZiBbICEgLWYgIiRzY3JpYmUiIF07IHRoZW4KICBlY2hvICJTY3JpYmUgUXdlbiBpcyBub3Qgb24gdGhlIHBob25lIHlldC4gUHJlc3MgRG93bmxvYWQgbW9kZWwgb24gTWVzaC4iCiAgZXhpdCAwCmZpCgptZXNoX2ZvbGRfbG9jYWwgfHwgdHJ1ZQplY2hvICJTVEVQIFNjb3V0IgpydW5fb25lICIkc2NvdXQiICIkYm94L21lc2gvc2NvdXQudHh0IiA0MDAgMTAyNCAwICIkYm94L21lc2gvcGFja2V0LnR4dCIgfHwgdHJ1ZQoKewogIG1lc2hfaWNtCiAgZWNobyAiWW91IGFyZSBTY3JpYmUuIEZvcm1hdCBzdHVicyBvbmx5LiBZb3UgYXJlIHRoZSBzcGVlY2ggZmFjZS4iCiAgZWNobyAiUmVmdXNlIGEgY2xhaW0gdGhhdCBpcyBub3QgaW4gRkFDVFMuIERvIG5vdCBhZGQgYSBzb3VyY2UuIgogIGVjaG8gIkZyb20gdGhlIFBhY2tldCwgd3JpdGUgc2hvcnQgc3R1YnM6IHdoYXQgdG8gc2F5LCB3aGF0IGlzIHVua25vd24sIHdoYXQgdG8gYXNrIG5leHQuIgogIGVjaG8gIlJlZnVzZSBjbGFpbXMgdGhhdCBhcmUgbm90IGluIEZBQ1RTLiBFbmdsaXNoIG9ubHkuIgogIGVjaG8gIlBhY2tldDoiCiAgaGVhZCAtYyAxNjAwIC0tICIkYm94L21lc2gvcGFja2V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQp9ID4gIiRib3gvbWVzaC9zY3JpYmUtc3R1YnMtcHJvbXB0LnR4dCIKZWNobyAiU1RFUCBTY3JpYmUgc3R1YnMiCnJ1bl9vbmUgIiRzY3JpYmUiICIkYm94L21lc2gvc2NyaWJlLXN0dWJzLXByb21wdC50eHQiIDI4MCAxMDI0IDAgIiRib3gvbWVzaC9zY3JpYmUtc3R1YnMudHh0IiB8fCB0cnVlCgplc2NhbGF0ZT1ubwpyb3V0ZT1zY3JpYmUKbWlkX2pzb249IiIKcnVuX21pZD1ubwppZiBbICIkZm9yY2VfbGVhZCIgPSAieWVzIiBdICYmIFsgIiRmb3JjZV9taWQiICE9ICJ5ZXMiIF07IHRoZW4KICBlY2hvICJGb3JjZSBMZWFkLiBNaWQgc3RheXMgdW5sb2FkZWQuIgogIGVzY2FsYXRlPXllcwplbHNlCiAgaWYgWyAiJGZvcmNlX21pZCIgPSAieWVzIiBdIHx8IFsgIiRtaWRfb3B0IiAhPSAibm8iIF07IHRoZW4KICAgIHJ1bl9taWQ9eWVzCiAgZmkKICByYW09JChtZXNoX3JhbV9rYikKICBpZiBbICIkcnVuX21pZCIgPSAieWVzIiBdICYmIFsgLW4gIiRyYW0iIF0gJiYgWyAiJHJhbSIgLWxlIDMxNDU3MjggXSAmJiBbICIkbWlkX29wdCIgIT0gInllcyIgXSAmJiBbICIkZm9yY2VfbWlkIiAhPSAieWVzIiBdOyB0aGVuCiAgICBydW5fbWlkPW5vCiAgICBlY2hvICJNaWQgaXMgb2ZmLiBVc2FibGUgUkFNIGlzIGFib3V0IDMgR0Igb3IgbGVzcy4gQWxsb3cgTWlkIG9uIE1lc2ggdG8gb3B0IGluLiIKICBmaQogIGlmIFsgIiRydW5fbWlkIiA9ICJ5ZXMiIF0gJiYgWyAhIC1mICIkbWlkIiBdOyB0aGVuCiAgICBydW5fbWlkPW5vCiAgICBlY2hvICJNaWQgUXdlbiBpcyBub3Qgb24gdGhlIHBob25lIHlldC4gU2NyaWJlIHdpbGwgYW5zd2VyIGZyb20gdGhlIFBhY2tldC4iCiAgZmkKZmkKCmlmIFsgIiRydW5fbWlkIiA9ICJ5ZXMiIF07IHRoZW4KICB7CiAgICBtZXNoX2ljbQogICAgZWNobyAiWW91IGFyZSBNaWQuIFlvdSBvd24gc29ydGluZyBhbmQgcm91dGluZy4iCiAgICBlY2hvICJSZWplY3QgYSB3cml0ZSB0aGF0IGJyZWFrcyB0aGUgSUNNIGxheW91dC4iCiAgICBlY2hvICJSZWFkIHRoZSBQYWNrZXQgYW5kIHRoZSBTY3JpYmUgc3R1YnMuIERlY2lkZS4gU2VuZCB3b3JrIGJhY2sgdG8gU2NvdXQgb3IgU2NyaWJlLiIKICAgIGVjaG8gIlJlcGx5IHdpdGggb25lIEpTT04gb2JqZWN0IGFuZCBubyBleHRyYSBicmFjZXM6IgogICAgZWNobyAneyJyb3V0ZSI6InNjcmliZSIsImVzY2FsYXRlIjpmYWxzZSwicmVhc29uIjoiIiwidGFza190eXBlIjoiY2hhdCIsInJpc2siOiJsb3ciLCJpbnN0cnVjdGlvbiI6InNob3J0IG5vdGUifScKICAgIGVjaG8gInJvdXRlIGlzIHNjb3V0LCBzY3JpYmUsIG9yIGxlYWQuIGluc3RydWN0aW9uIGhhcyBubyBxdW90ZXMuIgogICAgZWNobyAiU2V0IGVzY2FsYXRlIHRydWUgb25seSB3aGVuIGEgaGFyZCBmaWxlIGlzIGJleW9uZCB0aGlzIDNCIHBhc3MuIgogICAgZWNobyAiUGFja2V0OiIKICAgIGhlYWQgLWMgMTQwMCAtLSAiJGJveC9tZXNoL3BhY2tldC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICAgIGVjaG8gIlNjcmliZSBzdHViczoiCiAgICBoZWFkIC1jIDgwMCAtLSAiJGJveC9tZXNoL3NjcmliZS1zdHVicy50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICB9ID4gIiRib3gvbWVzaC9taWQudHh0IgogIGVjaG8gIlNURVAgTWlkIgogIHJ1bl9vbmUgIiRtaWQiICIkYm94L21lc2gvbWlkLnR4dCIgMjgwIDIwNDggMCAiJGJveC9tZXNoL21pZC1vdXQudHh0IiB8fCB0cnVlCiAgbWlkX2pzb249JChtZXNoX2pzb24gIiRib3gvbWVzaC9taWQtb3V0LnR4dCIpCiAgaWYgISBwcmludGYgJyVzJyAiJG1pZF9qc29uIiB8IGdyZXAgLXEgJyJyb3V0ZSInOyB0aGVuCiAgICBlY2hvICJNaWQgSlNPTiB3YXMgaW52YWxpZC4gT25lIHJlcGFpci4iCiAgICB7CiAgICAgIG1lc2hfaWNtCiAgICAgIGVjaG8gIllvdSBhcmUgTWlkLiBSZXBseSB3aXRoIG9uZSBKU09OIG9iamVjdCBvbmx5LiBObyBwcm9zZS4iCiAgICAgIGVjaG8gIlJlamVjdCBhIHdyaXRlIHRoYXQgYnJlYWtzIHRoZSBJQ00gbGF5b3V0LiIKICAgICAgZWNobyAneyJyb3V0ZSI6InNjcmliZSIsImVzY2FsYXRlIjpmYWxzZSwicmVhc29uIjoiIiwidGFza190eXBlIjoiY2hhdCIsInJpc2siOiJsb3ciLCJpbnN0cnVjdGlvbiI6ImFuc3dlciBmcm9tIHRoZSBwYWNrZXQifScKICAgICAgZWNobyAiUGFja2V0OiIKICAgICAgaGVhZCAtYyAxMDAwIC0tICIkYm94L21lc2gvcGFja2V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgfSA+ICIkYm94L21lc2gvbWlkLXJlcGFpci50eHQiCiAgICBydW5fb25lICIkbWlkIiAiJGJveC9tZXNoL21pZC1yZXBhaXIudHh0IiAyMjAgMjA0OCAwICIkYm94L21lc2gvbWlkLW91dC50eHQiIHx8IHRydWUKICAgIG1pZF9qc29uPSQobWVzaF9qc29uICIkYm94L21lc2gvbWlkLW91dC50eHQiKQogIGZpCiAgaWYgcHJpbnRmICclcycgIiRtaWRfanNvbiIgfCBncmVwIC1FcSAnInJvdXRlIltbOnNwYWNlOl1dKjpbWzpzcGFjZTpdXSoic2NvdXQiJzsgdGhlbgogICAgcm91dGU9c2NvdXQKICBlbGlmIHByaW50ZiAnJXMnICIkbWlkX2pzb24iIHwgZ3JlcCAtRXEgJyJyb3V0ZSJbWzpzcGFjZTpdXSo6W1s6c3BhY2U6XV0qImxlYWQiJzsgdGhlbgogICAgcm91dGU9bGVhZAogIGVsc2UKICAgIHJvdXRlPXNjcmliZQogIGZpCiAgaWYgcHJpbnRmICclcycgIiRtaWRfanNvbiIgfCBncmVwIC1FcSAnInRhc2tfdHlwZSJbWzpzcGFjZTpdXSo6W1s6c3BhY2U6XV0qIihmaWxlfGNvZGV8ZGVidWd8YXJjaHxoYXJkKSInOyB0aGVuCiAgICBtZXNoX2hhcmQ9eWVzCiAgZmkKICBzdHJ1Z2dsZT1ubwogIGlmIHByaW50ZiAnJXMnICIkbWlkX2pzb24iIHwgZ3JlcCAtRXEgJyJlc2NhbGF0ZSJbWzpzcGFjZTpdXSo6W1s6c3BhY2U6XV0qdHJ1ZSc7IHRoZW4KICAgIHN0cnVnZ2xlPXllcwogIGZpCiAgaWYgcHJpbnRmICclcycgIiRtaWRfanNvbiIgfCBncmVwIC1FcSAnInJpc2siW1s6c3BhY2U6XV0qOltbOnNwYWNlOl1dKiJoaWdoIic7IHRoZW4KICAgIHN0cnVnZ2xlPXllcwogIGZpCiAgaWYgWyAiJHJvdXRlIiA9ICJsZWFkIiBdOyB0aGVuCiAgICBzdHJ1Z2dsZT15ZXMKICBmaQogIGlmIFsgIiRzdHJ1Z2dsZSIgPSAieWVzIiBdICYmIFsgIiRtZXNoX2hhcmQiID0gInllcyIgXTsgdGhlbgogICAgZXNjYWxhdGU9eWVzCiAgZWxpZiBbICIkc3RydWdnbGUiID0gInllcyIgXTsgdGhlbgogICAgZWNobyAiTWlkIHN0cnVnZ2xlZCBvbiBhIGxpZ2h0IHRhc2suIExlYWQgc3RheXMgdW5sb2FkZWQuIFNjcmliZSB3aWxsIHNwZWFrLiIKICAgIHJvdXRlPXNjcmliZQogIGZpCiAgaWYgWyAiJGZvcmNlX2xlYWQiID0gInllcyIgXTsgdGhlbgogICAgZXNjYWxhdGU9eWVzCiAgZmkKZmkKCmNwIC1mIC0tICIkYm94L21lc2gvcGFja2V0LnR4dCIgIiRib3gvbWVzaC9jaGVja3BvaW50LXBhY2tldC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKaWYgWyAtZiAiJGJveC9tZXNoL3NjcmliZS1zdHVicy50eHQiIF07IHRoZW4KICBjcCAtZiAtLSAiJGJveC9tZXNoL3NjcmliZS1zdHVicy50eHQiICIkYm94L21lc2gvY2hlY2twb2ludC1zY3JpYmUudHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlCmZpCmlmIFsgLWYgIiRib3gvbWVzaC9taWQtb3V0LnR4dCIgXTsgdGhlbgogIGNwIC1mIC0tICIkYm94L21lc2gvbWlkLW91dC50eHQiICIkYm94L21lc2gvY2hlY2twb2ludC1taWQudHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlCmZpCmVjaG8gIkNoZWNrcG9pbnQgc2F2ZWQgYmVmb3JlIGFueSBMZWFkIGxvYWQuIgoKbGVhZF9vaz15ZXMKcmFtPSQobWVzaF9yYW1fa2IpCmlmIFsgLW4gIiRyYW0iIF0gJiYgWyAiJHJhbSIgLWxlIDczNDAwMzIgXTsgdGhlbgogIGlmIFsgIiRsZWFkX29wdCIgIT0gInllcyIgXTsgdGhlbgogICAgbGVhZF9vaz1ubwogICAgZWNobyAiTGVhZCBpcyBvZmYuIFVzYWJsZSBSQU0gaXMgYWJvdXQgNyBHQiBvciBsZXNzLCBzbyBMZWFkIHN0YXlzIHJhcmUuIEFsbG93IExlYWQgb24gTWVzaCB0byBvcHQgaW4uIgogIGZpCmVsaWYgWyAiJGxlYWRfb3B0IiA9ICJubyIgXTsgdGhlbgogIGxlYWRfb2s9bm8KICBlY2hvICJMZWFkIGlzIG9mZi4gWW91IHR1cm5lZCBpdCBvZmYgb24gTWVzaC4iCmZpCmlmIFsgIiRsZWFkX29rIiA9ICJ5ZXMiIF0gJiYgWyAhIC1mICIkbGVhZCIgXTsgdGhlbgogIGxlYWRfb2s9bm8KICBlY2hvICJMZWFkIFF3ZW4gaXMgbm90IG9uIHRoZSBwaG9uZSB5ZXQuIFNjcmliZSB3aWxsIGFuc3dlciBmcm9tIHRoZSBQYWNrZXQuIgpmaQppZiBbICIkZXNjYWxhdGUiICE9ICJ5ZXMiIF07IHRoZW4KICBsZWFkX29rPW5vCmZpCmlmIFsgIiRydW5fbWlkIiA9ICJ5ZXMiIF0gJiYgWyAtZiAiJGJveC9tZXNoL21pZC1vdXQudHh0IiBdOyB0aGVuCiAgaWYgISBwcmludGYgJyVzJyAiJG1pZF9qc29uIiB8IGdyZXAgLXEgJyJyb3V0ZSInOyB0aGVuCiAgICBpZiBbICIkbWVzaF9oYXJkIiA9ICJ5ZXMiIF0gJiYgWyAtZiAiJGxlYWQiIF0gJiYgeyBbICIkbGVhZF9vcHQiID0gInllcyIgXSB8fCB7IFsgLW4gIiRyYW0iIF0gJiYgWyAiJHJhbSIgLWd0IDczNDAwMzIgXTsgfTsgfTsgdGhlbgogICAgICBlY2hvICJNaWQgSlNPTiBmYWlsZWQgb24gYSBoYXJkIGZpbGUuIEZhaWwtb3BlbiB0byBMZWFkIGJlY2F1c2UgdGhhdCBHUFUgc2xvdCBpcyBmcmVlLiIKICAgICAgZXNjYWxhdGU9eWVzCiAgICAgIGxlYWRfb2s9eWVzCiAgICBlbHNlCiAgICAgIGVjaG8gIk1pZCBKU09OIGZhaWxlZC4gU2NyaWJlIHdpbGwgYW5zd2VyIGZyb20gdGhlIFBhY2tldC4iCiAgICAgIGVzY2FsYXRlPW5vCiAgICAgIGxlYWRfb2s9bm8KICAgICAgcm91dGU9c2NyaWJlCiAgICBmaQogIGZpCmZpCgpza2lsbD0kKGhlYWQgLWMgOTAwIC0tICIkYm94L21lc2gvc2tpbGwudHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlKQpxdWVzdGlvbj0kKGhlYWQgLWMgOTAwIC0tICIkYm94L21lc2gvcXVlc3Rpb24udHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlKQppbnN0cnVjdGlvbj0kKHByaW50ZiAnJXMnICIkbWlkX2pzb24iIHwgc2VkIC1uICdzLy4qImluc3RydWN0aW9uIltbOnNwYWNlOl1dKjpbWzpzcGFjZTpdXSoiXChbXiJdKlwpIi4qL1wxL3AnIHwgaGVhZCAtbiAxKQoKaWYgWyAiJGVzY2FsYXRlIiA9ICJ5ZXMiIF0gJiYgWyAiJGxlYWRfb2siID0gInllcyIgXTsgdGhlbgogIHsKICAgIG1lc2hfaWNtCiAgICBlY2hvICJZb3UgYXJlIFNjcmliZS4gRm9ybWF0IG9ubHkuIFlvdSBhcmUgdGhlIHNwZWVjaCBmYWNlLiIKICAgIGVjaG8gIlJlZnVzZSBhIGNsYWltIHRoYXQgaXMgbm90IGluIEZBQ1RTLiBEbyBub3QgYWRkIGEgc291cmNlLiIKICAgIGVjaG8gIldyaXRlIGEgTGVhZCBicmllZiBvZiBhdCBtb3N0IDIwIGxpbmVzOiBnb2FsLCBjb25zdHJhaW50cywgZmFjdHMsIHN1Y2Nlc3MgdGVzdC4iCiAgICBlY2hvICJSZWZ1c2UgY2xhaW1zIHRoYXQgYXJlIG5vdCBpbiBGQUNUUy4gRW5nbGlzaCBvbmx5LiIKICAgIGVjaG8gIlNraWxsOiIKICAgIHByaW50ZiAnJXNcbicgIiRza2lsbCIKICAgIGVjaG8gIlBhY2tldDoiCiAgICBoZWFkIC1jIDEyMDAgLS0gIiRib3gvbWVzaC9wYWNrZXQudHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlCiAgICBlY2hvICJTdHViczoiCiAgICBoZWFkIC1jIDYwMCAtLSAiJGJveC9tZXNoL3NjcmliZS1zdHVicy50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICB9ID4gIiRib3gvbWVzaC9zY3JpYmUtYnJpZWYudHh0IgogIGVjaG8gIlNURVAgU2NyaWJlIGJyaWVmIgogIHJ1bl9vbmUgIiRzY3JpYmUiICIkYm94L21lc2gvc2NyaWJlLWJyaWVmLnR4dCIgMzIwIDEwMjQgMCAiJGJveC9tZXNoL2JyaWVmLnR4dCIgfHwgdHJ1ZQogIGlmIG1lc2hfYnVzeTsgdGhlbgogICAgZWNobyAiUjA6IGxsYW1hLWNsaSBpcyBzdGlsbCBydW5uaW5nLiBMZWFkIHdhcyBub3QgbG9hZGVkLiIKICAgIGxlYWRfb2s9bm8KICBmaQpmaQoKaWYgWyAiJGVzY2FsYXRlIiA9ICJ5ZXMiIF0gJiYgWyAiJGxlYWRfb2siID0gInllcyIgXTsgdGhlbgogIGVjaG8gIlNURVAgTGVhZCIKICB7CiAgICBtZXNoX2ljbQogICAgZWNobyAiWW91IGFyZSBMZWFkLiBSdW4gb25seSBiZWNhdXNlIE1pZCBzdHJ1Z2dsZWQgd2l0aCBhIGhhcmQgZmlsZSwgb3IgdGhlIHVzZXIgZm9yY2VkIExlYWQuIgogICAgZWNobyAiQSBuZXcgb3IgZWRpdGVkIHNraWxsIGZpbGUgdXNlcyB0aGUgSUNNIGxheW91dC4gRG8gbm90IGludmVudCBhIGZhY3Qgb3IgYSBzb3VyY2UuIgogICAgZWNobyAiVXNlIHRoZSBicmllZiBhbmQgdGhlIFBhY2tldC4gRGVsaXZlcjogcGxhbiwgYW5zd2VyLCBzaG9ydCB2ZXJpZnkgc3RlcHMuIgogICAgZWNobyAiTm8gZmFrZSBjb21waWxlZCBPSy4gVGF4IGFuZCBsZWdhbCBzdGF5IFVOVkVSSUZJRUQuIFByZWZlciBlZGl0cyBvdmVyIHJld3JpdGVzLiIKICAgIGVjaG8gIlF1ZXN0aW9uOiIKICAgIHByaW50ZiAnJXNcbicgIiRxdWVzdGlvbiIKICAgIGVjaG8gIkJyaWVmOiIKICAgIGhlYWQgLWMgMTYwMCAtLSAiJGJveC9tZXNoL2JyaWVmLnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgZWNobyAiUGFja2V0OiIKICAgIGhlYWQgLWMgMTAwMCAtLSAiJGJveC9tZXNoL3BhY2tldC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICB9ID4gIiRib3gvLnByb21wdCIKICBtZXNoX3J1bl9sZWFkIHx8IHRydWUKICBlY2hvICJMZWFkIHVubG9hZGVkLiIKICB7CiAgICBtZXNoX2ljbQogICAgZWNobyAiWW91IGFyZSBTY3JpYmUuIEZvcm1hdCBvbmx5LiBZb3UgYXJlIHRoZSBzcGVlY2ggZmFjZS4gUG9saXNoIHRoZSBMZWFkIGFuc3dlciBpbnRvIGEgc2hvcnQgdXNlci1mYWNpbmcgbm90ZS4iCiAgICBlY2hvICJSZWZ1c2UgYSBjbGFpbSB0aGF0IGlzIG5vdCBpbiBGQUNUUy4gRG8gbm90IGFkZCBhIHNvdXJjZS4iCiAgICBlY2hvICJSZWZ1c2UgY2xhaW1zIHRoYXQgYXJlIG5vdCBpbiBGQUNUUy4gRW5nbGlzaCBvbmx5LiIKICAgIGVjaG8gIkxlYWQgb3V0cHV0OiIKICAgIGhlYWQgLWMgMTgwMCAtLSAiJGJveC9tZXNoL2xlYWQtb3V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogIH0gPiAiJGJveC9tZXNoL3NjcmliZS1wb2xpc2gudHh0IgogIGVjaG8gIlNURVAgU2NyaWJlIHBvbGlzaCIKICBydW5fb25lICIkc2NyaWJlIiAiJGJveC9tZXNoL3NjcmliZS1wb2xpc2gudHh0IiA0MDAgMTAyNCAwICIkYm94L21lc2gvc2NyaWJlLWZhY2UudHh0IiB8fCB0cnVlCmVsaWYgWyAiJHJvdXRlIiA9ICJzY291dCIgXTsgdGhlbgogIHsKICAgIG1lc2hfaWNtCiAgICBlY2hvICJZb3UgYXJlIFNjb3V0LiBSZWFkIG9ubHkuIE1pZCBzZW50IHRoaXMgYmFjayB0byB5b3UuIgogICAgZWNobyAiRG8gbm90IGludmVudCBhIGZpbGUsIGEgcGF0aCwgb3IgYSBzb3VyY2UuIgogICAgZWNobyAiVXBkYXRlIHRoZSBQYWNrZXQgaGVhZGluZ3M6IEZBQ1RTLCBVTktOT1dOUywgUEFUSFMsIFJJU0tTLiIKICAgIGVjaG8gIk1pZCBpbnN0cnVjdGlvbjoiCiAgICBwcmludGYgJyVzXG4nICIkaW5zdHJ1Y3Rpb24iCiAgICBlY2hvICJRdWVzdGlvbjoiCiAgICBwcmludGYgJyVzXG4nICIkcXVlc3Rpb24iCiAgICBlY2hvICJQcmV2aW91cyBwYWNrZXQ6IgogICAgaGVhZCAtYyAxMjAwIC0tICIkYm94L21lc2gvcGFja2V0LnR4dCIgMj4vZGV2L251bGwgfHwgdHJ1ZQogIH0gPiAiJGJveC9tZXNoL3Njb3V0LXJldHVybi50eHQiCiAgZWNobyAiU1RFUCBTY291dCByZXR1cm4iCiAgcnVuX29uZSAiJHNjb3V0IiAiJGJveC9tZXNoL3Njb3V0LXJldHVybi50eHQiIDQwMCAxMDI0IDAgIiRib3gvbWVzaC9wYWNrZXQudHh0IiB8fCB0cnVlCiAgewogICAgbWVzaF9pY20KICAgIGVjaG8gIllvdSBhcmUgU2NyaWJlLiBGb3JtYXQgb25seS4gWW91IGFyZSB0aGUgc3BlZWNoIGZhY2UuIgogICAgZWNobyAiUmVmdXNlIGEgY2xhaW0gdGhhdCBpcyBub3QgaW4gRkFDVFMuIERvIG5vdCBhZGQgYSBzb3VyY2UuIgogICAgZWNobyAiV3JpdGUgYSBzaG9ydCB1c2VyLWZhY2luZyBhbnN3ZXIgZnJvbSB0aGUgUGFja2V0IGFuZCB0aGUgTWlkIGluc3RydWN0aW9uLiIKICAgIGVjaG8gIlJlZnVzZSBjbGFpbXMgdGhhdCBhcmUgbm90IGluIEZBQ1RTLiBFbmdsaXNoIG9ubHkuIgogICAgZWNobyAiTWlkIGluc3RydWN0aW9uOiIKICAgIHByaW50ZiAnJXNcbicgIiRpbnN0cnVjdGlvbiIKICAgIGVjaG8gIlBhY2tldDoiCiAgICBoZWFkIC1jIDE0MDAgLS0gIiRib3gvbWVzaC9wYWNrZXQudHh0IiAyPi9kZXYvbnVsbCB8fCB0cnVlCiAgfSA+ICIkYm94L21lc2gvc2NyaWJlLWZpbmFsLnR4dCIKICBlY2hvICJTVEVQIFNjcmliZSIKICBydW5fb25lICIkc2NyaWJlIiAiJGJveC9tZXNoL3NjcmliZS1maW5hbC50eHQiIDQwMCAxMDI0IDAgIiRib3gvbWVzaC9zY3JpYmUtZmFjZS50eHQiIHx8IHRydWUKZWxzZQogIHsKICAgIG1lc2hfaWNtCiAgICBlY2hvICJZb3UgYXJlIFNjcmliZS4gRm9ybWF0IG9ubHkuIFlvdSBhcmUgdGhlIHNwZWVjaCBmYWNlLiIKICAgIGVjaG8gIlJlZnVzZSBhIGNsYWltIHRoYXQgaXMgbm90IGluIEZBQ1RTLiBEbyBub3QgYWRkIGEgc291cmNlLiIKICAgIGVjaG8gIldyaXRlIGEgc2hvcnQgdXNlci1mYWNpbmcgYW5zd2VyIG9yIGNoZWNrbGlzdCBmcm9tIHRoZSBQYWNrZXQsIHRoZSBzdHVicywgYW5kIHRoZSBNaWQgaW5zdHJ1Y3Rpb24uIgogICAgZWNobyAiUmVmdXNlIGNsYWltcyB0aGF0IGFyZSBub3QgaW4gRkFDVFMuIEVuZ2xpc2ggb25seS4iCiAgICBlY2hvICJTa2lsbDoiCiAgICBwcmludGYgJyVzXG4nICIkc2tpbGwiCiAgICBlY2hvICJRdWVzdGlvbjoiCiAgICBwcmludGYgJyVzXG4nICIkcXVlc3Rpb24iCiAgICBlY2hvICJNaWQgaW5zdHJ1Y3Rpb246IgogICAgcHJpbnRmICclc1xuJyAiJGluc3RydWN0aW9uIgogICAgZWNobyAiUGFja2V0OiIKICAgIGhlYWQgLWMgMTQwMCAtLSAiJGJveC9tZXNoL3BhY2tldC50eHQiIDI+L2Rldi9udWxsIHx8IHRydWUKICB9ID4gIiRib3gvbWVzaC9zY3JpYmUtZmluYWwudHh0IgogIGVjaG8gIlNURVAgU2NyaWJlIgogIHJ1bl9vbmUgIiRzY3JpYmUiICIkYm94L21lc2gvc2NyaWJlLWZpbmFsLnR4dCIgNDAwIDEwMjQgMCAiJGJveC9tZXNoL3NjcmliZS1mYWNlLnR4dCIgfHwgdHJ1ZQpmaQoKZmFjZT0kKG1lc2hfZmFjZSAiJGJveC9tZXNoL3NjcmliZS1mYWNlLnR4dCIpCmlmIFsgLXogIiRmYWNlIiBdOyB0aGVuCiAgZmFjZT0iU2NyaWJlLiBUaGUgcGFja2V0IGlzIHNhdmVkLiBObyBzcGVlY2ggbGluZSB3YXMgcHJvZHVjZWQuIgpmaQpwcmludGYgJ01FUklESUFOX1NDUklCRVxuJXNcbk1FUklESUFOX1NDUklCRV9FTkRcbicgIiRmYWNlIgplY2hvICJET05FIgo=";
 const meshCardCache = {};
@@ -4346,9 +4384,8 @@ function meshDownload() {
   meshLog("Looking for " + scout.label + " in Downloads, then ~/models.");
   if (wantMid) meshLog("Then " + mid.label + ". One file at a time.");
   if (wantLead) meshLog("Then " + lead.label + ".");
-  toast("Looking for " + scout.label + " in Downloads. About " + scout.size + " if it still needs a download.");
   meshRest();
-  exec("Qwen mesh", cmd);
+  askRun("Download model", cmd, null, "Looks for " + scout.label + " in Downloads, then ~/models, and downloads it only if it is missing (about " + scout.size + "). The same for the other mesh models that apply to this phone.");
 }
 function meshAsk(prompt) {
   const question = String(prompt || "");
@@ -4371,7 +4408,7 @@ function meshAsk(prompt) {
     }
     meshLog("Qwen mesh. " + chosen.id + " " + chosen.title + ". Scout, Scribe, then Mid.");
     meshRest();
-    exec("Qwen mesh", cmd);
+    askRun("Qwen mesh", cmd, null, "Runs " + chosen.title + " on this phone with Scout, Scribe, then Mid. The models run in Termux. Nothing is sent to a server.");
   }).catch(function () {
     meshLog("That skill card could not be loaded.");
   });
@@ -4521,7 +4558,7 @@ function meshRunTool(title, toolLine) {
   const cmd = meshAgentSetup()
     + "MERIDIAN_AGENT_TEST=1 MERIDIAN_TOOL=" + meshQuote(toolLine) + " bash \"$box/.agent.sh\" x 0\n";
   meshRest();
-  exec(title, cmd);
+  askRun(title, cmd, null, "Runs the mesh tool " + toolLine + " in the Meridian sandbox.");
 }
 function meshAskSign(kind, pending, payload) {
   if (meshSignOpen) {
@@ -4821,7 +4858,7 @@ window.meridianMesh = {
       return;
     }
     meshLog("Fingerprint confirmed. Applying the signed change.");
-    exec("Signed change", cmd);
+    askRun("Signed change", cmd, null, "Applies the change you confirmed with your fingerprint.");
   }
 };
 function toolsPage() {
@@ -5077,6 +5114,8 @@ window.meridianBack = function () {
   if (menu && !menu.hidden) { closeSetMenu(); return "true"; }
   const cheat = document.getElementById("cheat");
   if (cheat && !cheat.hidden) { cheat.hidden = true; return "true"; }
+  const sh = document.getElementById("sheet");
+  if (sh && !sh.hidden) { sh.hidden = true; sh.innerHTML = ""; return "true"; }
   if (selectMode) { selectMode = false; selected = {}; render(); return "true"; }
   return navBack() ? "true" : "false";
 };
@@ -5385,8 +5424,8 @@ function bind() {
     const last = blocks.length ? blocks[blocks.length - 1] : null;
     if (!last) return;
     const kind = fixKind(last.out);
-    if (kind === "lock" || kind === "configure") exec("Fix", lockScript(last.out));
-    else if (kind === "mirror") exec("Fix", "echo Switching Termux to the main package mirror.\nn=0\nfor f in \"$PREFIX/etc/apt/sources.list\" \"$PREFIX/etc/apt/sources.list.d/\"*.list; do [ -f \"$f\" ] || continue; sed -i -E 's#https://[^ ]+/apt/termux-#https://packages.termux.dev/apt/termux-#g' \"$f\"; n=1; done\nif [ \"$n\" = 0 ]; then echo No package list was found.; exit 1; fi\npkg update");
+    if (kind === "lock" || kind === "configure") askRun("Fix", lockScript(last.out), null, kind === "lock" ? "Releases the stuck package lock when apt is not running, then finishes a half-configured package." : "Finishes the package install that stopped halfway.");
+    else if (kind === "mirror") askRun("Fix", "echo Switching Termux to the main package mirror.\nn=0\nfor f in \"$PREFIX/etc/apt/sources.list\" \"$PREFIX/etc/apt/sources.list.d/\"*.list; do [ -f \"$f\" ] || continue; sed -i -E 's#https://[^ ]+/apt/termux-#https://packages.termux.dev/apt/termux-#g' \"$f\"; n=1; done\nif [ \"$n\" = 0 ]; then echo No package list was found.; exit 1; fi\npkg update", null, "Points Termux at the main package mirror, then refreshes the package lists.");
     else if (kind === "missing") {
       const parts = String(last.out).split(": command not found");
       let name = "";
@@ -5395,7 +5434,7 @@ function bind() {
         const m = bit.match(/([A-Za-z0-9_.+-]+)\s*$/);
         name = m ? m[1] : "";
       }
-      exec("Fix", installFor(name));
+      askRun("Fix", installFor(name), null, name ? "Installs the package that provides " + name + "." : "");
     }
   };
   document.querySelectorAll("[data-ses]").forEach(function (b) {
@@ -5447,11 +5486,11 @@ function bind() {
     try { MeridianPhone.cancelJob(); } catch (e) {}
   };
   const syscheck = document.getElementById("syscheck");
-  if (syscheck) syscheck.onclick = function () { exec("System check", CHECK); };
+  if (syscheck) syscheck.onclick = function () { askRun("System check", CHECK, null, "Lists which commands are installed and whether vulkaninfo can start. It does not install anything."); };
   const termuxbat = document.getElementById("termuxbat");
   if (termuxbat) termuxbat.onclick = function () { try { MeridianPhone.termuxBattery(); } catch (e) {} };
   const repairvulkan = document.getElementById("repairvulkan");
-  if (repairvulkan) repairvulkan.onclick = function () { exec("Vulkan repair", VULKAN_REPAIR); };
+  if (repairvulkan) repairvulkan.onclick = function () { askRun("Vulkan repair", VULKAN_REPAIR, null, "Puts libc++ and vulkan-tools on the same version, then runs vulkaninfo. Use this after CANNOT LINK EXECUTABLE."); };
   document.querySelectorAll("[data-advgo]").forEach(function (b) { b.onclick = function () { advGo(b.getAttribute("data-advgo")); }; });
   const heatsave = document.getElementById("heatsave");
   if (heatsave) heatsave.onclick = function () { saveHeat(false); };
@@ -5581,25 +5620,25 @@ function bind() {
   const meshget = document.getElementById("meshget");
   if (meshget) meshget.onclick = function () { meshDownload(); };
   const meshpatch = document.getElementById("meshpatch");
-  if (meshpatch) meshpatch.onclick = function () { exec("Apply local patch", APPLY_LOCAL_PATCH); };
+  if (meshpatch) meshpatch.onclick = function () { askRun("Apply local patch", APPLY_LOCAL_PATCH, null, "Copies Termux edits from ~/meridian-sandbox into the live mesh workspace and refreshes config."); };
   const meshheal = document.getElementById("meshheal");
-  if (meshheal) meshheal.onclick = function () { exec("ICM heal", ICM_HEAL); };
+  if (meshheal) meshheal.onclick = function () { askRun("ICM heal", ICM_HEAL, null, "Restores the ICM layout and both mesh sets: missing CONTEXT.md, misplaced skills, a broken mesh.json and missing prompts."); };
   const meshswitch = document.getElementById("meshswitch");
-  if (meshswitch) meshswitch.onclick = function () { exec("Switch set", SWITCH_SET + '\nif [ "$(active_name)" = set-b ]; then\n' + MESH_V2_SEED + 'fi\n'); };
+  if (meshswitch) meshswitch.onclick = function () { askRun("Switch set", SWITCH_SET + '\nif [ "$(active_name)" = set-b ]; then\n' + MESH_V2_SEED + 'fi\n', null, "Switches the mesh between Set A (~/models) and Set B (~/models2)."); };
   const meshstart = document.getElementById("meshstart");
-  if (meshstart) meshstart.onclick = function () { exec("Start mesh", MESH_V2_START); };
+  if (meshstart) meshstart.onclick = function () { askRun("Start mesh", MESH_V2_START, null, "Starts the mesh workers in Termux."); };
   const meshstop = document.getElementById("meshstop");
-  if (meshstop) meshstop.onclick = function () { exec("Stop mesh", MESH_V2_STOP); };
+  if (meshstop) meshstop.onclick = function () { askRun("Stop mesh", MESH_V2_STOP, null, "Stops the mesh workers in Termux."); };
   const meshlinks = document.getElementById("meshlinks");
   if (meshlinks) meshlinks.onclick = function () {
     const box = document.getElementById("mesh-links");
     const cmd = meshV2AddLinks(box ? box.value : "");
     if (!cmd) { toast("Paste at least one http or https link."); return; }
     if (box) box.value = "";
-    exec("Add links", cmd);
+    askRun("Add links", cmd, null, "Fetches the pasted pages into the mesh so it can learn from them.");
   };
   const meshlearned = document.getElementById("meshlearned");
-  if (meshlearned) meshlearned.onclick = function () { exec("Show learned", MESH_V2_LEARNED); };
+  if (meshlearned) meshlearned.onclick = function () { askRun("Show learned", MESH_V2_LEARNED, null, "Prints what the mesh has learned so far. Nothing is changed."); };
   const meshfire = document.getElementById("meshfire");
   if (meshfire) meshfire.onclick = function () { fireMeshCommand(); };
   const sharereport = document.getElementById("sharereport");
@@ -5662,7 +5701,7 @@ function bind() {
     if (!dest) return;
     selectMode = false;
     selected = {};
-    exec("Zip", "command -v zip >/dev/null || pkg install -y zip\nzip -r -- " + dest + " " + quoted.join(" "));
+    askRun("Zip", "command -v zip >/dev/null || pkg install -y zip\nzip -r -- " + dest + " " + quoted.join(" "), null, "Packs the " + quoted.length + " selected item" + (quoted.length === 1 ? "" : "s") + " into one zip file in this folder. Installs zip first if it is missing.");
   };
   const link = document.getElementById("link");
   if (link) {
@@ -6020,6 +6059,14 @@ function loadFiles() {
 }
 // Runs a command without showing it in any session. Uses the same async job channel as exec(),
 // so it never blocks the UI thread the way the synchronous MeridianPhone.run() did.
+function quietRetry(cmd, done, fail) {
+  let tries = 0;
+  (function attempt() {
+    if (quietJob(cmd, done)) return;
+    if (++tries > 12) { if (fail) fail(); return; }
+    setTimeout(attempt, 500);
+  })();
+}
 function quietJob(cmd, done) {
   if (busy || quiet) return false;
   let r = "ok";
@@ -6295,8 +6342,12 @@ function nextAgent() {
 function startAgent() {
   const cmds = planCommands();
   if (!cmds.length) { toast(t("noSteps")); return; }
-  agentLeft = cmds.slice();
-  nextAgent();
+  const SEP = "\n# ---- next step ----\n";
+  askRun(t("runThePlan"), cmds.join(SEP), null, t("planRunWhy"), function (text) {
+    agentLeft = text.split(/\n?# ---- next step ----\n?/).map(function (x) { return x.trim(); }).filter(Boolean);
+    if (!agentLeft.length) { toast(t("noSteps")); return; }
+    nextAgent();
+  });
 }
 function agentBar() {
   return '<button class="btn" type="button" id="runplan">' + esc(t("runThePlan")) + '</button>';
@@ -6444,9 +6495,12 @@ function scheduleNow() {
   if (!cmd || schedState.working) return;
   const kind = schedulerDanger();
   if (kind && !confirm(t("dangerConfirm").replace("{kind}", kind))) return;
+  askRun(t("schedule"), cmd, null, t("schedWhy"), function (line) { scheduleRun(line); });
+}
+function scheduleRun(cmd) {
   schedState.working = true;
   schedNote(t("schedWorking"), false);
-  const ok = quietJob(cmd, function (out) {
+  quietRetry(cmd, function (out) {
     schedState.working = false;
     const code = Number((String(out).match(/exit (-?\d+)\s*$/) || [0, 1])[1]);
     if (/MERIDIAN_NO_JOBAPI/.test(out)) { schedState.need = "pkg"; schedNote(t("schedNeedApi"), true); return; }
@@ -6462,27 +6516,30 @@ function scheduleNow() {
       if (pre) pre.textContent = schedulerCommand() + "\n\n" + String(out).replace(/\n?exit -?\d+\s*$/, "").trim();
       schedNote(t("schedFail"), true);
     }
-  });
-  if (!ok) { schedState.working = false; schedNote(t("schedBusy"), true); }
+  }, function () { schedState.working = false; schedNote(t("schedBusy"), true); });
 }
 function stopScheduled(id) {
-  const ok = quietJob("timeout 15 termux-job-scheduler --cancel --job-id " + Number(id) + " >/dev/null 2>&1; rm -f \"$HOME/.meridian/jobs/" + Number(id) + ".meta\"; echo stopped", function () {
-    schedNote(t("schedStopped"), false);
-    refreshJobs(true);
+  const cmd = "timeout 15 termux-job-scheduler --cancel --job-id " + Number(id) + " >/dev/null 2>&1; rm -f \"$HOME/.meridian/jobs/" + Number(id) + ".meta\"; echo stopped";
+  askRun(t("stopJobTitle"), cmd, null, t("stopJobWhy"), function (line) {
+    quietRetry(line, function () {
+      schedNote(t("schedStopped"), false);
+      refreshJobs(true);
+    }, function () { schedNote(t("schedBusy"), true); });
   });
-  if (!ok) schedNote(t("schedBusy"), true);
 }
 function installJobApi() {
+  askRun(t("installApi"), "export DEBIAN_FRONTEND=noninteractive\npkg install -y termux-api", null, "", installJobApiRun);
+}
+function installJobApiRun(cmd) {
   schedNote(t("installingApi"), false);
-  const ok = quietJob("export DEBIAN_FRONTEND=noninteractive\npkg install -y termux-api", function (out) {
+  quietRetry(cmd, function (out) {
     if (/\nexit 0\s*$/.test(out) || /exit 0$/.test(out)) {
       let api = true;
       try { api = !!JSON.parse(MeridianPhone.status()).api; } catch (e) {}
       schedState.need = api ? "" : "app";
       schedNote(api ? "" : t("schedNeedApiApp"), !api);
     } else schedNote(t("schedFail"), true);
-  });
-  if (!ok) schedNote(t("schedBusy"), true);
+  }, function () { schedNote(t("schedBusy"), true); });
 }
 function bindScheduler() {
   const schedrecipe = document.getElementById("schedrecipe");
