@@ -1156,6 +1156,16 @@ agentHint:"Pro lance une étape quand vous appuyez sur Exécuter. Premium peut e
 every15:"Toutes les 15 min",everyHour:"Toutes les heures",every6:"Toutes les 6 heures",everyDay:"Chaque jour"
 }
 };
+const CMD_I18N = {
+en:{cgPackages:"Packages",cgLanguages:"Languages",cgBuilds:"Builds",cgFiles:"Files",cgJobs:"Run and jobs",cgTools:"Tools",cgNetwork:"Network",cgRead:"Read",cgShell:"Shell",cmdCount:"commands"},
+hr:{cgPackages:"Paketi",cgLanguages:"Jezici",cgBuilds:"Gradnja",cgFiles:"Datoteke",cgJobs:"Pokretanje i poslovi",cgTools:"Alati",cgNetwork:"Mreža",cgRead:"Očitanja",cgShell:"Ljuska",cmdCount:"naredbi"},
+de:{cgPackages:"Pakete",cgLanguages:"Sprachen",cgBuilds:"Bauen",cgFiles:"Dateien",cgJobs:"Ausführen und Jobs",cgTools:"Werkzeuge",cgNetwork:"Netzwerk",cgRead:"Lesen",cgShell:"Shell",cmdCount:"Befehle"},
+ja:{cgPackages:"パッケージ",cgLanguages:"言語",cgBuilds:"ビルド",cgFiles:"ファイル",cgJobs:"実行とジョブ",cgTools:"ツール",cgNetwork:"ネットワーク",cgRead:"読み取り",cgShell:"シェル",cmdCount:"件のコマンド"},
+hi:{cgPackages:"पैकेज",cgLanguages:"भाषाएँ",cgBuilds:"बिल्ड",cgFiles:"फ़ाइलें",cgJobs:"चलाएँ और काम",cgTools:"टूल",cgNetwork:"नेटवर्क",cgRead:"पढ़ें",cgShell:"शेल",cmdCount:"कमांड"},
+es:{cgPackages:"Paquetes",cgLanguages:"Lenguajes",cgBuilds:"Construir",cgFiles:"Archivos",cgJobs:"Ejecutar y tareas",cgTools:"Herramientas",cgNetwork:"Red",cgRead:"Lectura",cgShell:"Shell",cmdCount:"comandos"},
+fr:{cgPackages:"Paquets",cgLanguages:"Langages",cgBuilds:"Construire",cgFiles:"Fichiers",cgJobs:"Lancer et tâches",cgTools:"Outils",cgNetwork:"Réseau",cgRead:"Lecture",cgShell:"Shell",cmdCount:"commandes"}
+};
+Object.keys(CMD_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, CMD_I18N[l]); });
 function t(key) {
   const extra = EXTRA[prefs.lang] || EXTRA.en;
   if (extra && extra[key]) return extra[key];
@@ -2879,107 +2889,96 @@ function paintTune() {
   const b = document.getElementById("tunescan");
   if (b) { b.disabled = tune.scanning; b.textContent = tune.scanning ? t("tuneScanning") : t("tuneScan"); }
 }
+// Termux > Library > Commands is the master list of the commands in the app. It holds
+// commands only. Build recipes are read straight from IDEAS (the Build screen's own data),
+// so the two never drift. Advanced tuning and Doctor stay their own entries in Machine and
+// are not repeated here. Each function appears once: where a Commands-only line did the
+// same job as a Build recipe, the Build recipe is the one entry.
+const CMD_OWN = {
+  "Show package": "pkg show python",
+  "Reinstall core": "pkg reinstall -y bash coreutils",
+  "Micro": "pkg install -y micro",
+  "Wget": "pkg install -y wget",
+  "htop": "pkg install -y htop",
+  "Nmap": "pkg install -y nmap",
+  "Android tools": "pkg install -y android-tools",
+  "Kernel": "uname -a",
+  "Uptime": "uptime",
+  "Model": "getprop ro.product.model",
+  "ABI": "getprop ro.product.cpu.abi",
+  "Android version": "getprop ro.build.version.release",
+  "Memory file": "cat /proc/meminfo",
+  "Processes": "ps -A",
+  "Who": "whoami && id && pwd",
+  "Date": "date",
+  "Home files": "ls -la",
+  "Disk use": "du -h -d 1 \"$HOME\"",
+  "Find": "find \"$HOME\" -maxdepth 2 -type d",
+  "DNS": "cat $PREFIX/etc/resolv.conf",
+  "Ping": "ping -c 4 1.1.1.1",
+  "Vulkan info": "vulkaninfo --summary",
+  "Vulkan name": "getprop ro.hardware.vulkan",
+  "EGL": "getprop ro.hardware.egl",
+  "OpenCL": "clinfo -l || true",
+  "Python version": "python -V || python3 -V",
+  "Node version": "node -v",
+  "Git version": "git --version",
+  "Clang version": "clang --version",
+  "Environment": "env",
+  "History": "cat \"$HOME/.bash_history\" | tail -n 40",
+  "Mounts": "mount | head -n 30",
+  "Wake lock": "termux-wake-lock",
+  "Wake unlock": "termux-wake-unlock"
+};
+// "b:" is a Build recipe (IDEAS), "c:" a Commands-only line (CMD_OWN).
+const CMD_GROUPS = [
+  ["cgPackages", ["b:Installed", "b:Update", "b:Upgrade", "b:Search", "c:Show package", "b:Apt cache", "b:Repair", "c:Reinstall core", "b:Format"]],
+  ["cgLanguages", ["b:Python+Pip", "b:Node.js+NPM", "b:Rust", "b:Go", "b:Ruby", "b:PHP", "b:Lua", "b:Java JDK"]],
+  ["cgBuilds", ["b:Clang", "b:CMake", "b:Make", "b:C/C++ build-essential", "b:Git", "b:Docker CLI"]],
+  ["cgFiles", ["b:Folders", "b:Storage", "c:Home files", "c:Find", "c:Disk use", "b:Vim", "b:Neovim", "c:Micro", "b:Ripgrep", "b:jq", "b:Tree", "b:Unzip", "b:Rsync", "b:Curl", "c:Wget"]],
+  ["cgJobs", ["b:Local model", "b:On-device AI", "b:llama server", "b:GPU compute", "b:Python job", "b:Node service", "b:Web page", "b:Media box", "b:Remote shell", "b:Debian", "b:Ubuntu", "b:Termux API"]],
+  ["cgTools", ["b:Fastfetch", "b:btop", "c:htop", "b:tmux", "b:Zsh", "b:FFmpeg", "b:SQLite", "c:Nmap", "c:Android tools"]],
+  ["cgNetwork", ["b:Network", "c:DNS", "c:Ping"]],
+  ["cgRead", ["b:Memory", "c:Memory file", "b:Disk", "b:CPU", "b:Battery", "c:Kernel", "c:Uptime", "c:Model", "c:ABI", "c:Android version", "c:Processes", "c:Who", "c:Date", "c:Vulkan info", "c:Vulkan name", "c:EGL", "c:OpenCL", "c:Python version", "c:Node version", "c:Git version", "c:Clang version"]],
+  ["cgShell", ["c:Environment", "c:History", "c:Mounts", "c:Wake lock", "c:Wake unlock"]]
+];
+function commandItems() {
+  const out = [];
+  const seen = {};
+  CMD_GROUPS.forEach(function (g) {
+    g[1].forEach(function (ref) {
+      if (seen[ref]) return;
+      const k = ref.slice(0, ref.indexOf(":")), name = ref.slice(ref.indexOf(":") + 1);
+      if (k === "b") { const i = ideaIndex(name); if (i < 0) return; out.push({ group: g[0], kind: "b", name: name, idea: IDEAS[i] }); }
+      else if (k === "c") { if (!CMD_OWN[name]) return; out.push({ group: g[0], kind: "c", name: name, cmd: CMD_OWN[name] }); }
+      seen[ref] = 1;
+    });
+  });
+  return out;
+}
+function recipeBody(idea) {
+  let html = '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button><article class="plate stack"><b>' + esc(idea[0]) + '</b><p class="muted">' + esc(idea[1]) + '</p></article>';
+  idea[2].forEach(function (s, i) {
+    html += '<article class="plate stack"><p class="muted">' + esc(whyFor(s)) + '</p>' + cmdField(s, ' data-step="' + i + '"') + '<button class="ghost" type="button" data-runstep="' + i + '">Run</button></article>';
+  });
+  return html + '</div>';
+}
 function commandsPage() {
-  const items = [
-    ["Update", "pkg update"],
-    ["Upgrade", "pkg upgrade -y"],
-    ["Search", "pkg search python"],
-    ["Installed", "pkg list-installed"],
-    ["Clean cache", "pkg clean && echo Done. Downloaded package files were removed. Installed tools stayed."],
-    ["Termux API", "pkg install -y termux-api"],
-    ["Storage", "termux-setup-storage"],
-    ["Fastfetch", "pkg install -y fastfetch"],
-    ["btop", "pkg install -y btop"],
-    ["Git", "pkg install -y git"],
-    ["Python", "pkg install -y python"],
-    ["Pip", "pkg install -y python && pip install --upgrade pip"],
-    ["Node", "pkg install -y nodejs"],
-    ["npm", "pkg install -y nodejs && npm -v"],
-    ["Rust", "pkg install -y rust"],
-    ["Go", "pkg install -y golang"],
-    ["Ruby", "pkg install -y ruby"],
-    ["PHP", "pkg install -y php"],
-    ["Lua", "pkg install -y lua"],
-    ["Java", "pkg install -y openjdk-21"],
-    ["Clang", "pkg install -y clang"],
-    ["CMake", "pkg install -y cmake ninja"],
-    ["Make", "pkg install -y make pkg-config"],
-    ["OpenSSH", "pkg install -y openssh"],
-    ["Curl", "pkg install -y curl"],
-    ["Wget", "pkg install -y wget"],
-    ["Vim", "pkg install -y vim"],
-    ["Neovim", "pkg install -y neovim"],
-    ["Ripgrep", "pkg install -y ripgrep"],
-    ["jq", "pkg install -y jq"],
-    ["Tree", "pkg install -y tree"],
-    ["tmux", "pkg install -y tmux"],
-    ["Unzip", "pkg install -y unzip"],
-    ["FFmpeg", "pkg install -y ffmpeg"],
-    ["SQLite", "pkg install -y sqlite"],
-    ["Rsync", "pkg install -y rsync"],
-    ["Zsh", "pkg install -y zsh"],
-    ["Proot", "pkg install -y proot-distro"],
-    ["Android tools", "pkg install -y android-tools"],
-    ["Kernel", "uname -a"],
-    ["Memory", "free -h"],
-    ["Disk", "df -h"],
-    ["CPU info", "lscpu || cat /proc/cpuinfo"],
-    ["Load", "cat /proc/loadavg"],
-    ["Uptime", "uptime"],
-    ["Model", "getprop ro.product.model"],
-    ["Battery", "termux-battery-status"],
-    ["Processes", "ps -A"],
-    ["Who", "whoami && pwd"],
-    ["Home files", "ls -la"],
-    ["Addresses", "ip -br addr || ifconfig"],
-    ["DNS", "cat $PREFIX/etc/resolv.conf"],
-    ["Environment", "env"],
-    ["Date", "date"],
-    ["Vulkan loader", "pkg install -y vulkan-loader-android opencl-vendor-driver ocl-icd"],
-    ["Vulkan info", "vulkaninfo --summary"],
-    ["Vulkan repair", VULKAN_REPAIR],
-    ["Vulkan name", "getprop ro.hardware.vulkan"],
-    ["EGL", "getprop ro.hardware.egl"],
-    ["OpenCL", "clinfo -l || true"],
-    ["Phone report", "termux-info"],
-    ["ABI", "getprop ro.product.cpu.abi"],
-    ["Android version", "getprop ro.build.version.release"],
-    ["Cores", "nproc"],
-    ["Memory file", "cat /proc/meminfo"],
-    ["Disk use", "du -h -d 1 \"$HOME\""],
-    ["Find", "find \"$HOME\" -maxdepth 2 -type d"],
-    ["Identity", "id"],
-    ["Ping", "ping -c 4 1.1.1.1"],
-    ["Python version", "python -V || python3 -V"],
-    ["Node version", "node -v"],
-    ["Git version", "git --version"],
-    ["Clang version", "clang --version"],
-    ["Show package", "pkg show python"],
-    ["Reinstall core", "pkg reinstall -y bash coreutils"],
-    ["History", "cat \"$HOME/.bash_history\" | tail -n 40"],
-    ["Mounts", "mount | head -n 30"],
-    ["Wake lock", "termux-wake-lock"],
-    ["Wake unlock", "termux-wake-unlock"],
-    ["Micro", "pkg install -y micro"],
-    ["htop", "pkg install -y htop"],
-    ["Nmap", "pkg install -y nmap"],
-    ["Build essential", "pkg install -y build-essential"],
-    ["pkg-config", "pkg install -y pkg-config"]
-  ];
+  const items = commandItems();
   if (openCmd !== "") {
-    const t = items[Number(openCmd)];
-    if (t) return sheet(t[0], whyFor(t[1]), t[1], "");
+    const it = items[Number(openCmd)];
+    if (it && it.kind === "b") return recipeBody(it.idea);
+    if (it && it.kind === "c") return sheet(it.name, whyFor(it.cmd), it.cmd, "");
   }
-  return bands("Commands", items, [
-    ["Packages", ["Update", "Upgrade", "Search", "Installed", "Clean cache", "Show package", "Reinstall core"]],
-    ["Languages", ["Python", "Pip", "Node", "npm", "Rust", "Go", "Ruby", "PHP", "Lua", "Java", "Python version", "Node version"]],
-    ["Build", ["Clang", "CMake", "Make", "Git", "Build essential", "pkg-config", "Clang version", "Git version"]],
-    ["Tools", ["Fastfetch", "btop", "htop", "Micro", "Vim", "Neovim", "Ripgrep", "jq", "Tree", "tmux", "FFmpeg", "SQLite", "Unzip", "Rsync", "Curl", "Wget", "Zsh", "Nmap", "Proot", "OpenSSH", "Android tools", "Termux API"]],
-    ["Read", ["Kernel", "Memory", "Memory file", "Disk", "Disk use", "CPU info", "Load", "Uptime", "Cores", "Model", "ABI", "Android version", "Battery", "Processes", "Phone report", "Who", "Identity", "Home files", "Find", "Date", "Ping"]],
-    ["Network", ["Addresses", "DNS", "Storage"]],
-    ["GPU", ["Vulkan loader", "Vulkan info", "Vulkan repair", "Vulkan name", "EGL", "OpenCL"]],
-    ["Shell", ["Environment", "History", "Mounts", "Wake lock", "Wake unlock"]]
-  ]);
+  let html = '<div class="desk"><div class="deskbar"><b style="font-size:13px">' + esc(t("titleCommands")) + '</b></div>';
+  CMD_GROUPS.forEach(function (g) {
+    let cells = "";
+    items.forEach(function (it, i) {
+      if (it.group === g[0]) cells += '<button class="ico" type="button" data-shelf="' + i + '">' + mark(it.name) + '<em>' + esc(it.name) + '</em></button>';
+    });
+    if (cells) html += '<p class="sec">' + esc(t(g[0])) + '</p><div class="grid">' + cells + '</div>';
+  });
+  return html + '<div class="deskfoot">' + items.length + ' ' + esc(t("cmdCount")) + '</div></div>';
 }
 const IDEAS = [
   ["Installed", "What is already on this Termux. Nothing is installed or deleted.", ["pkg list-installed"]],
