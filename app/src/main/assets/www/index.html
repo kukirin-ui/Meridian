@@ -63,6 +63,8 @@
   html, body { margin: 0; height: 100%; overflow: hidden; overflow-x: hidden; background: var(--bg); color: var(--fg); font: 16px/1.45 system-ui, "Segoe UI", Roboto, sans-serif; font-synthesis: none; }
   body { display: flex; flex-direction: column; min-height: 100dvh; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  /* Fields already carry a visible border, so a second offset outline on focus made a double ring. */
+  select:focus-visible, textarea:focus-visible, input:focus-visible, .planask textarea:focus-visible, #goal:focus-visible { outline: none; border-color: var(--accent); }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   header { position: sticky; top: 0; z-index: 8; flex: none; display: flex; align-items: center; gap: 8px; min-height: calc(64px + var(--cutout, 0px)); height: calc(64px + var(--cutout, 0px)); padding: var(--cutout, 0px) 8px 0; background: var(--header); border-bottom: 1px solid var(--line); }
   header > div { min-width: 0; }
@@ -243,6 +245,26 @@
   .logo i:nth-child(3) { inset: 22px; border: 1px solid transparent; border-right-color: var(--accent); border-bottom-color: var(--accent-border); animation: spin 9s linear infinite reverse; }
   .logo s { inset: 34px; border: 1px dashed var(--accent-border); text-decoration: none; animation: spin 22s linear infinite; }
   .logo b { inset: 44px; border: 1px solid var(--accent); background: radial-gradient(circle, var(--accent) 0 2px, transparent 3px); }
+  .tunesum { display: flex; flex-direction: column; gap: 2px; }
+  details.tunecat { border: 1px solid var(--line); border-radius: 14px; padding: 0 12px; margin: 0; background: var(--plate); }
+  details.tunecat > summary { list-style: none; cursor: pointer; padding: 12px 2px; font-weight: 650; color: var(--fg); }
+  details.tunecat > summary::-webkit-details-marker { display: none; }
+  details.tunecat[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  details.tunecat > .stack { padding-bottom: 12px; }
+  .tune { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--field); }
+  .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tunehead b { font-weight: 650; }
+  .acc { font-size: 0.6875rem; font-weight: 650; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--accent-border); color: var(--accent); white-space: nowrap; }
+  .acc.root { color: #e9a23b; border-color: #e9a23b55; }
+  .acc.rish { color: var(--accent); }
+  .acc.noroot { color: var(--muted); border-color: var(--line); }
+  .acc.off { opacity: 0.55; }
+  .tunewarn { color: #e9a23b; font-size: 0.8125rem; margin: 0; }
+  .tuneno { color: var(--muted); font-size: 0.8125rem; margin: 0; }
+  .tunecur { font-size: 0.8125rem; color: var(--muted); }
+  .tunecur b { color: var(--fg); font-weight: 650; }
+  pre.tuneout { background: var(--field); border: 1px solid var(--line); border-radius: 10px; padding: 8px; margin: 0; max-height: 220px; overflow: auto; font: 0.75rem/1.4 ui-monospace, monospace; white-space: pre-wrap; }
+  .ghost.danger { color: #e05a4f; border-color: #e05a4f55; }
   .idea { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 4px; background: var(--plate); border: 1px solid var(--accent-border); border-radius: 18px; padding: 14px 16px; box-shadow: 0 0 0 1px var(--line), 0 0 18px var(--accent-glow); }
   .idea b { font-size: 1rem; }
   .idea span { color: var(--muted); font-size: 0.8125rem; }
@@ -920,7 +942,9 @@ back:"Retour",carrierUnknown:"—",mainNav:"Principal"
 };
 const EXTRA = {
 en:{
-advTitle:"Advanced settings",advSystem:"Termux settings live in {setup}, under {conn}. Wake lock and Reload settings are there too.",advHardware:"Model choices (Allow Mid, Allow Lead) and the cores used while warm are on the {mesh} page. Threads, Memory and ZRAM are in {tweaks}.",advBattery:"The temperatures where models pause and start again, and the cores used while warm, are on the {mesh} page under Heat limits (advanced).",advOpen:"Open {x}",
+titleTuning:"Advanced tuning",tuneIntro:"One place to read and change CPU, GPU, thermal, memory, battery and general settings. The app shows only the controls this phone has.",tuneScanHint:"Scan to detect the device, the controls it has, and what access you have.",tuneScan:"Scan this phone",tuneScanning:"Scanning the phone...",tuneRescan:"Scan again",tuneBusy:"Termux is busy. Try again in a moment.",tuneDevice:"Device",tuneChip:"Chipset",tuneAccess:"Access you have",tuneNoAccess:"No Shizuku and no root were found, so you can read values but not apply them. Start Shizuku and export rish, or root the phone.",tuneNoGpu:"No adjustable GPU was found on this phone.",accNoRoot:"No root",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Needs Shizuku: start Shizuku and export rish, then scan again.",needRoot:"Needs root: su was not found on this phone.",catCpu:"CPU",catGpu:"GPU",catThermal:"Thermal",catMemory:"Memory",catBattery:"Battery",catGeneral:"General",current:"Now:",readCur:"Read current",apply:"Apply",resetOne:"Reset",tuneRisk:"Careful: pushing this too far can overheat the phone or make it unstable. Use Reset to undo.",tuneResetAll:"Reset all to default",tuneResetAllAsk:"Reset every control back to how the phone started, including thermal and power mode?",tuneResetAllDone:"Reset to defaults.",tuneApplied:"Applied.",tuneApplying:"Applying...",tuneFailAccess:"Could not apply: the needed access was refused.",tuneResetDone:"Reset done.",on:"On",off:"Off",ctlCpuGov:"CPU governor (cluster {n})",ctlCpuGovD:"How the processor cores in this cluster pick their speed.",ctlCpuMax:"CPU max speed (cluster {n})",ctlCpuMaxD:"The top clock these cores are allowed to reach.",ctlGpuGov:"GPU governor",ctlGpuGovD:"How the graphics chip picks its speed.",ctlGpuMin:"GPU minimum speed",ctlGpuMinD:"The lowest clock the graphics chip will drop to.",ctlGpuMax:"GPU maximum speed",ctlGpuMaxD:"The top clock the graphics chip is allowed to reach.",ctlGpuxD:"A graphics chip switch. Leave it as it was unless you know what it does.",gxBoost:"GPU boost disable",gxDgs:"Dynamic GPU scaling",gxIfpo:"GPU power-off disable",ctlTherm:"Thermal limit override",ctlThermD:"Tells Android to treat the phone as cooler or hotter than it is. Use Reset to hand control back to Android.",thNone:"None (off)",thLight:"Light",thMod:"Moderate",thSevere:"Severe",thCrit:"Critical",ctlZram:"ZRAM size",ctlZramD:"Compressed swap held in memory. Larger can help on low-memory phones.",ctlDrop:"Drop caches",ctlDropD:"Frees cached file memory. Harmless, the kernel refills it as needed.",ctlPower:"Power mode",ctlPowerD:"Android power mode. Low power trades speed for battery life.",pmOff:"Off",pmLow:"Low power",ctlLoad:"Live load",ctlLoadD:"Reads the busiest processes right now. Read only.",ctlBattD:"Battery charge, temperature and current, read from the phone. Read only.",
+
+advTitle:"Advanced settings",advSystem:"Termux settings live in {setup}, under {conn}. Wake lock and Reload settings are there too. {tuning} holds the CPU, GPU, thermal and memory controls.",advHardware:"Model choices (Allow Mid, Allow Lead) and the cores used while warm are on the {mesh} page. CPU, GPU, memory and thread controls are in {tuning}.",advBattery:"The temperatures where models pause and start again, and the CPU, GPU, thermal and power controls, are in {tuning}.",advOpen:"Open {x}",
 termuxInstalled:"Termux installed",termuxVersion:"Termux version",termuxConnection:"Connection",yes:"Yes",no:"No",fixShort:"Fix",
 termuxLinkTitle:"Termux connection",termuxLinkOk:"Connected",termuxLinkOff:"Not connected",termuxLinkChecking:"Checking",termuxLinkUnknown:"Not checked yet",termuxWhyOk:"Meridian can send commands to Termux.",termuxWhyExternal:"Termux does not accept commands from other apps yet. Tap Fix Termux connection, then in Termux long-press, tap Paste and press Enter.",termuxWhyPermission:"Android has not allowed Meridian to run Termux commands. Tap Allow Termux commands.",termuxWhyAsleep:"Termux is closed, so Android did not deliver the check. Open Termux once, then come back.",termuxWhyTimeout:"Termux did not answer. Tap Fix Termux connection, then come back here.",termuxWhyMissing:"Termux is not installed. Get it from F-Droid, not Play.",termuxWhyRefused:"Termux refused the command. Tap Fix Termux connection, then come back here.",fixTermux:"Fix Termux connection",allowTermuxPerm:"Allow Termux commands",checkAgain:"Check again",getTermux:"Get Termux",fixTermuxToast:"Command copied. In Termux, long-press the screen, tap Paste, then press Enter.",deskIntro:"Desk runs a task for you on its own, every hour or every day, even when the app is closed. Pick what to run and how often, then tap Schedule.",schedTitle:"Automatic tasks",schedWhat:"What to run",schedHow:"How often",schedule:"Schedule",showCommand:"Show command",hideCommand:"Hide command",activeJobs:"Active tasks",noJobs:"No tasks are scheduled yet.",stopJob:"Stop",refreshJobs:"Refresh",lastRun:"Last run",neverRun:"Not run yet",schedWorking:"Working on it",schedOk:"Scheduled. It now runs on its own.",schedStopped:"Stopped. It will not run again.",schedFail:"It could not be scheduled. Tap Show command to see the details.",schedBusy:"Another command is running. Try again in a moment.",schedNeedApi:"Automatic tasks need the Termux:API add-on in Termux.",installApi:"Install Termux:API",installingApi:"Installing Termux:API",schedNeedApiApp:"Automatic tasks also need the Termux:API app. Install it from F-Droid, then tap Schedule again.",getApiApp:"Get the Termux:API app",rcpCheck:"Check for updates",rcpCheckD:"Looks for newer versions of your Termux tools. Installs nothing.",rcpUpgrade:"Update tools",rcpUpgradeD:"Installs newer versions of the tools you already have.",rcpClean:"Clean up",rcpCleanD:"Deletes leftover installer files to free space. Your tools stay.",rcpBattery:"Battery log",rcpBatteryD:"Writes the battery level and temperature to meridian-logs/battery.log.",rcpStorage:"Storage log",rcpStorageD:"Writes how full the storage is to meridian-logs/storage.log.",rcpRepair:"Repair installs",rcpRepairD:"Finishes any install that was cut off halfway.",
 
@@ -970,7 +994,9 @@ agentHint:"Pro runs one step when you press Run. Premium can run the list in ord
 every15:"Every 15 min",everyHour:"Every hour",every6:"Every 6 hours",everyDay:"Every day"
 },
 hr:{
-advTitle:"Napredne postavke",advSystem:"Postavke Termuxa: {setup} > {conn}. Ondje su i Wake lock i Reload settings.",advHardware:"Izbor modela (Allow Mid, Allow Lead) i jezgre koje se koriste kad je toplo: stranica {mesh}. Threads, Memory i ZRAM: {tweaks}.",advBattery:"Temperature na kojima modeli staju i ponovno kreću, te jezgre koje se koriste kad je toplo, nalaze se na stranici {mesh} pod Heat limits (advanced).",advOpen:"Otvori: {x}",
+titleTuning:"Napredno podešavanje",tuneIntro:"Jedno mjesto za čitanje i promjenu postavki CPU-a, GPU-a, topline, memorije, baterije i općih postavki. Prikazuju se samo kontrole koje ovaj telefon ima.",tuneScanHint:"Skeniraj da se otkriju uređaj, dostupne kontrole i razina pristupa.",tuneScan:"Skeniraj telefon",tuneScanning:"Skeniram telefon...",tuneRescan:"Skeniraj ponovno",tuneBusy:"Termux je zauzet. Pokušaj za trenutak.",tuneDevice:"Uređaj",tuneChip:"Čipset",tuneAccess:"Tvoj pristup",tuneNoAccess:"Nema Shizukua ni roota, pa možeš čitati vrijednosti, ali ne i primijeniti ih. Pokreni Shizuku i izvezi rish ili rootaj telefon.",tuneNoGpu:"Na ovom telefonu nije pronađen podesivi GPU.",accNoRoot:"Bez roota",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Treba Shizuku: pokreni Shizuku i izvezi rish, pa skeniraj ponovno.",needRoot:"Treba root: su nije pronađen na telefonu.",catCpu:"CPU",catGpu:"GPU",catThermal:"Toplina",catMemory:"Memorija",catBattery:"Baterija",catGeneral:"Općenito",current:"Sada:",readCur:"Očitaj trenutno",apply:"Primijeni",resetOne:"Vrati",tuneRisk:"Oprez: pretjerivanje može pregrijati telefon ili ga učiniti nestabilnim. Koristi Vrati za poništavanje.",tuneResetAll:"Vrati sve na zadano",tuneResetAllAsk:"Vratiti sve kontrole na početno stanje telefona, uključujući toplinu i način napajanja?",tuneResetAllDone:"Vraćeno na zadano.",tuneApplied:"Primijenjeno.",tuneApplying:"Primjenjujem...",tuneFailAccess:"Nije moguće primijeniti: pristup je odbijen.",tuneResetDone:"Vraćeno.",on:"Uključeno",off:"Isključeno",ctlCpuGov:"CPU regulator (klaster {n})",ctlCpuGovD:"Kako jezgre u ovom klasteru biraju brzinu.",ctlCpuMax:"Najveća brzina CPU-a (klaster {n})",ctlCpuMaxD:"Najviši takt koji ove jezgre smiju dosegnuti.",ctlGpuGov:"GPU regulator",ctlGpuGovD:"Kako grafički čip bira brzinu.",ctlGpuMin:"Najmanja brzina GPU-a",ctlGpuMinD:"Najniži takt na koji će grafički čip pasti.",ctlGpuMax:"Najveća brzina GPU-a",ctlGpuMaxD:"Najviši takt koji grafički čip smije dosegnuti.",ctlGpuxD:"Prekidač grafičkog čipa. Ostavi kako je bilo ako nisi siguran.",gxBoost:"Onemogući GPU boost",gxDgs:"Dinamičko skaliranje GPU-a",gxIfpo:"Onemogući gašenje GPU-a",ctlTherm:"Nadjačavanje toplinskog ograničenja",ctlThermD:"Govori Androidu da telefon tretira kao hladniji ili topliji nego što jest. Koristi Vrati da kontrolu vratiš Androidu.",thNone:"Ništa (isključeno)",thLight:"Blago",thMod:"Umjereno",thSevere:"Jako",thCrit:"Kritično",ctlZram:"Veličina ZRAM-a",ctlZramD:"Komprimirani swap u memoriji. Veći može pomoći na telefonima s malo memorije.",ctlDrop:"Oslobodi predmemoriju",ctlDropD:"Oslobađa predmemoriju datoteka. Bezopasno, jezgra je puni po potrebi.",ctlPower:"Način napajanja",ctlPowerD:"Androidov način napajanja. Štednja smanjuje brzinu radi baterije.",pmOff:"Isključeno",pmLow:"Štednja energije",ctlLoad:"Trenutno opterećenje",ctlLoadD:"Čita najzauzetije procese sada. Samo čitanje.",ctlBattD:"Napunjenost, temperatura i struja baterije, očitano s telefona. Samo čitanje.",
+
+advTitle:"Napredne postavke",advSystem:"Postavke Termuxa: {setup} > {conn}. Ondje su i Wake lock i Reload settings. {tuning} sadrži kontrole za CPU, GPU, toplinu i memoriju.",advHardware:"Izbor modela (Allow Mid, Allow Lead) i jezgre koje se koriste kad je toplo: stranica {mesh}. Kontrole za CPU, GPU, memoriju i niti: {tuning}.",advBattery:"Temperature na kojima modeli staju i ponovno kreću te kontrole za CPU, GPU, toplinu i napajanje nalaze se u: {tuning}.",advOpen:"Otvori: {x}",
 termuxInstalled:"Termux instaliran",termuxVersion:"Verzija Termuxa",termuxConnection:"Veza",yes:"Da",no:"Ne",fixShort:"Popravi",
 termuxLinkTitle:"Veza s Termuxom",termuxLinkOk:"Povezano",termuxLinkOff:"Nije povezano",termuxLinkChecking:"Provjeravam",termuxLinkUnknown:"Još nije provjereno",termuxWhyOk:"Meridian može slati naredbe Termuxu.",termuxWhyExternal:"Termux još ne prima naredbe iz drugih aplikacija. Dodirnite Popravi vezu s Termuxom, zatim u Termuxu dugo pritisnite, dodirnite Paste i pritisnite Enter.",termuxWhyPermission:"Android još nije dopustio Meridianu da pokreće naredbe u Termuxu. Dodirnite Dopusti Termux naredbe.",termuxWhyAsleep:"Termux je zatvoren pa Android nije isporučio provjeru. Jednom otvorite Termux, pa se vratite.",termuxWhyTimeout:"Termux nije odgovorio. Dodirnite Popravi vezu s Termuxom, pa se vratite ovamo.",termuxWhyMissing:"Termux nije instaliran. Preuzmite ga s F-Droida, ne s Playa.",termuxWhyRefused:"Termux je odbio naredbu. Dodirnite Popravi vezu s Termuxom, pa se vratite ovamo.",fixTermux:"Popravi vezu s Termuxom",allowTermuxPerm:"Dopusti Termux naredbe",checkAgain:"Provjeri ponovno",getTermux:"Preuzmi Termux",fixTermuxToast:"Naredba je kopirana. U Termuxu dugo pritisnite ekran, dodirnite Paste, zatim pritisnite Enter.",deskIntro:"Desk sam pokreće zadatak umjesto vas, svaki sat ili svaki dan, čak i kad je aplikacija zatvorena. Odaberite što i koliko često, zatim dodirnite Zakaži.",schedTitle:"Automatski zadaci",schedWhat:"Što pokrenuti",schedHow:"Koliko često",schedule:"Zakaži",showCommand:"Prikaži naredbu",hideCommand:"Sakrij naredbu",activeJobs:"Aktivni zadaci",noJobs:"Još nema zakazanih zadataka.",stopJob:"Zaustavi",refreshJobs:"Osvježi",lastRun:"Zadnje pokretanje",neverRun:"Još nije pokrenuto",schedWorking:"Radim na tome",schedOk:"Zakazano. Sad se pokreće samo.",schedStopped:"Zaustavljeno. Više se neće pokretati.",schedFail:"Zakazivanje nije uspjelo. Dodirnite Prikaži naredbu za detalje.",schedBusy:"Druga naredba je u tijeku. Pokušajte za trenutak.",schedNeedApi:"Automatski zadaci trebaju dodatak Termux:API u Termuxu.",installApi:"Instaliraj Termux:API",installingApi:"Instaliram Termux:API",schedNeedApiApp:"Automatski zadaci trebaju i aplikaciju Termux:API. Instalirajte je s F-Droida, zatim ponovno dodirnite Zakaži.",getApiApp:"Preuzmi aplikaciju Termux:API",rcpCheck:"Provjeri ažuriranja",rcpCheckD:"Traži novije verzije vaših Termux alata. Ništa ne instalira.",rcpUpgrade:"Ažuriraj alate",rcpUpgradeD:"Instalira novije verzije alata koje već imate.",rcpClean:"Očisti",rcpCleanD:"Briše preostale instalacijske datoteke i oslobađa prostor. Alati ostaju.",rcpBattery:"Dnevnik baterije",rcpBatteryD:"Zapisuje razinu i temperaturu baterije u meridian-logs/battery.log.",rcpStorage:"Dnevnik prostora",rcpStorageD:"Zapisuje koliko je pohrana puna u meridian-logs/storage.log.",rcpRepair:"Popravi instalacije",rcpRepairD:"Dovršava instalaciju koja je prekinuta na pola.",
 
@@ -995,7 +1021,9 @@ agentHint:"Pro pokreće jedan korak kad pritisnete Pokreni. Premium može pokren
 every15:"Svakih 15 min",everyHour:"Svaki sat",every6:"Svakih 6 sati",everyDay:"Svaki dan"
 },
 de:{
-advTitle:"Erweiterte Einstellungen",advSystem:"Termux-Einstellungen findest du unter {setup}, bei {conn}. Dort sind auch Wake lock und Reload settings.",advHardware:"Modellauswahl (Allow Mid, Allow Lead) und die Kerne bei Wärme sind auf der Seite {mesh}. Threads, Memory und ZRAM sind unter {tweaks}.",advBattery:"Die Temperaturen, bei denen Modelle pausieren und wieder starten, und die Kerne bei Wärme sind auf der Seite {mesh} unter Heat limits (advanced).",advOpen:"{x} öffnen",
+titleTuning:"Erweiterte Abstimmung",tuneIntro:"Ein Ort, um CPU-, GPU-, Temperatur-, Speicher-, Akku- und allgemeine Einstellungen zu lesen und zu ändern. Es werden nur Regler gezeigt, die dieses Telefon hat.",tuneScanHint:"Scanne, um Gerät, vorhandene Regler und deinen Zugriff zu erkennen.",tuneScan:"Telefon scannen",tuneScanning:"Telefon wird gescannt...",tuneRescan:"Erneut scannen",tuneBusy:"Termux ist beschäftigt. Versuche es gleich noch einmal.",tuneDevice:"Gerät",tuneChip:"Chipsatz",tuneAccess:"Dein Zugriff",tuneNoAccess:"Weder Shizuku noch Root gefunden. Du kannst Werte lesen, aber nicht anwenden. Starte Shizuku und exportiere rish oder roote das Telefon.",tuneNoGpu:"Keine einstellbare GPU auf diesem Telefon gefunden.",accNoRoot:"Kein Root",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Benötigt Shizuku: Shizuku starten und rish exportieren, dann erneut scannen.",needRoot:"Benötigt Root: su wurde auf diesem Telefon nicht gefunden.",catCpu:"CPU",catGpu:"GPU",catThermal:"Temperatur",catMemory:"Speicher",catBattery:"Akku",catGeneral:"Allgemein",current:"Jetzt:",readCur:"Aktuell lesen",apply:"Anwenden",resetOne:"Zurücksetzen",tuneRisk:"Vorsicht: zu weit getrieben kann das Telefon überhitzen oder instabil machen. Mit Zurücksetzen rückgängig machen.",tuneResetAll:"Alles zurücksetzen",tuneResetAllAsk:"Alle Regler auf den Ausgangszustand des Telefons zurücksetzen, einschließlich Temperatur und Energiemodus?",tuneResetAllDone:"Auf Standard zurückgesetzt.",tuneApplied:"Angewendet.",tuneApplying:"Wird angewendet...",tuneFailAccess:"Konnte nicht angewendet werden: der Zugriff wurde verweigert.",tuneResetDone:"Zurückgesetzt.",on:"Ein",off:"Aus",ctlCpuGov:"CPU-Governor (Cluster {n})",ctlCpuGovD:"Wie die Kerne in diesem Cluster ihre Geschwindigkeit wählen.",ctlCpuMax:"CPU-Höchstgeschwindigkeit (Cluster {n})",ctlCpuMaxD:"Der höchste Takt, den diese Kerne erreichen dürfen.",ctlGpuGov:"GPU-Governor",ctlGpuGovD:"Wie der Grafikchip seine Geschwindigkeit wählt.",ctlGpuMin:"GPU-Mindestgeschwindigkeit",ctlGpuMinD:"Der niedrigste Takt, auf den der Grafikchip fällt.",ctlGpuMax:"GPU-Höchstgeschwindigkeit",ctlGpuMaxD:"Der höchste Takt, den der Grafikchip erreichen darf.",ctlGpuxD:"Ein Grafikchip-Schalter. Lass ihn, wie er war, wenn du unsicher bist.",gxBoost:"GPU-Boost deaktivieren",gxDgs:"Dynamische GPU-Skalierung",gxIfpo:"GPU-Abschaltung deaktivieren",ctlTherm:"Temperaturgrenze überschreiben",ctlThermD:"Sagt Android, das Telefon als kühler oder wärmer zu behandeln, als es ist. Mit Zurücksetzen die Kontrolle an Android zurückgeben.",thNone:"Keine (aus)",thLight:"Leicht",thMod:"Mäßig",thSevere:"Stark",thCrit:"Kritisch",ctlZram:"ZRAM-Größe",ctlZramD:"Komprimierter Swap im Speicher. Größer kann bei wenig Speicher helfen.",ctlDrop:"Caches leeren",ctlDropD:"Gibt zwischengespeicherten Dateispeicher frei. Harmlos, der Kernel füllt ihn bei Bedarf wieder.",ctlPower:"Energiemodus",ctlPowerD:"Androids Energiemodus. Energiesparen tauscht Geschwindigkeit gegen Akkulaufzeit.",pmOff:"Aus",pmLow:"Energiesparen",ctlLoad:"Aktuelle Last",ctlLoadD:"Liest die aktuell aktivsten Prozesse. Nur lesen.",ctlBattD:"Akkuladung, Temperatur und Strom, vom Telefon gelesen. Nur lesen.",
+
+advTitle:"Erweiterte Einstellungen",advSystem:"Termux-Einstellungen findest du unter {setup}, bei {conn}. Dort sind auch Wake lock und Reload settings. {tuning} enthält die Regler für CPU, GPU, Temperatur und Speicher.",advHardware:"Modellauswahl (Allow Mid, Allow Lead) und die Kerne bei Wärme sind auf der Seite {mesh}. Regler für CPU, GPU, Speicher und Threads sind in {tuning}.",advBattery:"Die Temperaturen, bei denen Modelle pausieren und wieder starten, sowie die Regler für CPU, GPU, Temperatur und Energie sind in {tuning}.",advOpen:"{x} öffnen",
 termuxInstalled:"Termux installiert",termuxVersion:"Termux-Version",termuxConnection:"Verbindung",yes:"Ja",no:"Nein",fixShort:"Reparieren",
 termuxLinkTitle:"Termux-Verbindung",termuxLinkOk:"Verbunden",termuxLinkOff:"Nicht verbunden",termuxLinkChecking:"Wird geprüft",termuxLinkUnknown:"Noch nicht geprüft",termuxWhyOk:"Meridian kann Befehle an Termux senden.",termuxWhyExternal:"Termux nimmt noch keine Befehle von anderen Apps an. Tippe auf Termux-Verbindung reparieren, dann in Termux lange drücken, Paste tippen und Enter drücken.",termuxWhyPermission:"Android hat Meridian noch nicht erlaubt, Termux-Befehle auszuführen. Tippe auf Termux-Befehle erlauben.",termuxWhyAsleep:"Termux ist geschlossen, daher hat Android die Prüfung nicht zugestellt. Öffne Termux einmal und komm zurück.",termuxWhyTimeout:"Termux hat nicht geantwortet. Tippe auf Termux-Verbindung reparieren und komm dann zurück.",termuxWhyMissing:"Termux ist nicht installiert. Hole es von F-Droid, nicht aus Play.",termuxWhyRefused:"Termux hat den Befehl abgelehnt. Tippe auf Termux-Verbindung reparieren und komm dann zurück.",fixTermux:"Termux-Verbindung reparieren",allowTermuxPerm:"Termux-Befehle erlauben",checkAgain:"Erneut prüfen",getTermux:"Termux holen",fixTermuxToast:"Befehl kopiert. In Termux lange auf den Bildschirm drücken, Paste tippen, dann Enter drücken.",deskIntro:"Desk führt eine Aufgabe von selbst für dich aus, jede Stunde oder jeden Tag, auch wenn die App geschlossen ist. Wähle, was und wie oft, dann tippe auf Planen.",schedTitle:"Automatische Aufgaben",schedWhat:"Was ausführen",schedHow:"Wie oft",schedule:"Planen",showCommand:"Befehl zeigen",hideCommand:"Befehl ausblenden",activeJobs:"Aktive Aufgaben",noJobs:"Noch keine Aufgaben geplant.",stopJob:"Stopp",refreshJobs:"Aktualisieren",lastRun:"Zuletzt",neverRun:"Noch nicht gelaufen",schedWorking:"Wird erledigt",schedOk:"Geplant. Läuft jetzt von selbst.",schedStopped:"Gestoppt. Läuft nicht mehr.",schedFail:"Planen hat nicht geklappt. Tippe auf Befehl zeigen für Details.",schedBusy:"Ein anderer Befehl läuft. Versuche es gleich noch einmal.",schedNeedApi:"Automatische Aufgaben brauchen das Termux:API-Paket in Termux.",installApi:"Termux:API installieren",installingApi:"Termux:API wird installiert",schedNeedApiApp:"Automatische Aufgaben brauchen auch die Termux:API-App. Installiere sie von F-Droid und tippe dann erneut auf Planen.",getApiApp:"Termux:API-App holen",rcpCheck:"Nach Updates suchen",rcpCheckD:"Sucht neuere Versionen deiner Termux-Tools. Installiert nichts.",rcpUpgrade:"Tools aktualisieren",rcpUpgradeD:"Installiert neuere Versionen der Tools, die du schon hast.",rcpClean:"Aufräumen",rcpCleanD:"Löscht übrige Installationsdateien und schafft Platz. Deine Tools bleiben.",rcpBattery:"Akku-Protokoll",rcpBatteryD:"Schreibt Akkustand und Temperatur in meridian-logs/battery.log.",rcpStorage:"Speicher-Protokoll",rcpStorageD:"Schreibt, wie voll der Speicher ist, in meridian-logs/storage.log.",rcpRepair:"Installationen reparieren",rcpRepairD:"Schließt eine halb abgebrochene Installation ab.",
 
@@ -1020,7 +1048,9 @@ agentHint:"Pro startet einen Schritt, wenn du Ausführen drückst. Premium kann 
 every15:"Alle 15 Min",everyHour:"Jede Stunde",every6:"Alle 6 Stunden",everyDay:"Jeden Tag"
 },
 ja:{
-advTitle:"詳細設定",advSystem:"Termux の設定は {setup} の {conn} にあります。Wake lock と Reload settings もそこにあります。",advHardware:"モデルの選択（Allow Mid、Allow Lead）と高温時に使うコア数は {mesh} ページにあります。Threads、Memory、ZRAM は {tweaks} にあります。",advBattery:"モデルが一時停止・再開する温度と高温時に使うコア数は、{mesh} ページの Heat limits (advanced) にあります。",advOpen:"{x} を開く",
+titleTuning:"詳細チューニング",tuneIntro:"One place to read and change CPU, GPU, thermal, memory, battery and general settings. The app shows only the controls this phone has.",tuneScanHint:"Scan to detect the device, the controls it has, and what access you have.",tuneScan:"この端末をスキャン",tuneScanning:"端末をスキャン中...",tuneRescan:"再スキャン",tuneBusy:"Termux がビジーです。少し待って再試行してください。",tuneDevice:"デバイス",tuneChip:"チップセット",tuneAccess:"利用できる権限",tuneNoAccess:"No Shizuku and no root were found, so you can read values but not apply them. Start Shizuku and export rish, or root the phone.",tuneNoGpu:"No adjustable GPU was found on this phone.",accNoRoot:"root なし",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Shizuku が必要です: Shizuku を起動して rish をエクスポートし、再スキャンしてください。",needRoot:"root が必要です: この端末で su が見つかりません。",catCpu:"CPU",catGpu:"GPU",catThermal:"温度",catMemory:"メモリ",catBattery:"バッテリー",catGeneral:"一般",current:"現在:",readCur:"現在値を読む",apply:"適用",resetOne:"リセット",tuneRisk:"Careful: pushing this too far can overheat the phone or make it unstable. Use Reset to undo.",tuneResetAll:"すべて既定に戻す",tuneResetAllAsk:"Reset every control back to how the phone started, including thermal and power mode?",tuneResetAllDone:"既定に戻しました。",tuneApplied:"適用しました。",tuneApplying:"適用中...",tuneFailAccess:"Could not apply: the needed access was refused.",tuneResetDone:"リセットしました。",on:"オン",off:"オフ",ctlCpuGov:"CPU governor (cluster {n})",ctlCpuGovD:"How the processor cores in this cluster pick their speed.",ctlCpuMax:"CPU max speed (cluster {n})",ctlCpuMaxD:"The top clock these cores are allowed to reach.",ctlGpuGov:"GPU governor",ctlGpuGovD:"How the graphics chip picks its speed.",ctlGpuMin:"GPU minimum speed",ctlGpuMinD:"The lowest clock the graphics chip will drop to.",ctlGpuMax:"GPU maximum speed",ctlGpuMaxD:"The top clock the graphics chip is allowed to reach.",ctlGpuxD:"A graphics chip switch. Leave it as it was unless you know what it does.",gxBoost:"GPU boost disable",gxDgs:"Dynamic GPU scaling",gxIfpo:"GPU power-off disable",ctlTherm:"Thermal limit override",ctlThermD:"Tells Android to treat the phone as cooler or hotter than it is. Use Reset to hand control back to Android.",thNone:"なし（オフ）",thLight:"軽度",thMod:"中度",thSevere:"重度",thCrit:"危険",ctlZram:"ZRAM size",ctlZramD:"Compressed swap held in memory. Larger can help on low-memory phones.",ctlDrop:"Drop caches",ctlDropD:"Frees cached file memory. Harmless, the kernel refills it as needed.",ctlPower:"Power mode",ctlPowerD:"Android power mode. Low power trades speed for battery life.",pmOff:"オフ",pmLow:"省電力",ctlLoad:"Live load",ctlLoadD:"Reads the busiest processes right now. Read only.",ctlBattD:"Battery charge, temperature and current, read from the phone. Read only.",
+
+advTitle:"詳細設定",advSystem:"Termux の設定は {setup} の {conn} にあります。Wake lock と Reload settings もそこにあります。CPU、GPU、温度、メモリの調整は {tuning} にあります。",advHardware:"モデルの選択（Allow Mid、Allow Lead）と高温時に使うコア数は {mesh} ページにあります。CPU、GPU、メモリ、スレッドの調整は {tuning} にあります。",advBattery:"モデルが一時停止・再開する温度と、CPU、GPU、温度、電源の調整は {tuning} にあります。",advOpen:"{x} を開く",
 termuxInstalled:"Termux インストール済み",termuxVersion:"Termux バージョン",termuxConnection:"接続",yes:"はい",no:"いいえ",fixShort:"修正",
 termuxLinkTitle:"Termux 接続",termuxLinkOk:"接続済み",termuxLinkOff:"未接続",termuxLinkChecking:"確認中",termuxLinkUnknown:"未確認",termuxWhyOk:"Meridian は Termux にコマンドを送れます。",termuxWhyExternal:"Termux はまだ他のアプリからのコマンドを受け付けません。「Termux 接続を修正」をタップし、Termux で長押しして Paste をタップし、Enter を押してください。",termuxWhyPermission:"Android が Meridian に Termux コマンドの実行を許可していません。「Termux コマンドを許可」をタップしてください。",termuxWhyAsleep:"Termux が閉じているため、確認が届きませんでした。Termux を一度開いてから戻ってください。",termuxWhyTimeout:"Termux が応答しませんでした。「Termux 接続を修正」をタップしてから戻ってください。",termuxWhyMissing:"Termux がインストールされていません。Play ではなく F-Droid から入手してください。",termuxWhyRefused:"Termux がコマンドを拒否しました。「Termux 接続を修正」をタップしてから戻ってください。",fixTermux:"Termux 接続を修正",allowTermuxPerm:"Termux コマンドを許可",checkAgain:"再確認",getTermux:"Termux を入手",fixTermuxToast:"コマンドをコピーしました。Termux で画面を長押しし、Paste をタップして Enter を押してください。",deskIntro:"Desk は、アプリを閉じていても、1時間ごとや毎日など自動でタスクを実行します。実行する内容と頻度を選び、「予約」をタップしてください。",schedTitle:"自動タスク",schedWhat:"実行する内容",schedHow:"頻度",schedule:"予約",showCommand:"コマンドを表示",hideCommand:"コマンドを隠す",activeJobs:"有効なタスク",noJobs:"予約されたタスクはまだありません。",stopJob:"停止",refreshJobs:"更新",lastRun:"前回の実行",neverRun:"未実行",schedWorking:"処理中",schedOk:"予約しました。今後は自動で実行されます。",schedStopped:"停止しました。今後は実行されません。",schedFail:"予約できませんでした。詳細は「コマンドを表示」で確認できます。",schedBusy:"別のコマンドが実行中です。少し待ってから再度お試しください。",schedNeedApi:"自動タスクには Termux の Termux:API パッケージが必要です。",installApi:"Termux:API をインストール",installingApi:"Termux:API をインストール中",schedNeedApiApp:"自動タスクには Termux:API アプリも必要です。F-Droid からインストールして、もう一度「予約」をタップしてください。",getApiApp:"Termux:API アプリを入手",rcpCheck:"更新を確認",rcpCheckD:"Termux ツールの新しいバージョンを探します。何もインストールしません。",rcpUpgrade:"ツールを更新",rcpUpgradeD:"すでにあるツールの新しいバージョンをインストールします。",rcpClean:"お掃除",rcpCleanD:"残ったインストール用ファイルを削除して空き容量を作ります。ツールは残ります。",rcpBattery:"電池ログ",rcpBatteryD:"電池残量と温度を meridian-logs/battery.log に記録します。",rcpStorage:"ストレージログ",rcpStorageD:"ストレージの使用状況を meridian-logs/storage.log に記録します。",rcpRepair:"インストールを修復",rcpRepairD:"途中で止まったインストールを完了させます。",
 
@@ -1045,7 +1075,9 @@ agentHint:"Pro は実行を押した手順だけ動きます。Premium は一覧
 every15:"15分ごと",everyHour:"1時間ごと",every6:"6時間ごと",everyDay:"毎日"
 },
 hi:{
-advTitle:"उन्नत सेटिंग्स",advSystem:"Termux की सेटिंग्स {setup} में {conn} के नीचे हैं। Wake lock और Reload settings भी वहीं हैं।",advHardware:"मॉडल चुनाव (Allow Mid, Allow Lead) और गर्म होने पर इस्तेमाल होने वाले कोर {mesh} पेज पर हैं। Threads, Memory और ZRAM {tweaks} में हैं।",advBattery:"जिन तापमानों पर मॉडल रुकते और फिर चलते हैं, और गर्म होने पर इस्तेमाल होने वाले कोर, {mesh} पेज पर Heat limits (advanced) में हैं।",advOpen:"{x} खोलें",
+titleTuning:"उन्नत ट्यूनिंग",tuneIntro:"One place to read and change CPU, GPU, thermal, memory, battery and general settings. The app shows only the controls this phone has.",tuneScanHint:"Scan to detect the device, the controls it has, and what access you have.",tuneScan:"इस फ़ोन को स्कैन करें",tuneScanning:"फ़ोन स्कैन हो रहा है...",tuneRescan:"फिर स्कैन करें",tuneBusy:"Termux व्यस्त है। थोड़ी देर में फिर कोशिश करें।",tuneDevice:"डिवाइस",tuneChip:"चिपसेट",tuneAccess:"आपकी पहुँच",tuneNoAccess:"No Shizuku and no root were found, so you can read values but not apply them. Start Shizuku and export rish, or root the phone.",tuneNoGpu:"No adjustable GPU was found on this phone.",accNoRoot:"बिना root",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Shizuku चाहिए: Shizuku शुरू करें और rish एक्सपोर्ट करें, फिर दोबारा स्कैन करें।",needRoot:"root चाहिए: इस फ़ोन पर su नहीं मिला।",catCpu:"CPU",catGpu:"GPU",catThermal:"तापमान",catMemory:"मेमोरी",catBattery:"बैटरी",catGeneral:"सामान्य",current:"अभी:",readCur:"वर्तमान पढ़ें",apply:"लागू करें",resetOne:"रीसेट",tuneRisk:"Careful: pushing this too far can overheat the phone or make it unstable. Use Reset to undo.",tuneResetAll:"सब डिफ़ॉल्ट पर लाएँ",tuneResetAllAsk:"Reset every control back to how the phone started, including thermal and power mode?",tuneResetAllDone:"डिफ़ॉल्ट पर लाया गया।",tuneApplied:"लागू हो गया।",tuneApplying:"लागू हो रहा है...",tuneFailAccess:"Could not apply: the needed access was refused.",tuneResetDone:"रीसेट हो गया।",on:"चालू",off:"बंद",ctlCpuGov:"CPU governor (cluster {n})",ctlCpuGovD:"How the processor cores in this cluster pick their speed.",ctlCpuMax:"CPU max speed (cluster {n})",ctlCpuMaxD:"The top clock these cores are allowed to reach.",ctlGpuGov:"GPU governor",ctlGpuGovD:"How the graphics chip picks its speed.",ctlGpuMin:"GPU minimum speed",ctlGpuMinD:"The lowest clock the graphics chip will drop to.",ctlGpuMax:"GPU maximum speed",ctlGpuMaxD:"The top clock the graphics chip is allowed to reach.",ctlGpuxD:"A graphics chip switch. Leave it as it was unless you know what it does.",gxBoost:"GPU boost disable",gxDgs:"Dynamic GPU scaling",gxIfpo:"GPU power-off disable",ctlTherm:"Thermal limit override",ctlThermD:"Tells Android to treat the phone as cooler or hotter than it is. Use Reset to hand control back to Android.",thNone:"कोई नहीं (बंद)",thLight:"हल्का",thMod:"मध्यम",thSevere:"गंभीर",thCrit:"अति गंभीर",ctlZram:"ZRAM size",ctlZramD:"Compressed swap held in memory. Larger can help on low-memory phones.",ctlDrop:"Drop caches",ctlDropD:"Frees cached file memory. Harmless, the kernel refills it as needed.",ctlPower:"Power mode",ctlPowerD:"Android power mode. Low power trades speed for battery life.",pmOff:"बंद",pmLow:"पावर बचत",ctlLoad:"Live load",ctlLoadD:"Reads the busiest processes right now. Read only.",ctlBattD:"Battery charge, temperature and current, read from the phone. Read only.",
+
+advTitle:"उन्नत सेटिंग्स",advSystem:"Termux की सेटिंग्स {setup} में {conn} के नीचे हैं। Wake lock और Reload settings भी वहीं हैं। CPU, GPU, तापमान और मेमोरी नियंत्रण {tuning} में हैं।",advHardware:"मॉडल चुनाव (Allow Mid, Allow Lead) और गर्म होने पर इस्तेमाल होने वाले कोर {mesh} पेज पर हैं। CPU, GPU, मेमोरी और थ्रेड नियंत्रण {tuning} में हैं।",advBattery:"जिन तापमानों पर मॉडल रुकते और फिर चलते हैं, और CPU, GPU, तापमान तथा पावर नियंत्रण {tuning} में हैं।",advOpen:"{x} खोलें",
 termuxInstalled:"Termux इंस्टॉल है",termuxVersion:"Termux वर्शन",termuxConnection:"कनेक्शन",yes:"हाँ",no:"नहीं",fixShort:"ठीक करें",
 termuxLinkTitle:"Termux कनेक्शन",termuxLinkOk:"कनेक्टेड",termuxLinkOff:"कनेक्ट नहीं",termuxLinkChecking:"जाँच हो रही है",termuxLinkUnknown:"अभी जाँचा नहीं",termuxWhyOk:"Meridian, Termux को कमांड भेज सकता है।",termuxWhyExternal:"Termux अभी दूसरे ऐप्स से कमांड नहीं लेता। Termux कनेक्शन ठीक करें पर टैप करें, फिर Termux में देर तक दबाएँ, Paste टैप करें और Enter दबाएँ।",termuxWhyPermission:"Android ने Meridian को Termux कमांड चलाने की अनुमति नहीं दी है। Termux कमांड की अनुमति दें पर टैप करें।",termuxWhyAsleep:"Termux बंद है, इसलिए Android ने जाँच नहीं पहुँचाई। Termux एक बार खोलें, फिर वापस आएँ।",termuxWhyTimeout:"Termux ने जवाब नहीं दिया। Termux कनेक्शन ठीक करें पर टैप करें, फिर यहाँ वापस आएँ।",termuxWhyMissing:"Termux इंस्टॉल नहीं है। इसे Play से नहीं, F-Droid से लें।",termuxWhyRefused:"Termux ने कमांड मना कर दी। Termux कनेक्शन ठीक करें पर टैप करें, फिर यहाँ वापस आएँ।",fixTermux:"Termux कनेक्शन ठीक करें",allowTermuxPerm:"Termux कमांड की अनुमति दें",checkAgain:"फिर से जाँचें",getTermux:"Termux पाएँ",fixTermuxToast:"कमांड कॉपी हो गई। Termux में स्क्रीन को देर तक दबाएँ, Paste टैप करें, फिर Enter दबाएँ।",deskIntro:"Desk आपके लिए अपने आप काम चलाता है, हर घंटे या हर दिन, ऐप बंद होने पर भी। क्या और कितनी बार चलाना है चुनें, फिर शेड्यूल करें पर टैप करें।",schedTitle:"अपने आप चलने वाले काम",schedWhat:"क्या चलाएँ",schedHow:"कितनी बार",schedule:"शेड्यूल करें",showCommand:"कमांड दिखाएँ",hideCommand:"कमांड छिपाएँ",activeJobs:"चालू काम",noJobs:"अभी कोई काम शेड्यूल नहीं है।",stopJob:"रोकें",refreshJobs:"रीफ़्रेश",lastRun:"पिछली बार",neverRun:"अभी नहीं चला",schedWorking:"काम हो रहा है",schedOk:"शेड्यूल हो गया। अब यह अपने आप चलेगा।",schedStopped:"रोक दिया। अब यह नहीं चलेगा।",schedFail:"शेड्यूल नहीं हो सका। विवरण के लिए कमांड दिखाएँ पर टैप करें।",schedBusy:"दूसरी कमांड चल रही है। थोड़ी देर में फिर कोशिश करें।",schedNeedApi:"अपने आप चलने वाले कामों के लिए Termux में Termux:API पैकेज चाहिए।",installApi:"Termux:API इंस्टॉल करें",installingApi:"Termux:API इंस्टॉल हो रहा है",schedNeedApiApp:"इसके लिए Termux:API ऐप भी चाहिए। इसे F-Droid से इंस्टॉल करें, फिर दोबारा शेड्यूल करें पर टैप करें।",getApiApp:"Termux:API ऐप पाएँ",rcpCheck:"अपडेट जाँचें",rcpCheckD:"आपके Termux टूल्स के नए वर्शन खोजता है। कुछ इंस्टॉल नहीं करता।",rcpUpgrade:"टूल्स अपडेट करें",rcpUpgradeD:"आपके मौजूदा टूल्स के नए वर्शन इंस्टॉल करता है।",rcpClean:"सफ़ाई",rcpCleanD:"बची हुई इंस्टॉलर फ़ाइलें हटाकर जगह खाली करता है। टूल्स बने रहते हैं।",rcpBattery:"बैटरी लॉग",rcpBatteryD:"बैटरी स्तर और तापमान meridian-logs/battery.log में लिखता है।",rcpStorage:"स्टोरेज लॉग",rcpStorageD:"स्टोरेज कितना भरा है, meridian-logs/storage.log में लिखता है।",rcpRepair:"इंस्टॉल ठीक करें",rcpRepairD:"बीच में रुका इंस्टॉल पूरा करता है।",
 
@@ -1070,7 +1102,9 @@ agentHint:"Pro एक कदम चलाता है जब आप चला�
 every15:"हर 15 मिनट",everyHour:"हर घंटे",every6:"हर 6 घंटे",everyDay:"हर दिन"
 },
 es:{
-advTitle:"Ajustes avanzados",advSystem:"Los ajustes de Termux están en {setup}, en {conn}. Wake lock y Reload settings también están ahí.",advHardware:"La elección de modelos (Allow Mid, Allow Lead) y los núcleos usados con calor están en la página {mesh}. Threads, Memory y ZRAM están en {tweaks}.",advBattery:"Las temperaturas a las que los modelos se pausan y vuelven a arrancar, y los núcleos usados con calor, están en la página {mesh}, en Heat limits (advanced).",advOpen:"Abrir {x}",
+titleTuning:"Ajuste avanzado",tuneIntro:"One place to read and change CPU, GPU, thermal, memory, battery and general settings. The app shows only the controls this phone has.",tuneScanHint:"Scan to detect the device, the controls it has, and what access you have.",tuneScan:"Escanear este teléfono",tuneScanning:"Escaneando el teléfono...",tuneRescan:"Escanear de nuevo",tuneBusy:"Termux está ocupado. Inténtalo en un momento.",tuneDevice:"Dispositivo",tuneChip:"Chipset",tuneAccess:"Tu acceso",tuneNoAccess:"No Shizuku and no root were found, so you can read values but not apply them. Start Shizuku and export rish, or root the phone.",tuneNoGpu:"No adjustable GPU was found on this phone.",accNoRoot:"Sin root",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Necesita Shizuku: inicia Shizuku y exporta rish, luego vuelve a escanear.",needRoot:"Necesita root: no se encontró su en este teléfono.",catCpu:"CPU",catGpu:"GPU",catThermal:"Temperatura",catMemory:"Memoria",catBattery:"Batería",catGeneral:"General",current:"Ahora:",readCur:"Leer actual",apply:"Aplicar",resetOne:"Restablecer",tuneRisk:"Careful: pushing this too far can overheat the phone or make it unstable. Use Reset to undo.",tuneResetAll:"Restablecer todo",tuneResetAllAsk:"Reset every control back to how the phone started, including thermal and power mode?",tuneResetAllDone:"Restablecido a valores por defecto.",tuneApplied:"Aplicado.",tuneApplying:"Aplicando...",tuneFailAccess:"Could not apply: the needed access was refused.",tuneResetDone:"Restablecido.",on:"Activado",off:"Desactivado",ctlCpuGov:"CPU governor (cluster {n})",ctlCpuGovD:"How the processor cores in this cluster pick their speed.",ctlCpuMax:"CPU max speed (cluster {n})",ctlCpuMaxD:"The top clock these cores are allowed to reach.",ctlGpuGov:"GPU governor",ctlGpuGovD:"How the graphics chip picks its speed.",ctlGpuMin:"GPU minimum speed",ctlGpuMinD:"The lowest clock the graphics chip will drop to.",ctlGpuMax:"GPU maximum speed",ctlGpuMaxD:"The top clock the graphics chip is allowed to reach.",ctlGpuxD:"A graphics chip switch. Leave it as it was unless you know what it does.",gxBoost:"GPU boost disable",gxDgs:"Dynamic GPU scaling",gxIfpo:"GPU power-off disable",ctlTherm:"Thermal limit override",ctlThermD:"Tells Android to treat the phone as cooler or hotter than it is. Use Reset to hand control back to Android.",thNone:"Ninguno (apagado)",thLight:"Ligero",thMod:"Moderado",thSevere:"Grave",thCrit:"Crítico",ctlZram:"ZRAM size",ctlZramD:"Compressed swap held in memory. Larger can help on low-memory phones.",ctlDrop:"Drop caches",ctlDropD:"Frees cached file memory. Harmless, the kernel refills it as needed.",ctlPower:"Power mode",ctlPowerD:"Android power mode. Low power trades speed for battery life.",pmOff:"Apagado",pmLow:"Ahorro de energía",ctlLoad:"Live load",ctlLoadD:"Reads the busiest processes right now. Read only.",ctlBattD:"Battery charge, temperature and current, read from the phone. Read only.",
+
+advTitle:"Ajustes avanzados",advSystem:"Los ajustes de Termux están en {setup}, en {conn}. Wake lock y Reload settings también están ahí. {tuning} tiene los controles de CPU, GPU, temperatura y memoria.",advHardware:"La elección de modelos (Allow Mid, Allow Lead) y los núcleos usados con calor están en la página {mesh}. Los controles de CPU, GPU, memoria e hilos están en {tuning}.",advBattery:"Las temperaturas a las que los modelos se pausan y vuelven a arrancar, y los controles de CPU, GPU, temperatura y energía, están en {tuning}.",advOpen:"Abrir {x}",
 termuxInstalled:"Termux instalado",termuxVersion:"Versión de Termux",termuxConnection:"Conexión",yes:"Sí",no:"No",fixShort:"Arreglar",
 termuxLinkTitle:"Conexión con Termux",termuxLinkOk:"Conectado",termuxLinkOff:"Sin conexión",termuxLinkChecking:"Comprobando",termuxLinkUnknown:"Sin comprobar",termuxWhyOk:"Meridian puede enviar comandos a Termux.",termuxWhyExternal:"Termux todavía no acepta comandos de otras apps. Toca Arreglar conexión con Termux y, en Termux, mantén pulsado, toca Paste y pulsa Enter.",termuxWhyPermission:"Android aún no permite a Meridian ejecutar comandos de Termux. Toca Permitir comandos de Termux.",termuxWhyAsleep:"Termux está cerrado, así que Android no entregó la comprobación. Abre Termux una vez y vuelve.",termuxWhyTimeout:"Termux no respondió. Toca Arreglar conexión con Termux y vuelve aquí.",termuxWhyMissing:"Termux no está instalado. Descárgalo de F-Droid, no de Play.",termuxWhyRefused:"Termux rechazó el comando. Toca Arreglar conexión con Termux y vuelve aquí.",fixTermux:"Arreglar conexión con Termux",allowTermuxPerm:"Permitir comandos de Termux",checkAgain:"Comprobar de nuevo",getTermux:"Obtener Termux",fixTermuxToast:"Comando copiado. En Termux, mantén pulsada la pantalla, toca Paste y pulsa Enter.",deskIntro:"Desk ejecuta una tarea por ti, cada hora o cada día, incluso con la app cerrada. Elige qué ejecutar y cada cuánto, y toca Programar.",schedTitle:"Tareas automáticas",schedWhat:"Qué ejecutar",schedHow:"Cada cuánto",schedule:"Programar",showCommand:"Ver comando",hideCommand:"Ocultar comando",activeJobs:"Tareas activas",noJobs:"Aún no hay tareas programadas.",stopJob:"Detener",refreshJobs:"Actualizar",lastRun:"Última vez",neverRun:"Aún no se ejecutó",schedWorking:"Trabajando",schedOk:"Programada. Ahora se ejecuta sola.",schedStopped:"Detenida. No volverá a ejecutarse.",schedFail:"No se pudo programar. Toca Ver comando para ver los detalles.",schedBusy:"Hay otro comando en marcha. Inténtalo en un momento.",schedNeedApi:"Las tareas automáticas necesitan el paquete Termux:API en Termux.",installApi:"Instalar Termux:API",installingApi:"Instalando Termux:API",schedNeedApiApp:"Las tareas automáticas también necesitan la app Termux:API. Instálala desde F-Droid y vuelve a tocar Programar.",getApiApp:"Obtener la app Termux:API",rcpCheck:"Buscar actualizaciones",rcpCheckD:"Busca versiones nuevas de tus herramientas de Termux. No instala nada.",rcpUpgrade:"Actualizar herramientas",rcpUpgradeD:"Instala versiones nuevas de las herramientas que ya tienes.",rcpClean:"Limpiar",rcpCleanD:"Borra archivos de instalación sobrantes para liberar espacio. Tus herramientas se quedan.",rcpBattery:"Registro de batería",rcpBatteryD:"Guarda el nivel y la temperatura de la batería en meridian-logs/battery.log.",rcpStorage:"Registro de almacenamiento",rcpStorageD:"Guarda lo lleno que está el almacenamiento en meridian-logs/storage.log.",rcpRepair:"Reparar instalaciones",rcpRepairD:"Termina una instalación que se cortó a medias.",
 
@@ -1095,7 +1129,9 @@ agentHint:"Pro ejecuta un paso cuando pulsas Ejecutar. Premium puede recorrer la
 every15:"Cada 15 min",everyHour:"Cada hora",every6:"Cada 6 horas",everyDay:"Cada día"
 },
 fr:{
-advTitle:"Réglages avancés",advSystem:"Les réglages de Termux sont dans {setup}, sous {conn}. Wake lock et Reload settings s’y trouvent aussi.",advHardware:"Le choix des modèles (Allow Mid, Allow Lead) et les cœurs utilisés à chaud sont sur la page {mesh}. Threads, Memory et ZRAM sont dans {tweaks}.",advBattery:"Les températures où les modèles se mettent en pause puis repartent, et les cœurs utilisés à chaud, sont sur la page {mesh}, sous Heat limits (advanced).",advOpen:"Ouvrir {x}",
+titleTuning:"Réglage avancé",tuneIntro:"One place to read and change CPU, GPU, thermal, memory, battery and general settings. The app shows only the controls this phone has.",tuneScanHint:"Scan to detect the device, the controls it has, and what access you have.",tuneScan:"Analyser ce téléphone",tuneScanning:"Analyse du téléphone...",tuneRescan:"Analyser à nouveau",tuneBusy:"Termux est occupé. Réessayez dans un instant.",tuneDevice:"Appareil",tuneChip:"Chipset",tuneAccess:"Votre accès",tuneNoAccess:"No Shizuku and no root were found, so you can read values but not apply them. Start Shizuku and export rish, or root the phone.",tuneNoGpu:"No adjustable GPU was found on this phone.",accNoRoot:"Sans root",accRish:"Shizuku (rish)",accRoot:"Root",needRish:"Nécessite Shizuku : lancez Shizuku et exportez rish, puis relancez l’analyse.",needRoot:"Nécessite root : su est introuvable sur ce téléphone.",catCpu:"CPU",catGpu:"GPU",catThermal:"Température",catMemory:"Mémoire",catBattery:"Batterie",catGeneral:"Général",current:"Maintenant :",readCur:"Lire l’actuel",apply:"Appliquer",resetOne:"Réinitialiser",tuneRisk:"Careful: pushing this too far can overheat the phone or make it unstable. Use Reset to undo.",tuneResetAll:"Tout réinitialiser",tuneResetAllAsk:"Reset every control back to how the phone started, including thermal and power mode?",tuneResetAllDone:"Réinitialisé aux valeurs par défaut.",tuneApplied:"Appliqué.",tuneApplying:"Application...",tuneFailAccess:"Could not apply: the needed access was refused.",tuneResetDone:"Réinitialisé.",on:"Activé",off:"Désactivé",ctlCpuGov:"CPU governor (cluster {n})",ctlCpuGovD:"How the processor cores in this cluster pick their speed.",ctlCpuMax:"CPU max speed (cluster {n})",ctlCpuMaxD:"The top clock these cores are allowed to reach.",ctlGpuGov:"GPU governor",ctlGpuGovD:"How the graphics chip picks its speed.",ctlGpuMin:"GPU minimum speed",ctlGpuMinD:"The lowest clock the graphics chip will drop to.",ctlGpuMax:"GPU maximum speed",ctlGpuMaxD:"The top clock the graphics chip is allowed to reach.",ctlGpuxD:"A graphics chip switch. Leave it as it was unless you know what it does.",gxBoost:"GPU boost disable",gxDgs:"Dynamic GPU scaling",gxIfpo:"GPU power-off disable",ctlTherm:"Thermal limit override",ctlThermD:"Tells Android to treat the phone as cooler or hotter than it is. Use Reset to hand control back to Android.",thNone:"Aucun (désactivé)",thLight:"Léger",thMod:"Modéré",thSevere:"Grave",thCrit:"Critique",ctlZram:"ZRAM size",ctlZramD:"Compressed swap held in memory. Larger can help on low-memory phones.",ctlDrop:"Drop caches",ctlDropD:"Frees cached file memory. Harmless, the kernel refills it as needed.",ctlPower:"Power mode",ctlPowerD:"Android power mode. Low power trades speed for battery life.",pmOff:"Désactivé",pmLow:"Économie d’énergie",ctlLoad:"Live load",ctlLoadD:"Reads the busiest processes right now. Read only.",ctlBattD:"Battery charge, temperature and current, read from the phone. Read only.",
+
+advTitle:"Réglages avancés",advSystem:"Les réglages de Termux sont dans {setup}, sous {conn}. Wake lock et Reload settings s’y trouvent aussi. {tuning} contient les réglages CPU, GPU, température et mémoire.",advHardware:"Le choix des modèles (Allow Mid, Allow Lead) et les cœurs utilisés à chaud sont sur la page {mesh}. Les réglages CPU, GPU, mémoire et threads sont dans {tuning}.",advBattery:"Les températures où les modèles se mettent en pause puis repartent, et les réglages CPU, GPU, température et énergie, sont dans {tuning}.",advOpen:"Ouvrir {x}",
 termuxInstalled:"Termux installé",termuxVersion:"Version de Termux",termuxConnection:"Connexion",yes:"Oui",no:"Non",fixShort:"Réparer",
 termuxLinkTitle:"Connexion à Termux",termuxLinkOk:"Connecté",termuxLinkOff:"Non connecté",termuxLinkChecking:"Vérification",termuxLinkUnknown:"Pas encore vérifié",termuxWhyOk:"Meridian peut envoyer des commandes à Termux.",termuxWhyExternal:"Termux n’accepte pas encore les commandes des autres apps. Touchez Réparer la connexion Termux, puis dans Termux faites un appui long, touchez Paste et appuyez sur Entrée.",termuxWhyPermission:"Android n’autorise pas encore Meridian à lancer des commandes Termux. Touchez Autoriser les commandes Termux.",termuxWhyAsleep:"Termux est fermé, Android n’a donc pas transmis la vérification. Ouvrez Termux une fois, puis revenez.",termuxWhyTimeout:"Termux n’a pas répondu. Touchez Réparer la connexion Termux, puis revenez ici.",termuxWhyMissing:"Termux n’est pas installé. Prenez-le sur F-Droid, pas sur Play.",termuxWhyRefused:"Termux a refusé la commande. Touchez Réparer la connexion Termux, puis revenez ici.",fixTermux:"Réparer la connexion Termux",allowTermuxPerm:"Autoriser les commandes Termux",checkAgain:"Vérifier à nouveau",getTermux:"Obtenir Termux",fixTermuxToast:"Commande copiée. Dans Termux, appui long sur l’écran, touchez Paste, puis appuyez sur Entrée.",deskIntro:"Desk lance une tâche pour vous, toutes les heures ou tous les jours, même quand l’app est fermée. Choisissez quoi lancer et à quelle fréquence, puis touchez Planifier.",schedTitle:"Tâches automatiques",schedWhat:"Quoi lancer",schedHow:"À quelle fréquence",schedule:"Planifier",showCommand:"Voir la commande",hideCommand:"Masquer la commande",activeJobs:"Tâches actives",noJobs:"Aucune tâche planifiée pour l’instant.",stopJob:"Arrêter",refreshJobs:"Actualiser",lastRun:"Dernière fois",neverRun:"Pas encore lancée",schedWorking:"En cours",schedOk:"Planifiée. Elle tourne maintenant toute seule.",schedStopped:"Arrêtée. Elle ne se relancera plus.",schedFail:"La planification a échoué. Touchez Voir la commande pour les détails.",schedBusy:"Une autre commande est en cours. Réessayez dans un instant.",schedNeedApi:"Les tâches automatiques ont besoin du paquet Termux:API dans Termux.",installApi:"Installer Termux:API",installingApi:"Installation de Termux:API",schedNeedApiApp:"Les tâches automatiques ont aussi besoin de l’app Termux:API. Installez-la depuis F-Droid, puis touchez à nouveau Planifier.",getApiApp:"Obtenir l’app Termux:API",rcpCheck:"Chercher des mises à jour",rcpCheckD:"Cherche de nouvelles versions de vos outils Termux. N’installe rien.",rcpUpgrade:"Mettre à jour les outils",rcpUpgradeD:"Installe les nouvelles versions des outils que vous avez déjà.",rcpClean:"Nettoyer",rcpCleanD:"Supprime les fichiers d’installation restants pour libérer de la place. Vos outils restent.",rcpBattery:"Journal batterie",rcpBatteryD:"Écrit le niveau et la température de la batterie dans meridian-logs/battery.log.",rcpStorage:"Journal stockage",rcpStorageD:"Écrit le remplissage du stockage dans meridian-logs/storage.log.",rcpRepair:"Réparer les installations",rcpRepairD:"Termine une installation coupée en cours de route.",
 
@@ -1935,7 +1971,7 @@ function systemPage() {
   html += row("Fingerprint", p.fingerprint);
   html += '</article>';
   html += termuxInfoCard();
-  html += advCard(t("advSystem").replace("{setup}", t("titleSetup")).replace("{conn}", "1. " + t("termuxLinkTitle")), [["setup", t("titleSetup")]]);
+  html += advCard(t("advSystem").replace("{setup}", t("titleSetup")).replace("{conn}", "1. " + t("termuxLinkTitle")).replace("{tuning}", t("titleTuning")), [["setup", t("titleSetup")], ["tuning", t("titleTuning")]]);
   return html + '</div>';
 }
 // Model fit card: real usable RAM, a friendly recommended setup, and the .gguf files Termux really has.
@@ -2056,7 +2092,7 @@ function hardwarePage() {
   const zramLine = p.zramTotal ? gb(p.zramOrig) + " of " + gb(p.zramTotal) + (ratio ? " · " + ratio : "") : "No ZRAM reading on this phone.";
   html += '<button class="accordion" type="button" id="zramtoggle" aria-expanded="' + (zramOpen ? "true" : "false") + '"><span>ZRAM</span><i class="chev" aria-hidden="true"></i></button><div class="accordion-body" id="zrambody"' + (zramOpen ? "" : " hidden") + '><p class="hwmono">' + esc(zramLine) + '</p></div>';
   html += '</article>';
-  html += advCard(t("advHardware").replace("{mesh}", "Mesh").replace("{tweaks}", t("titleTweaks")), [["mesh", "Mesh"], ["tweaks", t("titleTweaks")]]);
+  html += advCard(t("advHardware").replace("{tuning}", t("titleTuning")).replace("{mesh}", "Mesh"), [["tuning", t("titleTuning")], ["mesh", "Mesh"]]);
   html += '</div>';
   return html;
 }
@@ -2088,19 +2124,13 @@ function batteryPage() {
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");
-  // Use: only the battery pages this phone really has, opened with generic Android intents.
-  const pages = powerPages();
-  html += '</article><p class="sec">Use</p><div class="modes">';
-  if (pages.saver !== false) html += '<button class="ghost' + (s.power === "saver" ? " on" : "") + '" type="button" data-power="saver">Saver</button>';
-  if (pages.usage !== false) html += '<button class="ghost" type="button" data-power="usage">Battery usage</button>';
-  if (pages.fast) html += '<button class="ghost' + (s.power === "fast" ? " on" : "") + '" type="button" data-power="fast">Performance</button>';
-  html += '</div><p class="muted" id="powernote">Opens your phone\'s battery settings.</p>';
-  // Thermals: plain values from Android only. Model heat limits live with the model settings on the Mesh page.
+  html += '</article>';
+  // Thermals: plain values from Android only. Tuning is where the limits live.
   html += '<p class="sec">Thermals</p><article class="plate">';
   html += row("Battery temperature", s.tempKnown ? Number(s.temp || 0).toFixed(1) + "°C" : "");
   html += '<div class="kv linkrow"><span>Status</span><b><i class="linkdot ' + heatTone(s) + '" aria-hidden="true"></i>' + esc(heatLabel(s)) + '</b></div>';
   html += '</article>';
-  html += advCard(t("advBattery").replace("{mesh}", "Mesh"), [["meshheat", "Mesh"]]);
+  html += advCard(t("advBattery").replace("{tuning}", t("titleTuning")), [["tuning", t("titleTuning")]]);
   html += '</div>';
   return html;
 }
@@ -2405,18 +2435,19 @@ function advCard(text, targets) {
   return html + '</div></article>';
 }
 function advGo(where) {
+  if (where === "tuning" || where === "meshheat") {
+    goNav({ view: "tools", more: "tuning", openCmd: "" });
+    if (where === "meshheat") setTimeout(function () { const d = document.getElementById("tune-thermal"); if (d) { d.open = true; d.scrollIntoView({ block: "start" }); } }, 90);
+    return;
+  }
   if (where === "setup") {
     goNav({ view: "setup", more: "menu", openCmd: "" });
     setTimeout(function () { const c = document.getElementById("termuxlink"); if (c) c.scrollIntoView({ block: "start" }); }, 80);
-  } else if (where === "tweaks") {
-    goNav({ view: "tools", more: "tweaks", openCmd: "" });
-  } else if (where === "mesh" || where === "meshheat") {
+  } else if (where === "mesh") {
     goNav({ view: "tools", more: "mesh", openCmd: "" });
     setTimeout(function () {
-      const target = document.getElementById(where === "meshheat" ? "meshheat" : "mesh-mid");
-      if (!target) return;
-      if (where === "meshheat") target.open = true;
-      target.scrollIntoView({ block: "start" });
+      const target = document.getElementById("mesh-mid");
+      if (target) target.scrollIntoView({ block: "start" });
     }, 80);
   }
 }
@@ -2481,7 +2512,6 @@ function doctorPage() {
     ["Android 14 checklist", PHANTOM_CHECK, "Prints the checklist only. It does not change a setting. Battery Unrestricted, Samsung cached-app suspension off, and Disable child process restrictions."],
     ["Termux battery page", PHANTOM_INFO, "Opens the Termux app info page so you can set Battery to Unrestricted."],
     ["Model fit", MODEL_FIT, "Prints the Qwen files for this phone. About 5 to 7 GB usable means Mid 3B Q4 daily (mid_3b.gguf) and Lead 7B rare (gpu_lead_7B.gguf). Scout is cpu_scout_0b5.gguf. Scribe is cpu_scribe_0b5.gguf."],
-    ["Thermal policy", THERMAL_STATUS, "Reads the hottest zone and states the one mesh policy: pause llama-cli at 69C, resume at 49C."],
     ["CPU and GPU", DEVICE_VIABILITY, "Reports whether cpu_mesh can run at ngl 0 and whether gpu_lead can try ngl 99. It does not start a model."],
     ["Package lock", DOCTOR, "Clears a leftover package lock only when apt is not running, then finishes a half-configured package. A live install is left alone."],
     ["System check", CHECK, "Lists which commands are installed and whether vulkaninfo can start. It does not install anything."],
@@ -2510,36 +2540,344 @@ function doctorPage() {
     if (t) return sheet(t[0], t[2], t[1], "");
   }
   return guide("Nothing here runs by itself. Apply local patch copies Termux edits into the live mesh workspace. Phantom processes is the Android 14 one-tap. Open a fix, read what it does, then press Run.") + bands("Doctor", fixes, [
-    ["Phone", ["Apply local patch", "ICM heal", "Phantom processes", "Android 14 checklist", "Termux battery page", "Model fit", "Thermal policy", "CPU and GPU"]],
+    ["Phone", ["Apply local patch", "ICM heal", "Phantom processes", "Android 14 checklist", "Termux battery page", "Model fit", "CPU and GPU"]],
     ["Install", ["System check", "Vulkan repair", "Package lock", "Broken install", "Missing files", "Core tools", "Shebang"]],
     ["Lists", ["Repo refresh", "Package lists", "Change mirror", "Keyring", "Certificates", "X11 repo"]],
     ["Check", ["Audit", "API check", "Phone report", "Command cache", "Reload Termux", "Storage link", "Clean cache", "Temp folder"]]
   ]);
 }
-function tweaksPage() {
-  const items = [
-    ["Wake lock", "termux-wake-lock", "Keeps the phone awake while a job runs."],
-    ["Wake unlock", "termux-wake-unlock", "Lets the phone sleep again."],
-    ["Storage", "termux-setup-storage", "Links shared storage into home/storage."],
-    ["Governor", "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", "Read only. Writing a governor needs root and is not done for you."],
-    ["Core clocks", "for f in /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_cur_freq; do [ -r \"$f\" ] || continue; n=$(cat \"$f\"); echo \"$f $((n/1000)) MHz\"; done", "Prints the live clock of every core the kernel will open."],
-    ["Memory", "free -h", "Shows RAM and virtual memory from the shell."],
-    ["Drop caches", "if [ -w /proc/sys/vm/drop_caches ]; then sync; echo 3 > /proc/sys/vm/drop_caches; echo Caches dropped.; else echo This phone is not rooted. The kernel will not let an app drop caches.; fi", "Only works with root. On this phone it tells you that, and it does not pretend the memory moved."],
-    ["Swappiness", "cat /proc/sys/vm/swappiness", "Read only. This is how readily Android uses virtual memory."],
-    ["ZRAM", "f=/sys/block/zram0/mm_stat; if [ ! -r \"$f\" ]; then echo ZRAM stats are closed on this phone.; exit 0; fi; read a b c d e s p rest < \"$f\"; echo Uncompressed $((a/1048576)) MB; echo Compressed $((b/1048576)) MB; echo Memory used $((c/1048576)) MB; if [ \"$d\" = 0 ]; then echo Limit none; else echo Limit $((d/1048576)) MB; fi; echo Peak used $((e/1048576)) MB; echo Same pages $s; echo Pages compacted $p", "Uncompressed size, compressed size, and memory used by the virtual pool."],
-    ["Battery", "termux-battery-status", "Needs Termux:API. Prints charge, temperature, and current."],
-    ["GPU clock", "for g in /sys/class/devfreq/*gpu* /sys/class/devfreq/*mali* /sys/class/devfreq/*g3d* /sys/class/kgsl/kgsl-3d0; do [ -e \"$g\" ] || continue; echo \"$g\"; [ -r \"$g/cur_freq\" ] && echo clock $(cat \"$g/cur_freq\"); [ -r \"$g/gpuclk\" ] && echo clock $(cat \"$g/gpuclk\"); done", "Reads the GPU clock files that exist on this phone."],
-    ["Threads", "grep -q OMP_NUM_THREADS ~/.bashrc || echo 'export OMP_NUM_THREADS=$(nproc)' >> ~/.bashrc\ngrep -n OMP_NUM_THREADS ~/.bashrc", "Sets the thread count new shells give to llama.cpp and similar builds."]
-  ];
-  if (openCmd !== "") {
-    const t = items[Number(openCmd)];
-    if (t) return sheet(t[0], t[2], t[1], "");
+/* Advanced tuning: one place for CPU, GPU, Thermal, Memory, Battery and General controls.
+   Everything is button driven. Dropdowns are filled from the phone's own list commands,
+   access needed per control is detected (No root, Shizuku rish, Root) and controls the
+   user cannot use are disabled with the reason spelled out. Originals are saved before the
+   first write so Reset and Reset all can put them back. */
+let tune = { ready: false, scanning: false, access: { rish: null, su: null }, kind: "", soc: "",
+  cpu: [], gpu: null, gpux: [], thermal: "", zram: "", batt: "" };
+function tuneProbeCmd() {
+  return [
+    'echo TUNE_BEGIN',
+    'r=0; [ -x "$HOME/rish" ] && r=1; command -v rish >/dev/null 2>&1 && r=1',
+    'u=0; command -v su >/dev/null 2>&1 && u=1',
+    'echo "ACCESS|rish=$r|su=$u"',
+    'for p in /sys/devices/system/cpu/cpufreq/policy*; do [ -d "$p" ] || continue; i=${p##*/policy};',
+    '  echo "CPU|$i|gov=$(cat $p/scaling_governor 2>/dev/null)|govs=$(cat $p/scaling_available_governors 2>/dev/null)|max=$(cat $p/scaling_max_freq 2>/dev/null)|min=$(cat $p/scaling_min_freq 2>/dev/null)|cur=$(cat $p/scaling_cur_freq 2>/dev/null)|freqs=$(cat $p/scaling_available_frequencies 2>/dev/null)"; done',
+    'if [ -d /sys/kernel/gpu ]; then',
+    '  if [ -e /sys/kernel/gpu/sgpu_dgs_enable ] || [ -e /sys/kernel/gpu/sgpu_ifpo_disable ]; then echo "GPUKIND|sgpu"; else echo "GPUKIND|mali"; fi',
+    '  echo "GPU|path=/sys/kernel/gpu|gnode=gpu_governor|minnode=gpu_min_clock|maxnode=gpu_max_clock|curnode=gpu_clock|div=1000|gov=$(cat /sys/kernel/gpu/gpu_governor 2>/dev/null)|govs=$(cat /sys/kernel/gpu/gpu_available_governor 2>/dev/null)|min=$(cat /sys/kernel/gpu/gpu_min_clock 2>/dev/null)|max=$(cat /sys/kernel/gpu/gpu_max_clock 2>/dev/null)|cur=$(cat /sys/kernel/gpu/gpu_clock 2>/dev/null)|freqs=$(cat /sys/kernel/gpu/gpu_freq_table 2>/dev/null)"',
+    '  for x in gpu_cl_boost_disable sgpu_dgs_enable sgpu_ifpo_disable; do [ -e /sys/kernel/gpu/$x ] && echo "GPUX|$x|$(cat /sys/kernel/gpu/$x 2>/dev/null)"; done',
+    'elif [ -d /sys/class/kgsl/kgsl-3d0 ]; then echo "GPUKIND|adreno"',
+    '  echo "GPU|path=/sys/class/kgsl/kgsl-3d0/devfreq|gnode=governor|minnode=min_freq|maxnode=max_freq|curnode=/sys/class/kgsl/kgsl-3d0/gpuclk|div=1000000|gov=$(cat /sys/class/kgsl/kgsl-3d0/devfreq/governor 2>/dev/null)|govs=$(cat /sys/class/kgsl/kgsl-3d0/devfreq/available_governors 2>/dev/null)|min=$(cat /sys/class/kgsl/kgsl-3d0/devfreq/min_freq 2>/dev/null)|max=$(cat /sys/class/kgsl/kgsl-3d0/devfreq/max_freq 2>/dev/null)|cur=$(cat /sys/class/kgsl/kgsl-3d0/gpuclk 2>/dev/null)|freqs=$(cat /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies 2>/dev/null)"',
+    'else g=$(ls -d /sys/class/devfreq/*gpu* /sys/class/devfreq/*mali* /sys/class/devfreq/*g3d* 2>/dev/null | head -1);',
+    '  if [ -n "$g" ]; then echo "GPUKIND|devfreq"; echo "GPU|path=$g|gnode=governor|minnode=min_freq|maxnode=max_freq|curnode=$g/cur_freq|div=1000000|gov=$(cat $g/governor 2>/dev/null)|govs=$(cat $g/available_governors 2>/dev/null)|min=$(cat $g/min_freq 2>/dev/null)|max=$(cat $g/max_freq 2>/dev/null)|cur=$(cat $g/cur_freq 2>/dev/null)|freqs=$(cat $g/available_frequencies 2>/dev/null)"; else echo "GPUKIND|none"; fi',
+    'fi',
+    'echo "THERMAL|$(cmd thermalservice 2>/dev/null | head -1)"',
+    'echo "ZRAM|$(cat /sys/block/zram0/disksize 2>/dev/null)"',
+    'echo "SOC|$(getprop ro.board.platform 2>/dev/null) $(getprop ro.hardware 2>/dev/null)"',
+    'echo TUNE_END'
+  ].join('\n');
+}
+function tuneParse(out) {
+  const t = { ready: true, scanning: false, access: { rish: false, su: false }, kind: "none", soc: "",
+    cpu: [], gpu: null, gpux: [], thermal: "", zram: "" };
+  String(out || "").split("\n").forEach(function (ln) {
+    const parts = ln.split("|");
+    if (parts[0] === "ACCESS") {
+      parts.slice(1).forEach(function (kv) { const m = kv.split("="); if (m[0] === "rish") t.access.rish = m[1] === "1"; if (m[0] === "su") t.access.su = m[1] === "1"; });
+    } else if (parts[0] === "CPU") {
+      const o = { id: parts[1] }; parts.slice(2).forEach(function (kv) { const i = kv.indexOf("="); o[kv.slice(0, i)] = kv.slice(i + 1); }); t.cpu.push(o);
+    } else if (parts[0] === "GPUKIND") { t.kind = parts[1];
+    } else if (parts[0] === "GPU") {
+      const o = {}; parts.slice(1).forEach(function (kv) { const i = kv.indexOf("="); o[kv.slice(0, i)] = kv.slice(i + 1); }); t.gpu = o;
+    } else if (parts[0] === "GPUX") { t.gpux.push({ name: parts[1], val: parts[2] });
+    } else if (parts[0] === "THERMAL") { t.thermal = parts.slice(1).join("|");
+    } else if (parts[0] === "ZRAM") { t.zram = parts[1];
+    } else if (parts[0] === "SOC") { t.soc = parts.slice(1).join("|").trim(); }
+  });
+  return t;
+}
+function refreshTune(force) {
+  if (tune.scanning) return;
+  if (tune.ready && !force) { paintTune(); return; }
+  tune.scanning = true; paintTune();
+  const ok = quietJob(tuneProbeCmd(), function (out) {
+    tune = tuneParse((String(out || "").split("TUNE_BEGIN")[1] || out));
+    if (view === "tools" && more === "tuning") render();
+  });
+  if (!ok) { tune.scanning = false; const s = document.getElementById("tunestatus"); if (s) s.textContent = t("tuneBusy"); }
+}
+function tuneDevName() {
+  if (tune.kind === "sgpu") return "Exynos (Xclipse GPU)";
+  if (tune.kind === "mali") return "Exynos (Mali GPU)";
+  if (tune.kind === "adreno") return "Snapdragon (Adreno GPU)";
+  if (tune.kind === "devfreq") return "Generic (devfreq GPU)";
+  return t("tuneNoGpu");
+}
+function accOk(level) { if (level === "noroot") return true; if (level === "rish") return !!(tune.access.rish || tune.access.su); return !!tune.access.su; }
+function accLabel(level) { return level === "noroot" ? t("accNoRoot") : level === "rish" ? t("accRish") : t("accRoot"); }
+function accWhy(level) { return level === "rish" ? t("needRish") : level === "root" ? t("needRoot") : ""; }
+function accBadge(level) { return '<span class="acc ' + level + (accOk(level) ? "" : " off") + '">' + esc(accLabel(level)) + "</span>"; }
+function mhz(raw, div) { const n = Number(raw); if (!n) return String(raw || ""); return Math.round(n / (div || 1000)) + " MHz"; }
+function tuneKey(path) { return String(path).replace(/[^A-Za-z0-9]+/g, "_"); }
+function tunePrelude(level) {
+  // rish controls prefer rish, fall back to su; root controls use su only.
+  if (level === "root") return 'R(){ if command -v su >/dev/null 2>&1; then su -c "$1"; else echo MERIDIAN_NOACCESS; return 1; fi; }\n';
+  return 'R(){ if [ -x "$HOME/rish" ]; then "$HOME/rish" -c "$1"; elif command -v rish >/dev/null 2>&1; then rish -c "$1"; elif command -v su >/dev/null 2>&1; then su -c "$1"; else echo MERIDIAN_NOACCESS; return 1; fi; }\n';
+}
+function tuneWrite(level, path, val, read) {
+  const k = tuneKey(path);
+  return tunePrelude(level)
+    + 'O="$HOME/.meridian/tuning-orig"; mkdir -p "$O"\n'
+    + 'if [ ! -f "$O/' + k + '" ]; then R "cat ' + path + '" > "$O/' + k + '" 2>/dev/null; echo "' + k + ' ' + path + '" >> "$O/.index"; fi\n'
+    + 'R "echo ' + val + ' > ' + path + '"\n'
+    + 'echo "NOW=$(R \\"cat ' + (read || path) + '\\" 2>/dev/null)"\n';
+}
+function tuneRestore(level, path, read) {
+  const k = tuneKey(path);
+  return tunePrelude(level)
+    + 'O="$HOME/.meridian/tuning-orig"\n'
+    + 'if [ -f "$O/' + k + '" ]; then R "echo $(cat \\"$O/' + k + '\\") > ' + path + '"; fi\n'
+    + 'echo "NOW=$(R \\"cat ' + (read || path) + '\\" 2>/dev/null)"\n';
+}
+function parseNow(out) { const m = String(out || "").match(/NOW=([^\n]*)/); return m ? m[1].trim() : ""; }
+// Control registry. Built from the probe so only real controls appear.
+function tuneControls() {
+  const list = [];
+  // CPU, one group of controls per policy (each policy is a cluster of cores).
+  tune.cpu.forEach(function (c) {
+    const govs = (c.govs || "").trim().split(/\s+/).filter(Boolean);
+    const freqs = (c.freqs || "").trim().split(/\s+/).filter(Boolean).sort(function (a, b) { return Number(a) - Number(b); });
+    list.push({ cat: "cpu", id: "cpugov" + c.id, level: "root",
+      name: t("ctlCpuGov").replace("{n}", c.id), desc: t("ctlCpuGovD"),
+      opts: govs.map(function (g) { return [g, g]; }), cur: c.gov,
+      node: "/sys/devices/system/cpu/cpufreq/policy" + c.id + "/scaling_governor" });
+    if (freqs.length) list.push({ cat: "cpu", id: "cpumax" + c.id, level: "root", warn: true,
+      name: t("ctlCpuMax").replace("{n}", c.id), desc: t("ctlCpuMaxD"),
+      opts: freqs.map(function (f) { return [f, mhz(f, 1000)]; }), cur: c.max, curfmt: function (v) { return mhz(v, 1000); },
+      node: "/sys/devices/system/cpu/cpufreq/policy" + c.id + "/scaling_max_freq" });
+  });
+  // GPU
+  if (tune.gpu && tune.kind !== "none") {
+    const g = tune.gpu, div = Number(g.div) || 1000, lvl = (tune.kind === "sgpu" || tune.kind === "mali") ? "rish" : "root";
+    const govs = (g.govs || "").trim().split(/\s+/).filter(Boolean);
+    let freqs = (g.freqs || "").trim().split(/\s+/).map(function (f) { return f.replace(/[^0-9]/g, ""); }).filter(Boolean);
+    // Samsung lists the freq table in MHz but the clock nodes read and write kHz,
+    // so scale the Samsung table to kHz; Adreno and devfreq already share units with their nodes.
+    const samsung = tune.kind === "sgpu" || tune.kind === "mali";
+    const opt = freqs.map(function (f) { return samsung ? [String(Number(f) * 1000), f + " MHz"] : [f, mhz(f, div)]; });
+    opt.sort(function (a, b) { return Number(a[0]) - Number(b[0]); });
+    const gfmt = function (v) { return mhz(v, div); };
+    if (govs.length) list.push({ cat: "gpu", id: "gpugov", level: lvl, name: t("ctlGpuGov"), desc: t("ctlGpuGovD"),
+      opts: govs.map(function (x) { return [x, x]; }), cur: g.gov, node: g.path + "/" + g.gnode });
+    if (opt.length) {
+      list.push({ cat: "gpu", id: "gpumin", level: lvl, name: t("ctlGpuMin"), desc: t("ctlGpuMinD"),
+        opts: opt, cur: g.min, curfmt: gfmt, node: g.path + "/" + g.minnode });
+      list.push({ cat: "gpu", id: "gpumax", level: lvl, warn: true, name: t("ctlGpuMax"), desc: t("ctlGpuMaxD"),
+        opts: opt, cur: g.max, curfmt: gfmt, node: g.path + "/" + g.maxnode });
+    }
+    tune.gpux.forEach(function (x) {
+      list.push({ cat: "gpu", id: "gpux_" + x.name, level: "rish", name: tuneExtraName(x.name), desc: t("ctlGpuxD"),
+        opts: [["0", t("off")], ["1", t("on")]], cur: x.val, node: g.path + "/" + x.name });
+    });
   }
-  return guide("These read the phone or change one setting. Open one, read the command, then press Run.") + bands("Tweaks", items, [
-    ["Power", ["Wake lock", "Wake unlock", "Battery", "Governor"]],
-    ["Memory", ["Memory", "Drop caches", "Swappiness", "ZRAM", "Storage"]],
-    ["Speed", ["Core clocks", "GPU clock", "Threads"]]
-  ]);
+  // Thermal
+  list.push({ cat: "thermal", id: "thermover", level: "rish", warn: true, name: t("ctlTherm"), desc: t("ctlThermD"),
+    opts: [["0", t("thNone")], ["1", t("thLight")], ["2", t("thMod")], ["3", t("thSevere")], ["4", t("thCrit")]],
+    cur: "", action: function (v) { return tunePrelude("rish") + 'R "cmd thermalservice override-status ' + v + '"\n'; },
+    reset: function () { return tunePrelude("rish") + 'R "cmd thermalservice reset"\n'; } });
+  // Memory
+  if (tune.zram) list.push({ cat: "memory", id: "zram", level: "root", warn: true, name: t("ctlZram"), desc: t("ctlZramD"),
+    number: { min: 0, max: 8192, step: 256, suffix: "MB", scale: 1048576 }, cur: tune.zram, curfmt: function (v) { return Math.round(Number(v) / 1048576) + " MB"; },
+    node: "/sys/block/zram0/disksize" });
+  list.push({ cat: "memory", id: "drop", level: "root", name: t("ctlDrop"), desc: t("ctlDropD"),
+    action: function () { return tunePrelude("root") + 'R "sync; echo 3 > /proc/sys/vm/drop_caches"; echo "NOW=done"\n'; } });
+  // General
+  list.push({ cat: "general", id: "powermode", level: "rish", name: t("ctlPower"), desc: t("ctlPowerD"),
+    opts: [["0", t("pmOff")], ["1", t("pmLow")]], cur: "",
+    action: function (v) { return tunePrelude("rish") + 'R "cmd power set-mode ' + v + '"\n'; },
+    reset: function () { return tunePrelude("rish") + 'R "cmd power set-mode 0"\n'; } });
+  list.push({ cat: "general", id: "load", level: "noroot", name: t("ctlLoad"), desc: t("ctlLoadD"),
+    readonly: true, readCmd: "top -n 1 -b 2>/dev/null | head -12" });
+  return list;
+}
+function tuneExtraName(n) {
+  if (n === "gpu_cl_boost_disable") return t("gxBoost");
+  if (n === "sgpu_dgs_enable") return t("gxDgs");
+  if (n === "sgpu_ifpo_disable") return t("gxIfpo");
+  return n;
+}
+function tuneCtlHtml(c) {
+  const ok = accOk(c.level);
+  let h = '<div class="tune" data-ctl="' + c.id + '"><div class="tunehead"><b>' + esc(c.name) + '</b>' + accBadge(c.level) + '</div>';
+  h += '<p class="muted">' + esc(c.desc) + '</p>';
+  if (c.warn) h += '<p class="tunewarn">' + esc(t("tuneRisk")) + '</p>';
+  if (!ok) h += '<p class="tuneno">' + esc(accWhy(c.level)) + '</p>';
+  if (!c.readonly) {
+    const curtxt = c.cur ? (c.curfmt ? c.curfmt(c.cur) : c.cur) : "—";
+    h += '<div class="tunecur">' + esc(t("current")) + ' <b id="cur-' + c.id + '">' + esc(curtxt) + '</b></div>';
+  } else {
+    h += '<pre class="tuneout" id="cur-' + c.id + '"></pre>';
+  }
+  const dis = ok ? "" : " disabled";
+  if (c.opts) {
+    h += '<select id="in-' + c.id + '"' + dis + '>';
+    c.opts.forEach(function (o) { h += '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(c.cur) ? " selected" : "") + '>' + esc(o[1]) + "</option>"; });
+    h += '</select>';
+  } else if (c.number) {
+    const val = c.cur ? Math.round(Number(c.cur) / (c.number.scale || 1)) : "";
+    h += '<input id="in-' + c.id + '" type="number" inputmode="numeric" min="' + c.number.min + '" max="' + c.number.max + '" step="' + c.number.step + '" value="' + val + '"' + dis + ' />';
+  }
+  h += '<div class="tools">';
+  h += '<button class="ghost" type="button" data-tread="' + c.id + '">' + esc(t("readCur")) + '</button>';
+  if (!c.readonly) {
+    h += '<button class="btn" type="button" data-tapply="' + c.id + '"' + dis + '>' + esc(t("apply")) + '</button>';
+    h += '<button class="ghost" type="button" data-treset="' + c.id + '"' + dis + '>' + esc(t("resetOne")) + '</button>';
+  }
+  h += '</div></div>';
+  return h;
+}
+function tuningPage() {
+  if (!tune.ready) {
+    let h = '<div class="stack">';
+    h += '<p class="hint">' + esc(t("tuneIntro")) + '</p>';
+    h += '<p class="muted" id="tunestatus">' + esc(tune.scanning ? t("tuneScanning") : t("tuneScanHint")) + '</p>';
+    h += '<button class="btn" type="button" id="tunescan"' + (tune.scanning ? " disabled" : "") + '>' + esc(tune.scanning ? t("tuneScanning") : t("tuneScan")) + '</button>';
+    h += '</div>';
+    return h;
+  }
+  const cats = [
+    ["cpu", t("catCpu")], ["gpu", t("catGpu")], ["thermal", t("catThermal")],
+    ["memory", t("catMemory")], ["battery", t("catBattery")], ["general", t("catGeneral")]
+  ];
+  const ctls = tuneControls();
+  let h = '<div class="stack">';
+  // Detected device and access summary.
+  h += '<article class="plate tunesum">';
+  h += '<div class="kv"><span>' + esc(t("tuneDevice")) + '</span><b>' + esc(tuneDevName()) + '</b></div>';
+  if (tune.soc) h += '<div class="kv"><span>' + esc(t("tuneChip")) + '</span><b>' + esc(tune.soc) + '</b></div>';
+  h += '<div class="kv"><span>' + esc(t("tuneAccess")) + '</span><b>' + esc(tuneAccessText()) + '</b></div>';
+  h += '</article>';
+  if (!tune.access.rish && !tune.access.su) h += '<p class="tuneno">' + esc(t("tuneNoAccess")) + '</p>';
+  cats.forEach(function (cat) {
+    const items = ctls.filter(function (c) { return c.cat === cat[0]; });
+    if (cat[0] === "battery") {
+      h += '<details class="tunecat" id="tune-' + cat[0] + '"><summary>' + esc(cat[1]) + '</summary><div class="stack">';
+      h += tuneBatteryBlock();
+      h += '</div></details>';
+      return;
+    }
+    if (cat[0] === "thermal") {
+      h += '<details class="tunecat" id="tune-' + cat[0] + '"><summary>' + esc(cat[1]) + '</summary><div class="stack">';
+      items.forEach(function (c) { h += tuneCtlHtml(c); });
+      h += heatLimitsBlock();
+      h += '</div></details>';
+      return;
+    }
+    if (!items.length) {
+      if (cat[0] === "gpu" && tune.kind === "none") {
+        h += '<details class="tunecat" id="tune-' + cat[0] + '"><summary>' + esc(cat[1]) + '</summary><div class="stack"><p class="muted">' + esc(t("tuneNoGpu")) + '</p></div></details>';
+      }
+      return;
+    }
+    h += '<details class="tunecat" id="tune-' + cat[0] + '"' + (cat[0] === "cpu" ? " open" : "") + '><summary>' + esc(cat[1]) + '</summary><div class="stack">';
+    items.forEach(function (c) { h += tuneCtlHtml(c); });
+    h += '</div></details>';
+  });
+  h += '<div class="tools"><button class="ghost" type="button" id="tunerescan">' + esc(t("tuneRescan")) + '</button><button class="ghost danger" type="button" id="tuneresetall">' + esc(t("tuneResetAll")) + '</button></div>';
+  h += '<p class="muted" id="tunenote" role="status"></p>';
+  h += '</div>';
+  return h;
+}
+function tuneAccessText() {
+  const a = [];
+  a.push(t("accNoRoot"));
+  if (tune.access.rish) a.push(t("accRish"));
+  if (tune.access.su) a.push(t("accRoot"));
+  return a.join(", ");
+}
+function tuneBatteryBlock() {
+  let h = '<p class="muted">' + esc(t("ctlBattD")) + '</p>';
+  h += '<pre class="tuneout" id="cur-battinfo"></pre>';
+  h += '<div class="tools"><button class="ghost" type="button" data-tread="battinfo">' + esc(t("readCur")) + '</button></div>';
+  return h;
+}
+function tuneCtlById(id) { return tuneControls().filter(function (c) { return c.id === id; })[0]; }
+function tuneRead(id) {
+  if (id === "battinfo") {
+    quietJob("termux-battery-status 2>/dev/null || dumpsys battery 2>/dev/null", function (o) { const el = document.getElementById("cur-battinfo"); if (el) el.textContent = String(o || "").replace(/\nexit -?\d+\s*$/, "").trim() || "—"; });
+    return;
+  }
+  const c = tuneCtlById(id); if (!c) return;
+  if (c.readonly) {
+    quietJob(c.readCmd, function (o) { const el = document.getElementById("cur-" + id); if (el) el.textContent = String(o || "").replace(/\nexit -?\d+\s*$/, "").trim() || "—"; });
+    return;
+  }
+  const read = c.node || "";
+  if (!read) return;
+  quietJob(tunePrelude(c.level) + 'echo "NOW=$(R \"cat ' + read + '\" 2>/dev/null)"\n', function (o) {
+    const now = parseNow(o); const el = document.getElementById("cur-" + id);
+    if (el) el.textContent = now ? (c.curfmt ? c.curfmt(now) : now) : "—";
+  });
+}
+function tuneApply(id) {
+  const c = tuneCtlById(id); if (!c || !accOk(c.level)) return;
+  const inp = document.getElementById("in-" + id);
+  let val = inp ? inp.value : "";
+  if (c.number) val = String(Math.round(Number(val) * (c.number.scale || 1)));
+  const note = document.getElementById("tunenote");
+  let cmd;
+  if (c.action) cmd = c.action(val);
+  else cmd = tuneWrite(c.level, c.node, val, c.node);
+  const ok = quietJob(cmd, function (o) {
+    const now = parseNow(o);
+    const el = document.getElementById("cur-" + id);
+    if (el && c.node) el.textContent = now ? (c.curfmt ? c.curfmt(now) : now) : el.textContent;
+    if (note) note.textContent = String(o || "").indexOf("MERIDIAN_NOACCESS") >= 0 ? t("tuneFailAccess") : t("tuneApplied");
+  });
+  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
+}
+function tuneResetOne(id) {
+  const c = tuneCtlById(id); if (!c || !accOk(c.level)) return;
+  const note = document.getElementById("tunenote");
+  let cmd;
+  if (c.reset) cmd = c.reset();
+  else if (c.node) cmd = tuneRestore(c.level, c.node, c.node);
+  else return;
+  const ok = quietJob(cmd, function (o) {
+    const now = parseNow(o); const el = document.getElementById("cur-" + id);
+    if (el && c.node && now) el.textContent = c.curfmt ? c.curfmt(now) : now;
+    if (note) note.textContent = t("tuneResetDone");
+  });
+  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
+}
+function tuneResetAll() {
+  if (!confirm(t("tuneResetAllAsk"))) return;
+  const note = document.getElementById("tunenote");
+  // Prefer su for sysfs restores when present, fall back to rish. Reset thermal and power to default too.
+  const cmd = 'R(){ if command -v su >/dev/null 2>&1; then su -c "$1"; elif [ -x "$HOME/rish" ]; then "$HOME/rish" -c "$1"; elif command -v rish >/dev/null 2>&1; then rish -c "$1"; else echo MERIDIAN_NOACCESS; fi; }\n'
+    + 'O="$HOME/.meridian/tuning-orig"\n'
+    + 'R "cmd thermalservice reset" >/dev/null 2>&1\n'
+    + 'R "cmd power set-mode 0" >/dev/null 2>&1\n'
+    + 'if [ -f "$O/.index" ]; then while read k p; do [ -n "$p" ] && [ -f "$O/$k" ] && R "echo $(cat \"$O/$k\") > $p"; done < "$O/.index"; fi\n'
+    + 'echo "NOW=done"\n';
+  const ok = quietJob(cmd, function () { if (note) note.textContent = t("tuneResetAllDone"); setTimeout(function () { refreshTune(true); }, 300); });
+  if (note) note.textContent = ok ? t("tuneApplying") : t("tuneBusy");
+}
+function bindTune() {
+  const scan = document.getElementById("tunescan");
+  if (scan) scan.onclick = function () { refreshTune(true); };
+  const rescan = document.getElementById("tunerescan");
+  if (rescan) rescan.onclick = function () { refreshTune(true); };
+  const ra = document.getElementById("tuneresetall");
+  if (ra) ra.onclick = tuneResetAll;
+  document.querySelectorAll("[data-tread]").forEach(function (b) { b.onclick = function () { tuneRead(b.getAttribute("data-tread")); }; });
+  document.querySelectorAll("[data-tapply]").forEach(function (b) { b.onclick = function () { tuneApply(b.getAttribute("data-tapply")); }; });
+  document.querySelectorAll("[data-treset]").forEach(function (b) { b.onclick = function () { tuneResetOne(b.getAttribute("data-treset")); }; });
+}
+function paintTune() {
+  const s = document.getElementById("tunestatus");
+  if (s) s.textContent = tune.scanning ? t("tuneScanning") : t("tuneScanHint");
+  const b = document.getElementById("tunescan");
+  if (b) { b.disabled = tune.scanning; b.textContent = tune.scanning ? t("tuneScanning") : t("tuneScan"); }
 }
 function commandsPage() {
   const items = [
@@ -3495,7 +3833,6 @@ function meshPage() {
     + '<label class="muted" for="mesh-lead"><input id="mesh-lead" type="checkbox" aria-label="Allow Lead"' + (meshLeadChecked() ? " checked" : "") + '> Allow Lead</label>'
     + '<label class="muted" for="mesh-force"><input id="mesh-force" type="checkbox" aria-label="Force Lead"' + (meshForce ? " checked" : "") + '> Force Lead</label>'
     + '<p class="muted" id="meshmodelnote">' + esc(meshModelNote()) + '</p>'
-    + heatLimitsBlock()
     + '<button class="btn" type="button" id="meshget">Download model</button>'
     + '<label class="muted" for="mesh-cmd">Command</label>'
     + '<textarea id="mesh-cmd" rows="3" placeholder="Ask, read file ~/notes/a.txt, or fetch https://example.com">' + esc(meshDraft) + '</textarea>'
@@ -4490,7 +4827,7 @@ window.meridianMesh = {
 function toolsPage() {
   if (more !== "menu") {
     let inner = "";
-    if (more === "tweaks") inner = tweaksPage();
+    if (more === "tuning") inner = tuningPage();
     else if (more === "commands") inner = commandsPage();
     else if (more === "doctor") inner = doctorPage();
     else if (more === "links") inner = linksPage();
@@ -4513,7 +4850,7 @@ function toolsPage() {
     + '<button class="ico" type="button" data-go="files">' + mark("Files") + '<em>' + esc(t("files")) + '</em></button>'
     + '<button class="ico" type="button" data-go="console">' + mark("Console") + '<em>' + esc(t("console")) + '</em></button>'
     + '</div><div class="bend"></div><p class="sec mach">' + esc(t("machine")) + '</p><div class="grid">'
-    + '<button class="ico" type="button" data-more="tweaks">' + mark("Tweaks") + '<em>' + esc(t("tweaks")) + '</em>' + "" + '</button>'
+    + '<button class="ico" type="button" data-more="tuning">' + mark("Tweaks") + '<em>' + esc(t("titleTuning")) + '</em>' + "" + '</button>'
     + '<button class="ico" type="button" data-more="doctor">' + mark("Doctor") + '<em>' + esc(t("doctor")) + '</em></button>'
     + '<button class="ico" type="button" data-more="pc">' + mark("Debian") + '<em>' + esc(t("linuxPc")) + '</em>' + "" + '</button>'
     + '</div><div class="bend"></div><p class="sec lib">' + esc(t("library")) + '</p><div class="grid">'
@@ -4551,7 +4888,7 @@ function windowTitle() {
   if (view === "settings") return t("titleSettings");
   if (view === "tools") {
     if (more === "doctor") return t("titleDoctor");
-    if (more === "tweaks") return t("titleTweaks");
+    if (more === "tuning") return t("titleTuning");
     if (more === "commands") return t("titleCommands");
     if (more === "links") return t("titleLinks");
     if (more === "about") return t("titleAbout");
@@ -4609,7 +4946,7 @@ function payPage() {
 // Info screens (Dashboard, Hardware, System, Battery, Security) read as plain widgets.
 function commandScreen() {
   if (view === "console" || view === "plan" || view === "build") return true;
-  return view === "tools" && (more === "commands" || more === "doctor" || more === "tweaks" || more === "mesh" || more === "pc");
+  return view === "tools" && (more === "commands" || more === "doctor" || more === "mesh" || more === "pc");
 }
 function render() {
   const main = document.getElementById("main");
@@ -5121,6 +5458,7 @@ function bind() {
   const heatreset = document.getElementById("heatreset");
   if (heatreset) heatreset.onclick = function () { saveHeat(true); };
   bindTermuxFix(document);
+  if (view === "tools" && more === "tuning") { bindTune(); setTimeout(function () { refreshTune(false); }, 60); }
   if (view === "setup" && openCmd === "") setTimeout(function () { checkTermuxLink(false); }, 60);
   if (view === "hardware") setTimeout(function () { loadModelFiles(false); }, 120);
   if (view === "system" && (termuxLink.state === "unknown" || Date.now() - termuxLink.at > 30000)) setTimeout(function () { checkTermuxLink(false); }, 60);
