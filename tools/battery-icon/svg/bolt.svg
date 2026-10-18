@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="512" height="512"><defs>
+<linearGradient id="ringg" gradientUnits="userSpaceOnUse" x1="10" y1="150" x2="150" y2="10"><stop offset="0" stop-color="#0f8a5f"/><stop offset="1" stop-color="#4dffa6"/></linearGradient>
+<linearGradient id="shellg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0f8a5f"/><stop offset="1" stop-color="#4dffa6"/></linearGradient>
+<linearGradient id="barg" gradientUnits="userSpaceOnUse" x1="0" y1="117" x2="0" y2="37"><stop offset="0" stop-color="#0f8a5f"/><stop offset="1" stop-color="#4dffa6"/></linearGradient>
+<filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6" result="b"/><feFlood flood-color="rgba(60,255,160,0.55)"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs><path d="M83.5 60 71 82h8.2l-3.4 18L89 77h-8.4l2.9-17z" fill="#ffffff" stroke="#06331f" stroke-opacity="0.55" stroke-width="1" stroke-linejoin="round" filter="url(#glow)"/></svg>

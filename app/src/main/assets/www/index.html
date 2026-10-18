@@ -263,30 +263,28 @@
   .core b::after { content: " MHz"; font-size: 10px; font-weight: 550; color: var(--muted); }
   .bar { display: block; height: 7px; margin-top: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); transition: width 400ms ease-out; }
-  .xtal { display: flex; align-items: center; height: 36px; margin: 8px 0 2px; }
-  .xtal-orb { width: 36px; height: 36px; border-radius: 50%; flex: none; z-index: 2; display: grid; place-items: center; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%), radial-gradient(circle at 50% 60%, #eaff6a 0%, #8dff3c 26%, #1c9a52 56%, rgba(6, 28, 20, .4) 80%); box-shadow: inset 0 0 0 2px rgba(186, 255, 255, .95), inset 0 0 0 4px rgba(0, 190, 230, .28), inset 0 -6px 8px rgba(0, 30, 16, .5), 0 0 10px rgba(0, 230, 255, .4); }
-  .xtal-orb svg { width: 14px; height: 14px; display: block; fill: #0b3a22; }
-  .xtal-track { position: relative; flex: 1; height: 22px; margin-left: -8px; border-radius: 6px 14px 7px 6px; transform: skewX(-18deg); overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 36%, rgba(0, 16, 32, .55)), repeating-linear-gradient(105deg, rgba(90, 160, 180, .16) 0 8px, rgba(8, 24, 36, .35) 8px 15px); border: 1.5px solid rgba(140, 248, 255, .95); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -6px 8px rgba(0, 50, 80, .5), 0 0 8px rgba(0, 210, 255, .35); }
-  .xtal-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%, rgba(0, 70, 30, .22)), repeating-linear-gradient(105deg, rgba(210, 255, 60, .2) 0 6px, #f3ff78 6px 11px, rgba(90, 210, 20, .35) 11px 16px); box-shadow: inset 0 0 14px rgba(255,255,255,.3); }
-  .xtal-track::after { content: ""; position: absolute; left: 10px; right: 22px; top: 5px; height: 7px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(255,255,255,.08)); pointer-events: none; }
   /* Battery screen: live battery graphic in its own window on the right. */
   .bathead { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
   .batread { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
   .batread .sec { margin: 0; }
   .batread .batpct { font-size: 44px; line-height: 1.05; font-weight: 700; letter-spacing: -.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
   .batread .muted { margin: 0; }
-  .batwin { --bat-hi: #4dffa6; --bat-lo: #0f8a5f; --bat-glow: rgba(60, 255, 160, .35); position: relative; flex: none; width: 46%; max-width: 190px; aspect-ratio: 1; border-radius: 18px; background: radial-gradient(circle at 50% 46%, #0b2550 0%, #061633 58%, #040e24 100%); border: 1px solid rgba(110, 170, 255, .18); box-shadow: inset 0 0 24px rgba(0, 0, 0, .45), 0 6px 18px rgba(0, 0, 0, .35); overflow: hidden; }
+  /* Transparent PNG layers (tools/battery-icon) with the live bar fill drawn in CSS on top. No panel behind it. */
+  .batwin { --bat-hi: #4dffa6; --bat-lo: #0f8a5f; --bat-glow: rgba(60, 255, 160, .35); position: relative; flex: none; width: 46%; max-width: 190px; aspect-ratio: 1; background: none; border: 0; }
   .batwin.low { --bat-hi: #ffd166; --bat-lo: #c97a0a; --bat-glow: rgba(255, 190, 70, .35); }
   .batwin.crit { --bat-hi: #ff6b6b; --bat-lo: #a51d2d; --bat-glow: rgba(255, 80, 80, .4); }
-  .batwin svg { display: block; width: 100%; height: 100%; }
-  .batwin .bat-ring { transform-origin: 80px 80px; transform-box: view-box; filter: drop-shadow(0 0 3px var(--bat-glow)); }
+  .batwin .bat-l { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; pointer-events: none; }
+  .batwin .bat-ring { background-image: url(img/battery/ring-green.png); background-image: -webkit-image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); background-image: image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); }
+  .batwin.low .bat-ring { background-image: url(img/battery/ring-amber.png); background-image: -webkit-image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); background-image: image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); }
+  .batwin.crit .bat-ring { background-image: url(img/battery/ring-red.png); background-image: -webkit-image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); background-image: image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); }
+  .batwin .bat-body { background-image: url(img/battery/body-green.png); background-image: -webkit-image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); background-image: image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); }
+  .batwin.low .bat-body { background-image: url(img/battery/body-amber.png); background-image: -webkit-image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); background-image: image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); }
+  .batwin.crit .bat-body { background-image: url(img/battery/body-red.png); background-image: -webkit-image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); background-image: image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); }
+  .batwin .bat-bolt { background-image: url(img/battery/bolt.png); background-image: -webkit-image-set(url(img/battery/bolt.png) 1x, url(img/battery/bolt@2x.png) 2x); background-image: image-set(url(img/battery/bolt.png) 1x, url(img/battery/bolt@2x.png) 2x); opacity: 0; transition: opacity 300ms ease-out; }
+  .batwin.charging .bat-bolt { opacity: .95; }
   .batwin.charging .bat-ring { animation: spin 14s linear infinite; }
-  .batwin .bat-shell { fill: none; stroke: var(--bat-lo); stroke-width: 2.4; opacity: .85; }
-  .batwin .bat-cap { fill: var(--bat-lo); opacity: .85; }
-  .batwin .bat-slot { fill: rgba(255, 255, 255, .06); }
-  .batwin .bat-bar { transition: height 500ms ease-out, y 500ms ease-out; }
-  .batwin .bat-bolt { fill: #ffffff; opacity: 0; transition: opacity 300ms ease-out; filter: drop-shadow(0 0 4px var(--bat-glow)); }
-  .batwin.charging .bat-bolt { opacity: .92; }
+  .batwin .bat-slot { position: absolute; left: 38.75%; width: 22.5%; height: 8.125%; border-radius: 6.9% / 19.2%; overflow: hidden; filter: drop-shadow(0 0 2px var(--bat-glow)); }
+  .batwin .bat-bar { position: absolute; inset: 0; background: linear-gradient(to top, var(--bat-lo), var(--bat-hi)); background-size: 100% 615%; clip-path: inset(100% 0 0 0); transition: clip-path 500ms ease-out; }
   @media (prefers-reduced-motion: reduce) {
     html:not([data-motion="full"]) .batwin .bat-ring { animation: none !important; }
   }
@@ -1448,12 +1446,6 @@ function netView(p) {
   return { big: "—", sub: "interface closed" };
 }
 function bar(pct) { let n = parseInt(pct, 10); if (isNaN(n) || n < 0) n = 0; if (n > 100) n = 100; return '<i class="bar"><i style="width:' + n + '%"></i></i>'; }
-function crystalBat(pct) {
-  let n = parseInt(pct, 10);
-  if (isNaN(n) || n < 0) n = 0;
-  if (n > 100) n = 100;
-  return '<div class="xtal" aria-hidden="true"><span class="xtal-orb"><svg viewBox="0 0 24 24"><path d="M14.2 1.6 6 13.2h5.6L10.2 22.4 18.8 10h-5.8l1.2-8.4z"/></svg></span><span class="xtal-track"><span class="xtal-fill" id="batfill" style="width:' + n + '%"></span></span></div>';
-}
 // Live battery graphic for the Battery screen: five stacked bars inside a dashed ring.
 // Level fills the bars from the bottom (the top lit bar can be partial), the ring turns
 // slowly while charging, and the colours move to amber below 20% and red below 10%.
@@ -1471,54 +1463,31 @@ function batBarFill(n, i) {
   if (n < 0) return 0;
   return Math.max(0, Math.min(1, n / 20 - i));
 }
-function batBarGeom(n, i) {
-  const f = batBarFill(n, i);
-  const bottom = BAT_BAR_BOTTOM - i * (BAT_BAR_H + BAT_BAR_GAP);
-  const h = BAT_BAR_H * f;
-  return { y: (bottom - h).toFixed(2), h: h.toFixed(2), slotY: (bottom - BAT_BAR_H).toFixed(2) };
-}
+// Clip from the top so the lit part of each bar grows from its bottom edge.
+function batBarClip(n, i) { return "inset(" + ((1 - batBarFill(n, i)) * 100).toFixed(1) + "% 0 0 0)"; }
+function batLabel(s, n) { return n >= 0 ? "Battery " + n + "%" + (batCharging(s) ? ", charging" : "") : "Battery level unknown"; }
 function batGraphic(s) {
   const n = batLevel(s);
-  const label = n >= 0 ? "Battery " + n + "%" + (batCharging(s) ? ", charging" : "") : "Battery level unknown";
-  let ticks = "";
-  for (let i = 0; i < 48; i++) {
-    const a = i * 7.5 * Math.PI / 180;
-    const x1 = 80 + 60 * Math.sin(a), y1 = 80 - 60 * Math.cos(a);
-    const x2 = 80 + 70 * Math.sin(a), y2 = 80 - 70 * Math.cos(a);
-    const op = (0.35 + 0.65 * (0.5 + 0.5 * Math.cos(a - Math.PI * 1.75))).toFixed(2);
-    ticks += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" opacity="' + op + '"/>';
-  }
   let bars = "";
   for (let i = 0; i < 5; i++) {
-    const g = batBarGeom(n, i);
-    bars += '<rect class="bat-slot" x="62" y="' + g.slotY + '" width="36" height="' + BAT_BAR_H + '" rx="2.5"/>';
-    bars += '<rect class="bat-bar" id="batbar' + i + '" x="62" y="' + g.y + '" width="36" height="' + g.h + '" rx="2.5" fill="url(#batbarfill)"/>';
+    // Bar geometry follows the 160x160 artwork in tools/battery-icon/render.py.
+    const top = (BAT_BAR_BOTTOM - i * (BAT_BAR_H + BAT_BAR_GAP) - BAT_BAR_H) / 160 * 100;
+    const pos = (67 - i * (BAT_BAR_H + BAT_BAR_GAP)) / 66.95 * 100;
+    bars += '<span class="bat-slot" style="top:' + top.toFixed(3) + '%"><i class="bat-bar" id="batbar' + i + '" style="background-position:0 ' + pos.toFixed(1) + '%;clip-path:' + batBarClip(n, i) + '"></i></span>';
   }
-  return '<div class="batwin' + batTone(n) + (batCharging(s) ? " charging" : "") + '" id="batwin" role="img" aria-label="' + esc(label) + '">' +
-    '<svg viewBox="0 0 160 160" aria-hidden="true">' +
-    '<defs>' +
-    '<linearGradient id="batringfill" x1="0" y1="1" x2="1" y2="0"><stop offset="0" style="stop-color:var(--bat-lo)"/><stop offset="1" style="stop-color:var(--bat-hi)"/></linearGradient>' +
-    '<linearGradient id="batbarfill" gradientUnits="userSpaceOnUse" x1="0" y1="' + BAT_BAR_BOTTOM + '" x2="0" y2="37"><stop offset="0" style="stop-color:var(--bat-lo)"/><stop offset="1" style="stop-color:var(--bat-hi)"/></linearGradient>' +
-    '</defs>' +
-    '<g class="bat-ring" stroke="url(#batringfill)" stroke-width="3.2" stroke-linecap="round">' + ticks + '</g>' +
-    '<rect class="bat-cap" x="71" y="29" width="18" height="6" rx="2"/>' +
-    '<rect class="bat-shell" x="56" y="35" width="48" height="88" rx="8"/>' +
-    bars +
-    '<path class="bat-bolt" d="M83.5 60 71 82h8.2l-3.4 18L89 77h-8.4l2.9-17z"/>' +
-    '</svg></div>';
+  return '<div class="batwin' + batTone(n) + (batCharging(s) ? " charging" : "") + '" id="batwin" role="img" aria-label="' + esc(batLabel(s, n)) + '">' +
+    '<i class="bat-l bat-ring" aria-hidden="true"></i><i class="bat-l bat-body" aria-hidden="true"></i>' + bars +
+    '<i class="bat-l bat-bolt" aria-hidden="true"></i></div>';
 }
 function paintBatGraphic(s) {
   const win = document.getElementById("batwin");
   if (!win) return;
   const n = batLevel(s);
   win.className = "batwin" + batTone(n) + (batCharging(s) ? " charging" : "");
-  win.setAttribute("aria-label", n >= 0 ? "Battery " + n + "%" + (batCharging(s) ? ", charging" : "") : "Battery level unknown");
+  win.setAttribute("aria-label", batLabel(s, n));
   for (let i = 0; i < 5; i++) {
     const r = document.getElementById("batbar" + i);
-    if (!r) continue;
-    const g = batBarGeom(n, i);
-    r.setAttribute("y", g.y);
-    r.setAttribute("height", g.h);
+    if (r) r.style.clipPath = batBarClip(n, i);
   }
 }
 function shortKernel(k) { k = String(k || ""); const cut = k.indexOf("("); return (cut > 8 ? k.slice(0, cut) : k).trim(); }
@@ -1856,8 +1825,6 @@ function paintBattery() {
     if (s.tempKnown) temp.textContent = Number(s.temp || 0).toFixed(1) + "°C";
     else temp.remove();
   }
-  const fill = document.getElementById("batfill");
-  if (fill) fill.style.width = Math.max(0, Math.min(100, Number(s.battery) || 0)) + "%";
   const state = document.querySelector("[data-k='BatState']");
   if (state) state.textContent = s.state || "Battery";
   paintBatGraphic(s);
@@ -1982,7 +1949,6 @@ function batteryPage() {
   html += '<b class="batpct" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
   if (s.tempKnown) html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>";
   html += '</div>' + batGraphic(s) + '</div>';
-  html += crystalBat(s.battery);
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");

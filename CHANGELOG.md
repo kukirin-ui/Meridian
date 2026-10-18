@@ -5,13 +5,15 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
-- Battery screen: a live battery graphic in its own window on the right. Five stacked bars fill with the real charge level (the top lit bar can be partial), a dashed ring turns slowly while the phone is charging and stays still otherwise, and the colours move to amber below 20% and red below 10%. The ring stays still when Motion is off or the system asks for reduced motion.
+- Battery screen: a live battery icon on the right, drawn as transparent PNG layers with no panel behind it. Five stacked bars fill with the real charge level (the top lit bar can be partial), the bolt shows and a dashed ring turns slowly while the phone is charging, and the colours move to amber below 20% and red below 10%. The ring stays still when Motion is off or the system asks for reduced motion.
+- `tools/battery-icon/render.py` renders the battery artwork from its SVG source to transparent PNGs at 512 px and 1024 px (2x) in `assets/www/img/battery/`.
 
 ### Changed
 - Battery screen: charge level, state, and temperature sit in a left column next to the new graphic, and the state label now updates live with the other readings.
 
 ### Removed
 - The `>_` mark in the Battery window title bar. Other screens keep it.
+- The old battery orb with the striped progress bar under the Battery readings, with its styles. The readings rows now sit right under the new icon.
 
 ## [2.3.29-oss] - 2026-10-13
 
