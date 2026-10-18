@@ -344,10 +344,12 @@
   .runbar .muted { flex: 1; font-size: 0.8125rem; }
   textarea.cmd { display: block; padding: 10px 12px; line-height: 1.45; font: 0.8125rem/1.45 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; resize: vertical; min-height: 72px; }
   select, textarea, input { width: 100%; background: var(--field); color: var(--fg); border: 2px solid var(--accent-strong); border-radius: 12px; padding: 12px; }
+  input[type="checkbox"] { width: 20px; height: 20px; flex: none; margin: 0; padding: 0; accent-color: var(--accent); }
+  label:has(> input[type="checkbox"]) { display: flex; align-items: center; gap: 10px; min-height: 44px; }
   select { min-height: 44px; }
   nav { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid var(--line); border-radius: 16px; z-index: 5; padding: 0 8px; box-shadow: none; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
   nav::-webkit-scrollbar { display: none; }
-  nav button { position: relative; flex: 1 0 64px; min-width: 48px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
+  nav button { position: relative; flex: 1 0 auto; min-width: 64px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0 4px; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
   nav button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   nav button.on { color: var(--accent); }
   nav button.on::before { content: ""; position: absolute; top: 2px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
@@ -403,17 +405,19 @@
   .glyph.dir { background: linear-gradient(var(--icon), var(--icon)) 2px 0 / 18px 6px no-repeat, linear-gradient(var(--icon-soft), var(--icon-soft)) 0 6px / 100% 30px no-repeat; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--icon); }
   .glyph.file { background: transparent; border: 1px solid var(--icon); border-radius: 2px; }
   .glyph.file::after { content: ""; position: absolute; top: -1px; right: -1px; border-width: 0 9px 9px 0; border-style: solid; border-color: var(--paper) var(--accent-strong) transparent transparent; }
-  .ico em { position: relative; z-index: 1; font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--icon); -webkit-text-fill-color: var(--icon); text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; opacity: 1; }
+  .ico em { position: relative; z-index: 1; font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--icon); -webkit-text-fill-color: var(--icon); text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; opacity: 1; }
   .ico .mark { position: relative; z-index: 1; opacity: 1; }
   .ico em::before, .ico em::after, .sec::after, .deskbar b::before, .deskbar b::after { content: none !important; }
   textarea.cmd { font: var(--term-size)/1.3 ui-monospace, monospace; padding: 8px; white-space: pre-wrap; overflow: auto; word-break: normal; overflow-wrap: break-word; min-height: 0; }
   .about { align-items: center; text-align: center; }
   .about .osx { margin: 4px auto 0; }
-  .filegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .filegrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
-  .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
-  .speedrow #devicecare { margin-left: auto; width: auto; flex: none; }
+  .filegrid .ico em { font-size: 0.8125rem; text-align: left; min-width: 0; white-space: normal; word-break: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; max-height: none; }
+  .desk .filegrid { padding: 12px 16px; }
+  @media (min-width: 720px) { .filegrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .speedrow #devicecare { width: auto; flex: 1 1 auto; }
   #ramout:empty { display: none; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .planpage .chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: row; gap: 8px; align-items: stretch; }
@@ -502,6 +506,7 @@
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
   .sheet .tiny { margin-top: auto; color: var(--muted); font-size: 11px; text-align: center; }
   .desk .grid { padding: 16px; }
+  .desk > .deskbar, .desk > .desktools, .desk > .deskfoot { padding-left: 16px; padding-right: 16px; }
   .desk > .plate, .desk > article { margin: 0 16px 16px; }
   .winbody > * { animation: rise 280ms ease-out; }
   @keyframes rise {
@@ -548,8 +553,8 @@
   .cheatcard .row { position: relative; display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid transparent; font-size: 0.875rem; }
   .cheatcard kbd { font: 0.75rem/1 ui-monospace, monospace; color: var(--accent); }
   html[data-theme="oled"] .win { box-shadow: none; }
-  .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 8px; }
-  .speedrow .ghost { width: auto; flex: none; }
+  .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .speedrow .ghost { width: auto; flex: 1 1 auto; }
   #carrierline { margin: 0; min-width: 0; flex: 1; max-width: 100%; color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.14em; line-height: 1.15; text-transform: uppercase; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
@@ -1993,7 +1998,7 @@ function termActs(b) {
   if (!label && !asleep && !linkish) return "";
   let html = '<div class="termacts">';
   if (label) html += '<button class="btn" type="button" id="fixerr">' + label + '</button>';
-  if (asleep) html += '<button class="btn" type="button" id="opentermux">Open Termux</button>';
+  if (asleep) html += '<button class="btn" type="button" id="wakeTermux">Open Termux</button>';
   if (linkish) html += '<button class="btn" type="button" id="repairvulkan">Repair Vulkan</button>';
   return html + '</div>';
 }
@@ -2396,6 +2401,7 @@ function planPage() {
 function mark(name) {
   const n = String(name || "").toLowerCase();
   if (n === "go") return '<svg class="mark" viewBox="0 0 24 24"><path d="M4 12h14M13 7l5 5-5 5"/></svg>';
+  if (typeof APIS !== "undefined" && APIS.some(function (a) { return a[0].toLowerCase() === n; })) return '<svg class="mark" viewBox="0 0 24 24"><path d="M10 14a4 4 0 1 1 1-1h8v2h-2v2h-2v-2"/></svg>';
   const hit = [
     ["f-droid", '<path d="M12 4v10M8 10l4 4 4-4M6 19h12"/>'],
     ["llama", '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>'],
@@ -4726,8 +4732,10 @@ function bind() {
   if (termuxbat) termuxbat.onclick = function () { try { MeridianPhone.termuxBattery(); } catch (e) {} };
   const repairvulkan = document.getElementById("repairvulkan");
   if (repairvulkan) repairvulkan.onclick = function () { exec("Vulkan repair", VULKAN_REPAIR); };
-  const opentermux = document.getElementById("opentermux");
-  if (opentermux) opentermux.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  ["opentermux", "wakeTermux"].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  });
   const winlogo = document.getElementById("winlogo");
   if (winlogo) winlogo.onclick = function () {
     logoPressed = !logoPressed;
