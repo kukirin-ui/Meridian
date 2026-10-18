@@ -544,6 +544,7 @@
   .sheet { position: fixed; inset: 0; z-index: 40; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + var(--kb, 0px) + env(safe-area-inset-bottom)); overflow: auto; }
   .sheet[hidden] { display: none !important; }
   .sheet h2 { margin: 8px 0; }
+  .plate > .linkdesc { margin: 0 0 6px; font-size: 0.8rem; line-height: 1.35; }
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
   .sheet .tiny { margin-top: auto; color: var(--muted); font-size: 11px; text-align: center; }
   .desk .grid { padding: 16px; }
@@ -3259,87 +3260,113 @@ function keyPage() {
   chips += "</div>";
   return '<div class="stack">' + chips + '<input id="k-base" value="' + esc(base) + '" placeholder="API address" aria-label="API address" autocapitalize="off" /><input id="k-model" value="' + esc(model) + '" placeholder="model name" aria-label="Model name" autocapitalize="off" /><input id="k-key" type="password" value="' + esc(key) + '" placeholder="API key" aria-label="API key" autocomplete="off" /><button class="btn" type="button" id="savekey">Save on this phone</button><button class="ghost danger" type="button" id="forgetkey">Forget the key</button><p class="muted" id="keystatus"></p></div>';
 }
+// Links, one topic per group. Every link sits in exactly one group. GPU is three folders, one per API.
+const LINK_GROUPS = [
+  ["lgTermux", [
+    ["Termux", "https://github.com/termux/termux-app"],
+    ["Packages", "https://github.com/termux/termux-packages"],
+    ["Termux:API", "https://github.com/termux/termux-api"],
+    ["Wiki", "https://wiki.termux.com"],
+    ["F-Droid", "https://f-droid.org/packages/com.termux/"]
+  ]],
+  ["lgLinux", [
+    ["Linux", "https://en.wikipedia.org/wiki/Linux"],
+    ["Debian", "https://wiki.debian.org"],
+    ["Arch wiki", "https://wiki.archlinux.org"]
+  ]],
+  ["lgKernel", [
+    ["Kernel", "https://www.kernel.org"],
+    ["ZRAM", "https://en.wikipedia.org/wiki/Zram"],
+    ["ARM", "https://en.wikipedia.org/wiki/ARM_architecture_family"]
+  ]],
+  ["lgAndroid", [
+    ["Android", "https://en.wikipedia.org/wiki/Android_(operating_system)"],
+    ["Android source", "https://source.android.com"],
+    ["Android docs", "https://developer.android.com"]
+  ]],
+  ["lgGpu", [
+    ["Vulkan", "gpu-vulkan"],
+    ["OpenGL", "gpu-opengl"],
+    ["OpenCL", "gpu-opencl"]
+  ]],
+  ["lgShell", [
+    ["man pages", "https://man7.org/linux/man-pages/"],
+    ["Bash", "https://www.gnu.org/software/bash/manual/"],
+    ["tldr", "https://tldr.inbrowser.app"],
+    ["Explain Shell", "https://explainshell.com"],
+    ["Wikipedia", "https://www.wikipedia.org"]
+  ]],
+  ["lgCode", [
+    ["GitHub", "https://github.com"],
+    ["GitLab", "https://gitlab.com"],
+    ["Codeberg", "https://codeberg.org"]
+  ], "lgCodeD"],
+  ["lgLanguages", [
+    ["Python", "https://www.python.org"],
+    ["Python docs", "https://docs.python.org"],
+    ["PyPI", "https://pypi.org"],
+    ["Node.js", "https://nodejs.org"],
+    ["npm", "https://www.npmjs.com"],
+    ["Rust", "https://www.rust-lang.org"],
+    ["crates.io", "https://crates.io"],
+    ["Go", "https://go.dev"],
+    ["MDN", "https://developer.mozilla.org"]
+  ]],
+  ["lgTools", [
+    ["CMake", "https://cmake.org"],
+    ["FFmpeg", "https://ffmpeg.org"]
+  ]],
+  ["lgDatabase", [
+    ["SQLite", "https://sqlite.org"],
+    ["PostgreSQL", "https://www.postgresql.org"],
+    ["MySQL", "https://www.mysql.com"],
+    ["MongoDB", "https://www.mongodb.com"],
+    ["Redis", "https://redis.io"],
+    ["Microsoft SQL Server", "https://www.microsoft.com/sql-server"],
+    ["Oracle Database", "https://www.oracle.com/database/"]
+  ]],
+  ["lgModels", [
+    ["llama.cpp", "https://github.com/ggml-org/llama.cpp"],
+    ["Hugging Face", "https://huggingface.co"],
+    ["GGUF", "https://huggingface.co/docs/hub/gguf"]
+  ]],
+  ["lgCommunity", [
+    ["Discord", "https://discord.com"],
+    ["Stack Overflow", "https://stackoverflow.com"],
+    ["Reddit", "https://www.reddit.com"],
+    ["Hacker News", "https://news.ycombinator.com"]
+  ]]
+];
+const GPU_LINKS = {
+  "gpu-vulkan": ["Vulkan", "gpuVulkanD", [["Khronos: Vulkan", "https://www.khronos.org/vulkan/"], ["Wikipedia: Vulkan", "https://en.wikipedia.org/wiki/Vulkan"]]],
+  "gpu-opengl": ["OpenGL", "gpuOpenglD", [["Khronos: OpenGL", "https://www.khronos.org/opengl/"], ["Wikipedia: OpenGL", "https://en.wikipedia.org/wiki/OpenGL"]]],
+  "gpu-opencl": ["OpenCL", "gpuOpenclD", [["Khronos: OpenCL", "https://www.khronos.org/opencl/"], ["Wikipedia: OpenCL", "https://en.wikipedia.org/wiki/OpenCL"]]]
+};
+function linkRow(item) {
+  if (GPU_LINKS[item[1]]) return '<button class="rowline" type="button" data-shelf="' + esc(item[1]) + '"><span>' + esc(item[0]) + '</span><span class="muted" aria-hidden="true" style="margin-left:auto">›</span></button>';
+  return '<button class="rowline" type="button" data-open="' + esc(item[1]) + '"><span>' + esc(item[0]) + '</span></button>';
+}
 function linksPage() {
-  const groups = [
-    ["Termux", [
-      ["Termux", "https://github.com/termux/termux-app"],
-      ["Packages", "https://github.com/termux/termux-packages"],
-      ["Termux:API", "https://github.com/termux/termux-api"],
-      ["Wiki", "https://wiki.termux.com"],
-      ["F-Droid", "https://f-droid.org/packages/com.termux/"]
-    ]],
-    ["Reference", [
-      ["Wikipedia", "https://www.wikipedia.org"],
-      ["Linux", "https://en.wikipedia.org/wiki/Linux"],
-      ["Android", "https://en.wikipedia.org/wiki/Android_(operating_system)"],
-      ["ARM", "https://en.wikipedia.org/wiki/ARM_architecture_family"],
-      ["ZRAM", "https://en.wikipedia.org/wiki/Zram"],
-      ["Kernel", "https://www.kernel.org"],
-      ["man pages", "https://man7.org/linux/man-pages/"],
-      ["Bash", "https://www.gnu.org/software/bash/manual/"]
-    ]],
-    ["Code", [
-      ["GitHub", "https://github.com"],
-      ["GitLab", "https://gitlab.com"],
-      ["Codeberg", "https://codeberg.org"],
-      ["Android source", "https://source.android.com"],
-      ["Android docs", "https://developer.android.com"],
-      ["llama.cpp", "https://github.com/ggml-org/llama.cpp"]
-    ]],
-    ["GPU", [
-      ["Vulkan", "https://www.khronos.org/vulkan/"],
-      ["OpenGL", "https://www.khronos.org/opengl/"],
-      ["OpenCL", "https://www.khronos.org/opencl/"],
-      ["Vulkan article", "https://en.wikipedia.org/wiki/Vulkan"],
-      ["OpenGL article", "https://en.wikipedia.org/wiki/OpenGL"],
-      ["OpenCL article", "https://en.wikipedia.org/wiki/OpenCL"]
-    ]],
-    ["Languages", [
-      ["Python", "https://www.python.org"],
-      ["Python docs", "https://docs.python.org"],
-      ["PyPI", "https://pypi.org"],
-      ["Node.js", "https://nodejs.org"],
-      ["npm", "https://www.npmjs.com"],
-      ["Rust", "https://www.rust-lang.org"],
-      ["crates.io", "https://crates.io"],
-      ["Go", "https://go.dev"],
-      ["MDN", "https://developer.mozilla.org"]
-    ]],
-    ["Learn", [
-      ["Arch wiki", "https://wiki.archlinux.org"],
-      ["Debian", "https://wiki.debian.org"],
-      ["tldr", "https://tldr.inbrowser.app"],
-      ["Explain Shell", "https://explainshell.com"],
-      ["CMake", "https://cmake.org"],
-      ["FFmpeg", "https://ffmpeg.org"],
-      ["SQLite", "https://sqlite.org"]
-    ]],
-    ["Models", [
-      ["llama.cpp", "https://github.com/ggml-org/llama.cpp"],
-      ["Hugging Face", "https://huggingface.co"],
-      ["GGUF", "https://huggingface.co/docs/hub/gguf"]
-    ]],
-    ["Community", [
-      ["Discord", "https://discord.com"],
-      ["Stack Overflow", "https://stackoverflow.com"],
-      ["r/termux", "https://www.reddit.com/r/termux"],
-      ["Hacker News", "https://news.ycombinator.com"],
-      ["Play Store", "https://play.google.com"]
-    ]]
-  ];
+  const sub = GPU_LINKS[openCmd];
+  if (sub) {
+    let html = '<div class="stack"><button class="ghost" type="button" id="shelfback">' + esc(t("back")) + '</button>';
+    html += '<article class="plate stack"><b>' + esc(sub[0]) + '</b><p class="muted">' + esc(t(sub[1])) + '</p></article><article class="plate">';
+    sub[2].forEach(function (item) { html += linkRow(item); });
+    return html + '</article><div class="deskfoot">' + sub[2].length + ' items</div></div>';
+  }
   let n = 0;
   let html = '<div class="stack">';
-  groups.forEach(function (group) {
+  LINK_GROUPS.forEach(function (group) {
     html += '<article class="plate">';
-    html += '<p class="sec">' + esc(group[0]) + '</p>';
-    group[1].forEach(function (item) {
-      n += 1;
-      html += '<button class="rowline" type="button" data-open="' + esc(item[1]) + '"><span>' + esc(item[0]) + '</span></button>';
-    });
+    html += '<p class="sec">' + esc(t(group[0])) + '</p>';
+    if (group[2]) html += '<p class="muted linkdesc">' + esc(t(group[2])) + '</p>';
+    group[1].forEach(function (item) { n += GPU_LINKS[item[1]] ? GPU_LINKS[item[1]][2].length : 1; html += linkRow(item); });
     html += '</article>';
   });
   return html + '<div class="deskfoot">' + n + ' items</div></div>';
 }
+const LINKS_I18N = {"en": {"lgCodeD": "Where code is written, hosted and run. Repositories, version control and platform documentation for putting any language into practice.", "lgDatabase": "Database", "lgTermux": "Termux", "lgLinux": "Linux and systems", "lgKernel": "Kernel, CPU and memory", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "Shell and reference", "lgCode": "Code", "lgLanguages": "Languages", "lgTools": "Build and media tools", "lgModels": "Models", "lgCommunity": "Community", "gpuVulkanD": "Vulkan is a cross-vendor graphics and compute API from the Khronos Group. It is not tied to one GPU maker: Samsung Xclipse (for example the S26), Qualcomm Adreno, ARM Mali and others support it. llama.cpp can use it for GPU offload.", "gpuOpenglD": "OpenGL, and OpenGL ES on phones, is the older cross-vendor graphics API from the Khronos Group. Android GPUs from every major vendor support OpenGL ES.", "gpuOpenclD": "OpenCL is the Khronos Group API for general compute on GPUs and other processors. Support on phones depends on the vendor driver."}, "hr": {"lgCodeD": "Gdje se kod piše, smješta i pokreće. Repozitoriji, kontrola verzija i dokumentacija platformi za primjenu bilo kojeg jezika u praksi.", "lgDatabase": "Baze podataka", "lgTermux": "Termux", "lgLinux": "Linux i sustavi", "lgKernel": "Jezgra, CPU i memorija", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "Ljuska i priručnici", "lgCode": "Kod", "lgLanguages": "Jezici", "lgTools": "Alati za gradnju i medije", "lgModels": "Modeli", "lgCommunity": "Zajednica", "gpuVulkanD": "Vulkan je API za grafiku i računanje grupe Khronos koji rade svi proizvođači. Nije vezan uz jednog proizvođača GPU-a: podržavaju ga Samsung Xclipse (na primjer S26), Qualcomm Adreno, ARM Mali i drugi. llama.cpp ga može koristiti za rad na GPU-u.", "gpuOpenglD": "OpenGL, a na telefonima OpenGL ES, stariji je grafički API grupe Khronos za sve proizvođače. Android GPU-ovi svih većih proizvođača podržavaju OpenGL ES.", "gpuOpenclD": "OpenCL je API grupe Khronos za opće računanje na GPU-ovima i drugim procesorima. Podrška na telefonima ovisi o upravljačkom programu proizvođača."}, "de": {"lgCodeD": "Wo Code geschrieben, gehostet und ausgeführt wird. Repositorys, Versionskontrolle und Plattformdokumentation, um jede Sprache in die Praxis umzusetzen.", "lgDatabase": "Datenbanken", "lgTermux": "Termux", "lgLinux": "Linux und Systeme", "lgKernel": "Kernel, CPU und Speicher", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "Shell und Nachschlagen", "lgCode": "Code", "lgLanguages": "Sprachen", "lgTools": "Build- und Medienwerkzeuge", "lgModels": "Modelle", "lgCommunity": "Community", "gpuVulkanD": "Vulkan ist eine herstellerübergreifende Grafik- und Rechen-API der Khronos Group. Sie gehört keinem einzelnen GPU-Hersteller: Samsung Xclipse (zum Beispiel im S26), Qualcomm Adreno, ARM Mali und andere unterstützen sie. llama.cpp kann sie für die GPU-Auslagerung nutzen.", "gpuOpenglD": "OpenGL, auf Telefonen OpenGL ES, ist die ältere herstellerübergreifende Grafik-API der Khronos Group. Android-GPUs aller großen Hersteller unterstützen OpenGL ES.", "gpuOpenclD": "OpenCL ist die API der Khronos Group für allgemeines Rechnen auf GPUs und anderen Prozessoren. Die Unterstützung auf Telefonen hängt vom Treiber des Herstellers ab."}, "ja": {"lgCodeD": "コードを書き、置き、動かす場所。どの言語でも実践に移すためのリポジトリ、バージョン管理、プラットフォームのドキュメント。", "lgDatabase": "データベース", "lgTermux": "Termux", "lgLinux": "Linux とシステム", "lgKernel": "カーネル、CPU、メモリ", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "シェルとリファレンス", "lgCode": "コード", "lgLanguages": "言語", "lgTools": "ビルドとメディアのツール", "lgModels": "モデル", "lgCommunity": "コミュニティ", "gpuVulkanD": "Vulkan は Khronos Group によるベンダー共通のグラフィックスと計算の API です。特定の GPU メーカーのものではなく、Samsung Xclipse(例: S26)、Qualcomm Adreno、ARM Mali などが対応しています。llama.cpp は GPU オフロードに使えます。", "gpuOpenglD": "OpenGL(スマートフォンでは OpenGL ES)は Khronos Group による以前からのベンダー共通グラフィックス API です。主要メーカーの Android GPU はすべて OpenGL ES に対応しています。", "gpuOpenclD": "OpenCL は GPU などのプロセッサで汎用計算を行う Khronos Group の API です。スマートフォンでの対応はメーカーのドライバー次第です。"}, "hi": {"lgCodeD": "जहाँ कोड लिखा, होस्ट और चलाया जाता है। किसी भी भाषा को व्यवहार में लाने के लिए रिपॉज़िटरी, वर्ज़न कंट्रोल और प्लेटफ़ॉर्म दस्तावेज़।", "lgDatabase": "डेटाबेस", "lgTermux": "Termux", "lgLinux": "Linux और सिस्टम", "lgKernel": "कर्नेल, CPU और मेमोरी", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "शेल और संदर्भ", "lgCode": "कोड", "lgLanguages": "भाषाएँ", "lgTools": "बिल्ड और मीडिया टूल", "lgModels": "मॉडल", "lgCommunity": "समुदाय", "gpuVulkanD": "Vulkan, Khronos Group का सभी निर्माताओं के लिए ग्राफ़िक्स और कंप्यूट API है। यह किसी एक GPU कंपनी का नहीं है: Samsung Xclipse (जैसे S26), Qualcomm Adreno, ARM Mali और अन्य इसे सपोर्ट करते हैं। llama.cpp इसे GPU ऑफ़लोड के लिए इस्तेमाल कर सकता है।", "gpuOpenglD": "OpenGL, और फ़ोन पर OpenGL ES, Khronos Group का पुराना सभी निर्माताओं वाला ग्राफ़िक्स API है। हर बड़े निर्माता के Android GPU OpenGL ES सपोर्ट करते हैं।", "gpuOpenclD": "OpenCL, GPU और दूसरे प्रोसेसर पर सामान्य गणना के लिए Khronos Group का API है। फ़ोन पर सपोर्ट निर्माता के ड्राइवर पर निर्भर करता है।"}, "es": {"lgCodeD": "Donde el código se escribe, se aloja y se ejecuta. Repositorios, control de versiones y documentación de plataformas para llevar cualquier lenguaje a la práctica.", "lgDatabase": "Bases de datos", "lgTermux": "Termux", "lgLinux": "Linux y sistemas", "lgKernel": "Kernel, CPU y memoria", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "Shell y referencia", "lgCode": "Código", "lgLanguages": "Lenguajes", "lgTools": "Herramientas de compilación y multimedia", "lgModels": "Modelos", "lgCommunity": "Comunidad", "gpuVulkanD": "Vulkan es una API de gráficos y cálculo multiplataforma del Khronos Group. No pertenece a un solo fabricante de GPU: la admiten Samsung Xclipse (por ejemplo, el S26), Qualcomm Adreno, ARM Mali y otros. llama.cpp puede usarla para descargar trabajo en la GPU.", "gpuOpenglD": "OpenGL, y OpenGL ES en teléfonos, es la API de gráficos multiplataforma más antigua del Khronos Group. Las GPU Android de todos los grandes fabricantes admiten OpenGL ES.", "gpuOpenclD": "OpenCL es la API del Khronos Group para cálculo general en GPU y otros procesadores. El soporte en teléfonos depende del controlador del fabricante."}, "fr": {"lgCodeD": "Là où le code s'écrit, s'héberge et s'exécute. Dépôts, gestion de versions et documentation des plateformes pour mettre n'importe quel langage en pratique.", "lgDatabase": "Bases de données", "lgTermux": "Termux", "lgLinux": "Linux et systèmes", "lgKernel": "Noyau, CPU et mémoire", "lgAndroid": "Android", "lgGpu": "GPU", "lgShell": "Shell et référence", "lgCode": "Code", "lgLanguages": "Langages", "lgTools": "Outils de compilation et multimédia", "lgModels": "Modèles", "lgCommunity": "Communauté", "gpuVulkanD": "Vulkan est une API graphique et de calcul multi-fabricants du Khronos Group. Elle n'appartient à aucun fabricant de GPU : Samsung Xclipse (par exemple le S26), Qualcomm Adreno, ARM Mali et d'autres la prennent en charge. llama.cpp peut s'en servir pour décharger le calcul sur le GPU.", "gpuOpenglD": "OpenGL, et OpenGL ES sur téléphone, est l'ancienne API graphique multi-fabricants du Khronos Group. Les GPU Android de tous les grands fabricants prennent en charge OpenGL ES.", "gpuOpenclD": "OpenCL est l'API du Khronos Group pour le calcul général sur GPU et autres processeurs. La prise en charge sur téléphone dépend du pilote du fabricant."}};
+Object.keys(LINKS_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, LINKS_I18N[l]); });
 function supportPage() {
   return payPage();
 }
