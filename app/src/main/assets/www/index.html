@@ -1186,15 +1186,58 @@ es:{premiumLead:"Sistema, Hardware, Batería y las demás lecturas siguen gratis
 fr:{premiumLead:"Système, Matériel, Batterie et les autres mesures restent gratuits. Premium débloque les parties qui modifient ou lancent des choses sur ce téléphone.",premiumItems:"Réglage avancé du CPU, du GPU, de la température et de la mémoire|Fichiers et dossiers Termux|Construire et Plan|Console et lancement de commandes|Desk et le planificateur|Commandes, Mesh et PC Linux",premiumNote:"Ouvre la page de paiement Revolut dans le navigateur. La clé de licence arrive après le paiement.",premiumKeyLabel:"Saisir la clé de licence",premiumActivate:"Activer",premiumEmpty:"Colle d’abord ta clé de licence.",premiumBad:"Cette clé n’a pas été acceptée. Vérifie que tu l’as copiée en entier.",premiumOk:"Premium est actif sur ce téléphone.",premiumActive:"Premium actif",premiumFree:"Version gratuite",premiumSee:"Voir Premium",premiumLockedAria:"Fonction Premium"}
 };
 Object.keys(PREMIUM_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, PREMIUM_I18N[l]); });
-// TODO(Abc): the encrypted license key check goes here. Until it is written, no key is accepted.
-// Return true only for a key that passes that check. Nothing else in the app decides Premium.
-function verifyLicense(key) {
-  return false;
+// License check. Only the SHA-256 of the key is in the app, never the key. The input is trimmed and
+// lowercased, hashed (lowercase hex) and compared in constant time. Nothing else in the app decides Premium.
+const PREMIUM_KEY_SHA256 = "3e2838be6d6d13df9c366653871f38172beece0ff3f2cd2f268c842387cb1f89";
+function sha256Hex(text) {
+  const bytes = unescape(encodeURIComponent(String(text)));
+  const K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+  const H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const n = bytes.length;
+  const total = ((n + 9 + 63) >> 6) << 6;
+  const m = new Uint8Array(total);
+  for (let i = 0; i < n; i++) m[i] = bytes.charCodeAt(i);
+  m[n] = 0x80;
+  const bits = n * 8;
+  m[total - 4] = (bits >>> 24) & 255; m[total - 3] = (bits >>> 16) & 255; m[total - 2] = (bits >>> 8) & 255; m[total - 1] = bits & 255;
+  m[total - 5] = Math.floor(bits / 4294967296) & 255;
+  const w = new Array(64);
+  const rotr = function (x, r) { return (x >>> r) | (x << (32 - r)); };
+  for (let off = 0; off < total; off += 64) {
+    for (let i = 0; i < 16; i++) w[i] = (m[off + 4 * i] << 24) | (m[off + 4 * i + 1] << 16) | (m[off + 4 * i + 2] << 8) | m[off + 4 * i + 3];
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+    let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+    H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  return H.map(function (x) { return ("00000000" + (x >>> 0).toString(16)).slice(-8); }).join("");
 }
+// Same time for every input of the right length: no early exit on the first different character.
+function sameHex(a, b) {
+  a = String(a || ""); b = String(b || "");
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < b.length; i++) diff |= (a.charCodeAt(i) | 0) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+function verifyLicense(key) {
+  const clean = String(key || "").trim().toLowerCase();
+  if (!clean) return false;
+  return sameHex(sha256Hex(clean), PREMIUM_KEY_SHA256);
+}
+// Activation is stored on this phone as the key's hash, never the key itself.
 function isPremiumUnlocked() {
-  let key = "";
-  try { key = localStorage.getItem("m-premium-key") || ""; } catch (e) {}
-  return key !== "" && verifyLicense(key) === true;
+  let mark = "";
+  try { mark = localStorage.getItem("m-premium") || ""; } catch (e) {}
+  return mark !== "" && sameHex(mark, PREMIUM_KEY_SHA256);
 }
 function premiumNeeded(v, m) {
   if (v === "build" || v === "plan" || v === "console" || v === "files") return true;
@@ -1210,7 +1253,7 @@ function activateLicense(raw) {
   const key = String(raw || "").trim();
   if (!key) return { ok: false, msg: t("premiumEmpty") };
   if (verifyLicense(key) !== true) return { ok: false, msg: t("premiumBad") };
-  try { localStorage.setItem("m-premium-key", key); } catch (e) {}
+  try { localStorage.setItem("m-premium", sha256Hex(key.toLowerCase())); localStorage.removeItem("m-premium-key"); } catch (e) {}
   paintPremium();
   return { ok: true, msg: t("premiumOk") };
 }
@@ -6826,7 +6869,8 @@ function openSheet(kind) {
   el.hidden = false;
   const back = document.getElementById("sheetback");
   if (back) back.onclick = function () { el.hidden = true; };
-  if (kind === "premium") bindPremiumSheet(function () { render(); });
+  // After a good key the sheet shows "Premium active" right away; the page behind it unlocks.
+  if (kind === "premium") bindPremiumSheet(function () { openSheet("premium"); render(); });
   const setup = document.getElementById("sheetsetup");
   if (setup) setup.onclick = function () {
     if (introUp()) { openSheet("started"); return; }
