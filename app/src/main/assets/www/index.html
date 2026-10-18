@@ -15,6 +15,8 @@
     --accent-border:rgba(255,77,154,.55); --accent-strong:rgba(255,77,154,.75);
     --accent-glow:rgba(255,77,154,.28); --term-size:13px;
     --ease:cubic-bezier(0.25, 1, 0.5, 1);
+    /* Shared frame: page window, top icons and bottom nav use the same ring. */
+    --frame-w:1px; --frame-c:var(--accent); --frame-r:16px; --cell-gap:6px; --nav-n:5;
     color-scheme: dark;
   }
   html[data-theme="system"] { color-scheme: dark; }
@@ -220,7 +222,7 @@
   body.console #main { padding-bottom: calc(116px + env(safe-area-inset-bottom)); }
   body.ime #main { padding-bottom: calc(20px + var(--kb, 0px)); }
   body.ime nav { visibility: hidden; }
-  .win { position: relative; display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: 16px; overflow: hidden; overflow-x: hidden; border: 1px solid var(--accent); box-shadow: none; background: var(--win); animation: tileglow 2.8s var(--ease) infinite; }
+  .win { position: relative; display: flex; flex-direction: column; flex: 1 1 0; height: auto; max-height: none; min-height: 0; border-radius: var(--frame-r); overflow: hidden; overflow-x: hidden; border: var(--frame-w) solid var(--frame-c); box-shadow: none; background: var(--win); animation: tileglow 2.8s var(--ease) infinite; }
   .winbody { flex: 1; min-height: 0; overflow: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px 16px 32px; overscroll-behavior: contain; display: flex; flex-direction: column; }
   body.ime .winbody { padding-bottom: calc(28px + var(--kb, 0px)); }
   .pair.sens .tile { height: auto; min-height: 86px; }
@@ -388,17 +390,20 @@
   input[type="checkbox"] { width: 20px; height: 20px; flex: none; margin: 0; padding: 0; accent-color: var(--accent); }
   label:has(> input[type="checkbox"]) { display: flex; align-items: center; gap: 10px; min-height: 44px; }
   select { min-height: 44px; }
-  nav { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid var(--line); border-radius: 16px; z-index: 5; padding: 0 8px; box-shadow: none; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+  nav { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; align-items: stretch; gap: var(--cell-gap); background: transparent; border: 0; border-radius: var(--frame-r); z-index: 5; padding: 0; box-shadow: none; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  @media (max-width: 399px) { nav { --nav-n: 4; } }
+  @media (min-width: 480px) and (max-width: 719px) { nav { --nav-n: 6; } }
   nav::-webkit-scrollbar { display: none; }
-  nav button { position: relative; flex: 1 0 auto; min-width: 64px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0 4px; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
+  nav button:focus-visible, .ico:focus-visible { outline: none; border-color: var(--fg); }
+  nav button { position: relative; flex: 0 0 calc((100% - (var(--nav-n) - 1) * var(--cell-gap)) / var(--nav-n)); min-width: 0; height: 52px; min-height: 52px; border: var(--frame-w) solid var(--frame-c); background: var(--header); color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: var(--frame-r); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 2px 4px; white-space: normal; text-align: center; line-height: 1.1; overflow: hidden; overflow-wrap: normal; hyphens: manual; scroll-snap-align: start; animation: tileglow 2.8s var(--ease) infinite; }
   nav button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   nav button.on { color: var(--accent); }
-  nav button.on::before { content: ""; position: absolute; top: 2px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
+  nav button.on::before { content: ""; position: absolute; top: 3px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
   .probadge { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .08em; padding: 2px 6px; border-radius: 6px; background: var(--accent); color: var(--btnfg); vertical-align: middle; margin-left: 6px; }
   .meshlog { max-height: 220px; overflow: auto; white-space: pre-wrap; margin: 0; font: 0.8125rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   @media (min-width: 720px) {
-    nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 8px 4px; border-radius: 18px; }
-    nav button { flex: 0 0 48px; min-height: 48px; }
+    nav { top: 66px; bottom: 10px; right: auto; width: 96px; flex-direction: column; overflow-x: hidden; overflow-y: auto; padding: 0; border-radius: var(--frame-r); scroll-snap-type: none; }
+    nav button { flex: 0 0 auto; width: 100%; height: auto; min-height: 52px; }
     #main { padding: 8px 10px 10px 116px; }
     .desk .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .filegrid, .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -420,7 +425,7 @@
     body.console .term { max-height: max(120px, calc(100dvh - 250px)); }
   }
   .desk { border: 0; border-radius: 0; overflow: visible; background: transparent; animation: none; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 6px; padding: 12px; min-height: 0; align-content: start; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: var(--cell-gap); padding: 12px; min-height: 0; align-content: start; }
   .deskbar { position: relative; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 10px; background: var(--header); border-bottom: 1px solid transparent; }
   .desk .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .desk .grid:has(> :nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -435,7 +440,7 @@
   .ico.own { border-color: transparent; background: var(--field); box-shadow: none; }
   .ico.own em { color: var(--icon); -webkit-text-fill-color: var(--icon); }
   .ico.own .glyph.file { border-color: var(--icon); box-shadow: none; }
-  .ico { position: relative; border: 1px solid var(--accent); border-radius: 16px; min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--icon); background: transparent; box-shadow: none; animation: tileglow 2.8s var(--ease) infinite; }
+  .ico { position: relative; border: var(--frame-w) solid var(--frame-c); border-radius: var(--frame-r); min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--icon); background: transparent; box-shadow: none; animation: tileglow 2.8s var(--ease) infinite; }
   .ico > .probadge { position: absolute; top: 4px; right: 4px; margin: 0; z-index: 2; pointer-events: none; }
   .ico .mark { width: 28px; height: 28px; stroke: var(--icon); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .grid.big .ico .mark { width: 36px; height: 36px; }
@@ -619,6 +624,7 @@
   html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
   html[data-motion="full"] .termorb-caret { animation: blink 1.1s steps(1) infinite !important; }
   html[data-motion="full"] .win,
+  html[data-motion="full"] nav button,
   html[data-motion="full"] .ico { animation: tileglow 2.8s var(--ease) infinite !important; }
   html[data-motion="full"] .meridian-pulse svg,
   html[data-motion="full"] .wintop::after,
@@ -850,11 +856,11 @@ shortcutsTitle:"Shortcuts",shortcutsBody:"Works from any page. Typing in a field
 back:"Back",carrierUnknown:"—",mainNav:"Main"
 },
 hr: {
-navHome:"Nadzorna",navHardware:"Hardver",navSystem:"Sustav",navBattery:"Baterija",navBuild:"Gradnja",navPlan:"Plan",navKeys:"API platforme",navTermux:"Termux",
+navHome:"Nadzorna",navHardware:"Hardver",navSystem:"Sustav",navBattery:"Baterija",navSecurity:"Sigurnost",navBuild:"Gradnja",navPlan:"Plan",navKeys:"API platforme",navTermux:"Termux",
 connect:"Poveži",disconnect:"Prekini",connected:"Povezano",allowTermux:"Dopusti Termux",noTermux:"Nema Termuxa",notConnected:"Nije povezano",
 settingsAria:"Postavke",commandPh:"Naredba",run:"Pokreni",
 work:"Rad",machine:"Stroj",library:"Knjižnica",files:"Datoteke",console:"Konzola",tweaks:"Podešavanja",doctor:"Doktor",commands:"Naredbe",links:"Poveznice",setup:"Postavljanje",meridian:"Meridian",linuxPc:"Linux PC",
-titleFinder:"Datoteke",titleConsole:"Konzola",titleSetup:"Postavljanje",titleHardware:"Hardver",titleSystem:"Sustav",titleBattery:"Baterija",titleBuild:"Gradnja",titlePlan:"Plan",titleKeys:"API platforme",titleSettings:"Postavke",titleDoctor:"Doktor",titleTweaks:"Podešavanja",titleCommands:"Naredbe",titleLinks:"Poveznice",titleAbout:"O aplikaciji",titleSupport:"Podrška",titleTermux:"Termux",titleHome:"Nadzorna",titleLinux:"Linux PC",
+titleFinder:"Datoteke",titleConsole:"Konzola",titleSetup:"Postavljanje",titleHardware:"Hardver",titleSystem:"Sustav",titleBattery:"Baterija",titleSecurity:"Sigurnost",titleBuild:"Gradnja",titlePlan:"Plan",titleKeys:"API platforme",titleSettings:"Postavke",titleDoctor:"Doktor",titleTweaks:"Podešavanja",titleCommands:"Naredbe",titleLinks:"Poveznice",titleAbout:"O aplikaciji",titleSupport:"Podrška",titleTermux:"Termux",titleHome:"Nadzorna",titleLinux:"Linux PC",
 thisPhone:"Ovaj telefon",hardwareFromDevice:"Hardver s ovog uređaja",systemStrained:"Sustav je opterećen",systemOptimal:"Sustav je u redu",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Baterija",heat:"Temp. bat.",voltage:"Napon",ramFree:"Slobodan RAM",memory:"Memorija",virtual:"Virtualna",deviceCare:"Briga o uređaju",settings:"Postavke",about:"O aplikaciji",liveClocks:"Živi satovi",hold:"Zadrži",live:"Uživo",quietCool:"Mirno i hladno",heatOrRam:"Toplina ili RAM su visoki",storage:"Pohrana",network:"Mreža",testSpeed:"Test brzine mreže",testing:"Testiram…",noRamPlus:"Nema RAM Plus",usedOf:" zauzeto · ",connectTermux:"Poveži Termux",connectTermuxBody:"Instaliraj F-Droid, zatim Termux s F-Droid, ne s Play. Otvori Postavljanje i slijedi korake. Kad piše Povezano, Postavljanje ide na kraj Termuxa.",connectedTermux:"Povezano s Termuxom",copyLine:"Kopiraj redak",reading:"Čitam…",
 look:"Izgled",theme:"Tema",themeSystem:"Sustav",themeDark:"Tamna",themeLight:"Svijetla",themeOled:"OLED",accent:"Naglasak",feel:"Osjećaj",refresh:"Osvježavanje",refreshSaver:"Štednja 2s",refreshNormal:"Normalno 1s",refreshLive:"Uživo 250ms",consoleFont:"Font konzole",keepAwake:"Drži budnim dok naredba radi",haptics:"Vibracija",on:"Uključeno",off:"Isključeno",motion:"Pokret",motionSystem:"Sustav",motionOff:"Isključeno",motionOn:"Uključeno",motionTestOn:"Pokret je uključen — ova traka se upravo pojavila.",motionTestOff:"Pokret je isključen — nema pretapanja ni vrtnje globusa.",language:"Jezik",shortcuts:"Prečaci na tipkovnici",
 aboutBlurb:"Nadzorna ploča za ovaj telefon, povezana s Termuxom.",aboutReadings:"Očitavanja dolaze s uređaja. Naredbe se izvode u Termuxu na ovom telefonu. Nema računa ni poslužitelja. Ključ, ako ga spremite, ostaje ovdje i šalje se samo kad pritisnete Plan.",shareReport:"Podijeli hardversko izvješće",copyright:"Autorsko pravo 2026",
@@ -865,11 +871,11 @@ shortcutsTitle:"Prečaci",shortcutsBody:"Radi sa svake stranice. Tipkanje u polj
 back:"Natrag",carrierUnknown:"—",mainNav:"Glavno"
 },
 de: {
-navHome:"Übersicht",navHardware:"Hardware",navSystem:"System",navBattery:"Akku",navBuild:"Bauen",navPlan:"Plan",navKeys:"API-Plattformen",navTermux:"Termux",
+navHome:"Übersicht",navHardware:"Hardware",navSystem:"System",navBattery:"Akku",navSecurity:"Sicherheit",navBuild:"Bauen",navPlan:"Plan",navKeys:"API-Plattformen",navTermux:"Termux",
 connect:"Verbinden",disconnect:"Trennen",connected:"Verbunden",allowTermux:"Termux erlauben",noTermux:"Kein Termux",notConnected:"Nicht verbunden",
 settingsAria:"Einstellungen",commandPh:"Befehl",run:"Ausführen",
 work:"Arbeit",machine:"Maschine",library:"Bibliothek",files:"Dateien",console:"Konsole",tweaks:"Anpassungen",doctor:"Diagnose",commands:"Befehle",links:"Links",setup:"Einrichtung",meridian:"Meridian",linuxPc:"Linux-PC",
-titleFinder:"Dateien",titleConsole:"Konsole",titleSetup:"Einrichtung",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Akku",titleBuild:"Bauen",titlePlan:"Plan",titleKeys:"API-Plattformen",titleSettings:"Einstellungen",titleDoctor:"Diagnose",titleTweaks:"Anpassungen",titleCommands:"Befehle",titleLinks:"Links",titleAbout:"Über",titleSupport:"Support",titleTermux:"Termux",titleHome:"Übersicht",titleLinux:"Linux-PC",
+titleFinder:"Dateien",titleConsole:"Konsole",titleSetup:"Einrichtung",titleHardware:"Hardware",titleSystem:"System",titleBattery:"Akku",titleSecurity:"Sicherheit",titleBuild:"Bauen",titlePlan:"Plan",titleKeys:"API-Plattformen",titleSettings:"Einstellungen",titleDoctor:"Diagnose",titleTweaks:"Anpassungen",titleCommands:"Befehle",titleLinks:"Links",titleAbout:"Über",titleSupport:"Support",titleTermux:"Termux",titleHome:"Übersicht",titleLinux:"Linux-PC",
 thisPhone:"Dieses Telefon",hardwareFromDevice:"Hardware dieses Geräts",systemStrained:"System belastet",systemOptimal:"System in Ordnung",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Akku",heat:"Akku-Temp.",voltage:"Spannung",ramFree:"RAM frei",memory:"Speicher",virtual:"Virtuell",deviceCare:"Gerätepflege",settings:"Einstellungen",about:"Über",liveClocks:"Live-Takte",hold:"Halten",live:"Live",quietCool:"Ruhig und kühl",heatOrRam:"Wärme oder RAM ist hoch",storage:"Speicher",network:"Netzwerk",testSpeed:"Netzwerkgeschwindigkeit testen",testing:"Teste…",noRamPlus:"Kein RAM Plus",usedOf:" belegt · ",connectTermux:"Termux verbinden",connectTermuxBody:"F-Droid installieren, dann Termux von F-Droid, nicht Play. Einrichtung öffnen und folgen. Steht Verbunden, wandert Einrichtung ans Ende von Termux.",connectedTermux:"Mit Termux verbunden",copyLine:"Zeile kopieren",reading:"Lesen…",
 look:"Aussehen",theme:"Thema",themeSystem:"System",themeDark:"Dunkel",themeLight:"Hell",themeOled:"OLED",accent:"Akzent",feel:"Verhalten",refresh:"Aktualisierung",refreshSaver:"Sparmodus 2s",refreshNormal:"Normal 1s",refreshLive:"Live 250ms",consoleFont:"Konsolenschrift",keepAwake:"Wach halten während eines Jobs",haptics:"Haptik",on:"An",off:"Aus",motion:"Bewegung",motionSystem:"System",motionOff:"Aus",motionOn:"An",motionTestOn:"Bewegung ist an — dieser Balken ist gerade eingeblendet.",motionTestOff:"Bewegung ist aus — kein Überblenden, keine Globusdrehung.",language:"Sprache",shortcuts:"Tastaturkürzel",
 aboutBlurb:"Ein Dashboard für dieses Telefon, verbunden mit Termux.",aboutReadings:"Werte kommen vom Gerät. Befehle laufen in Termux auf diesem Telefon. Kein Konto, kein Server. Ein Schlüssel bleibt hier und wird nur gesendet, wenn du Plan drückst.",shareReport:"Hardwarebericht teilen",copyright:"Copyright 2026",
@@ -880,11 +886,11 @@ shortcutsTitle:"Kürzel",shortcutsBody:"Funktioniert auf jeder Seite. Tippen in 
 back:"Zurück",carrierUnknown:"—",mainNav:"Haupt"
 },
 ja: {
-navHome:"ダッシュボード",navHardware:"ハードウェア",navSystem:"システム",navBattery:"電池",navBuild:"ビルド",navPlan:"プラン",navKeys:"API",navTermux:"Termux",
+navHome:"ダッシュボード",navHardware:"ハードウェア",navSystem:"システム",navBattery:"電池",navSecurity:"セキュリティ",navBuild:"ビルド",navPlan:"プラン",navKeys:"API",navTermux:"Termux",
 connect:"接続",disconnect:"切断",connected:"接続済み",allowTermux:"Termuxを許可",noTermux:"Termuxなし",notConnected:"未接続",
 settingsAria:"設定",commandPh:"コマンド",run:"実行",
 work:"作業",machine:"マシン",library:"ライブラリ",files:"ファイル",console:"コンソール",tweaks:"調整",doctor:"診断",commands:"コマンド",links:"リンク",setup:"セットアップ",meridian:"Meridian",lookModesFoot:"見た目、モード、ライセンス",linuxPc:"Linux PC",
-titleFinder:"ファイル",titleConsole:"コンソール",titleSetup:"セットアップ",titleHardware:"ハードウェア",titleSystem:"システム",titleBattery:"電池",titleBuild:"ビルド",titlePlan:"プラン",titleKeys:"API",titleSettings:"設定",titleDoctor:"診断",titleTweaks:"調整",titleCommands:"コマンド",titleLinks:"リンク",titleAbout:"情報",titleSupport:"サポート",titleTermux:"Termux",titleHome:"ダッシュボード",titleLinux:"Linux PC",
+titleFinder:"ファイル",titleConsole:"コンソール",titleSetup:"セットアップ",titleHardware:"ハードウェア",titleSystem:"システム",titleBattery:"電池",titleSecurity:"セキュリティ",titleBuild:"ビルド",titlePlan:"プラン",titleKeys:"API",titleSettings:"設定",titleDoctor:"診断",titleTweaks:"調整",titleCommands:"コマンド",titleLinks:"リンク",titleAbout:"情報",titleSupport:"サポート",titleTermux:"Termux",titleHome:"ダッシュボード",titleLinux:"Linux PC",
 thisPhone:"この端末",hardwareFromDevice:"この端末のハードウェア",systemStrained:"負荷が高い",systemOptimal:"正常",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"電池",heat:"電池温度",voltage:"電圧",ramFree:"空きRAM",memory:"メモリ",virtual:"仮想",deviceCare:"端末ケア",settings:"設定",about:"情報",liveClocks:"ライブ周波数",hold:"停止",live:"ライブ",quietCool:"静かで涼しい",heatOrRam:"温度またはRAMが高い",storage:"ストレージ",network:"ネットワーク",testSpeed:"通信速度を測定",testing:"測定中…",noRamPlus:"RAM Plusなし",usedOf:" 使用 · ",connectTermux:"Termuxに接続",connectTermuxBody:"F-Droidを入れ、PlayではなくF-DroidのTermuxを入れてください。セットアップを開いて進めてください。接続済みと出たら、セットアップはTermuxの末尾に移ります。",connectedTermux:"Termuxに接続済み",copyLine:"行をコピー",reading:"読み取り中…",
 look:"見た目",theme:"テーマ",themeSystem:"システム",themeDark:"ダーク",themeLight:"ライト",themeOled:"OLED",accent:"アクセント",feel:"操作感",refresh:"更新",refreshSaver:"省電力 2秒",refreshNormal:"通常 1秒",refreshLive:"ライブ 250ms",consoleFont:"コンソールフォント",keepAwake:"ジョブ中は画面をつけたまま",haptics:"振動",on:"オン",off:"オフ",motion:"モーション",motionSystem:"システム",motionOff:"オフ",motionOn:"オン",motionTestOn:"モーションはオンです。このバーがフェードインしました。",motionTestOff:"モーションはオフです。フェードも地球の回転もありません。",language:"言語",shortcuts:"キーボードショートカット",
 aboutBlurb:"この端末のダッシュボード。Termuxと接続します。",aboutReadings:"数値はこの端末から来ます。コマンドはこの端末のTermuxで実行されます。アカウントもサーバーもありません。保存したキーはここだけにあり、プランを押したときだけ送られます。",shareReport:"ハードウェア報告を共有",copyright:"Copyright 2026",
@@ -895,11 +901,11 @@ shortcutsTitle:"ショートカット",shortcutsBody:"どのページからで�
 back:"戻る",carrierUnknown:"—",mainNav:"メイン"
 },
 hi: {
-navHome:"डैशबोर्ड",navHardware:"हार्डवेयर",navSystem:"सिस्टम",navBattery:"बैटरी",navBuild:"बिल्ड",navPlan:"योजना",navKeys:"API",navTermux:"Termux",
+navHome:"डैशबोर्ड",navHardware:"हार्डवेयर",navSystem:"सिस्टम",navBattery:"बैटरी",navSecurity:"सुरक्षा",navBuild:"बिल्ड",navPlan:"योजना",navKeys:"API",navTermux:"Termux",
 connect:"जोड़ें",disconnect:"काटें",connected:"जुड़ा",allowTermux:"Termux अनुमति",noTermux:"Termux नहीं",notConnected:"जुड़ा नहीं",
 settingsAria:"सेटिंग्स",commandPh:"कमांड",run:"चलाएँ",
 work:"काम",machine:"मशीन",library:"लाइब्रेरी",files:"फ़ाइलें",console:"कंसोल",tweaks:"ट्वीक",doctor:"डॉक्टर",commands:"कमांड",links:"लिंक",setup:"सेटअप",meridian:"Meridian",lookModesFoot:"रूप, मोड और लाइसेंस",linuxPc:"Linux PC",
-titleFinder:"फ़ाइलें",titleConsole:"कंसोल",titleSetup:"सेटअप",titleHardware:"हार्डवेयर",titleSystem:"सिस्टम",titleBattery:"बैटरी",titleBuild:"बिल्ड",titlePlan:"योजना",titleKeys:"API",titleSettings:"सेटिंग्स",titleDoctor:"डॉक्टर",titleTweaks:"ट्वीक",titleCommands:"कमांड",titleLinks:"लिंक",titleAbout:"परिचय",titleSupport:"सहायता",titleTermux:"Termux",titleHome:"डैशबोर्ड",titleLinux:"Linux PC",
+titleFinder:"फ़ाइलें",titleConsole:"कंसोल",titleSetup:"सेटअप",titleHardware:"हार्डवेयर",titleSystem:"सिस्टम",titleBattery:"बैटरी",titleSecurity:"सुरक्षा",titleBuild:"बिल्ड",titlePlan:"योजना",titleKeys:"API",titleSettings:"सेटिंग्स",titleDoctor:"डॉक्टर",titleTweaks:"ट्वीक",titleCommands:"कमांड",titleLinks:"लिंक",titleAbout:"परिचय",titleSupport:"सहायता",titleTermux:"Termux",titleHome:"डैशबोर्ड",titleLinux:"Linux PC",
 thisPhone:"यह फ़ोन",hardwareFromDevice:"इस डिवाइस का हार्डवेयर",systemStrained:"सिस्टम पर भार",systemOptimal:"सिस्टम ठीक",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"बैटरी",heat:"बैट. तापमान",voltage:"वोल्टेज",ramFree:"खाली RAM",memory:"मेमोरी",virtual:"वर्चुअल",deviceCare:"डिवाइस केयर",settings:"सेटिंग्स",about:"परिचय",liveClocks:"लाइव घड़ियाँ",hold:"रोकें",live:"लाइव",quietCool:"शांत और ठंडा",heatOrRam:"गर्मी या RAM ज्यादा है",storage:"स्टोरेज",network:"नेटवर्क",testSpeed:"नेटवर्क स्पीड जाँच",testing:"जाँच…",noRamPlus:"RAM Plus नहीं",usedOf:" उपयोग · ",connectTermux:"Termux जोड़ें",connectTermuxBody:"F-Droid लगाएँ, फिर Play नहीं बल्कि F-Droid से Termux। सेटअप खोलकर चलें। जब जुड़ा दिखे, सेटअप Termux के अंत में चला जाता है।",connectedTermux:"Termux से जुड़ा",copyLine:"पंक्ति कॉपी करें",reading:"पढ़ रहा है…",
 look:"रूप",theme:"थीम",themeSystem:"सिस्टम",themeDark:"डार्क",themeLight:"लाइट",themeOled:"OLED",accent:"रंग",feel:"अनुभव",refresh:"रिफ़्रेश",refreshSaver:"बैटरी-सेवर 2से",refreshNormal:"सामान्य 1से",refreshLive:"लाइव 250ms",consoleFont:"कंसोल फ़ॉन्ट",keepAwake:"जॉब चलते स्क्रीन जगाएँ",haptics:"कंपन",on:"चालू",off:"बंद",motion:"गति",motionSystem:"सिस्टम",motionOff:"बंद",motionOn:"चालू",motionTestOn:"गति चालू है — यह पट्टी अभी फेज़ हुई।",motionTestOff:"गति बंद है — न फेज़, न ग्लोब घूमना।",language:"भाषा",shortcuts:"कीबोर्ड शॉर्टकट",
 aboutBlurb:"इस फ़ोन का डैशबोर्ड, Termux से जुड़ा।",aboutReadings:"आँकड़े डिवाइस से आते हैं। कमांड इस फ़ोन के Termux में चलती हैं। कोई खाता या सर्वर नहीं। कुंजी यहीं रहती है और योजना दबाने पर ही भेजी जाती है।",shareReport:"हार्डवेयर रिपोर्ट साझा करें",copyright:"कॉपीराइट 2026",
@@ -910,11 +916,11 @@ shortcutsTitle:"शॉर्टकट",shortcutsBody:"हर पेज से �
 back:"वापस",carrierUnknown:"—",mainNav:"मुख्य"
 },
 es: {
-navHome:"Panel",navHardware:"Hardware",navSystem:"Sistema",navBattery:"Batería",navBuild:"Construir",navPlan:"Plan",navKeys:"Plataformas API",navTermux:"Termux",
+navHome:"Panel",navHardware:"Hardware",navSystem:"Sistema",navBattery:"Batería",navSecurity:"Seguridad",navBuild:"Construir",navPlan:"Plan",navKeys:"Plataformas API",navTermux:"Termux",
 connect:"Conectar",disconnect:"Desconectar",connected:"Conectado",allowTermux:"Permitir Termux",noTermux:"Sin Termux",notConnected:"No conectado",
 settingsAria:"Ajustes",commandPh:"Comando",run:"Ejecutar",
 work:"Trabajo",machine:"Máquina",library:"Biblioteca",files:"Archivos",console:"Consola",tweaks:"Ajustes finos",doctor:"Doctor",commands:"Comandos",links:"Enlaces",setup:"Configuración",meridian:"Meridian",linuxPc:"PC Linux",
-titleFinder:"Archivos",titleConsole:"Consola",titleSetup:"Configuración",titleHardware:"Hardware",titleSystem:"Sistema",titleBattery:"Batería",titleBuild:"Construir",titlePlan:"Plan",titleKeys:"Plataformas API",titleSettings:"Ajustes",titleDoctor:"Doctor",titleTweaks:"Ajustes finos",titleCommands:"Comandos",titleLinks:"Enlaces",titleAbout:"Acerca de",titleSupport:"Soporte",titleTermux:"Termux",titleHome:"Panel",titleLinux:"PC Linux",
+titleFinder:"Archivos",titleConsole:"Consola",titleSetup:"Configuración",titleHardware:"Hardware",titleSystem:"Sistema",titleBattery:"Batería",titleSecurity:"Seguridad",titleBuild:"Construir",titlePlan:"Plan",titleKeys:"Plataformas API",titleSettings:"Ajustes",titleDoctor:"Doctor",titleTweaks:"Ajustes finos",titleCommands:"Comandos",titleLinks:"Enlaces",titleAbout:"Acerca de",titleSupport:"Soporte",titleTermux:"Termux",titleHome:"Panel",titleLinux:"PC Linux",
 thisPhone:"Este teléfono",hardwareFromDevice:"Hardware de este dispositivo",systemStrained:"Sistema cargado",systemOptimal:"Sistema óptimo",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batería",heat:"Temp. bat.",voltage:"Voltaje",ramFree:"RAM libre",memory:"Memoria",virtual:"Virtual",deviceCare:"Cuidado del dispositivo",settings:"Ajustes",about:"Acerca de",liveClocks:"Relojes en vivo",hold:"Pausar",live:"En vivo",quietCool:"Tranquilo y fresco",heatOrRam:"El calor o la RAM están altos",storage:"Almacenamiento",network:"Red",testSpeed:"Probar velocidad de red",testing:"Probando…",noRamPlus:"Sin RAM Plus",usedOf:" usado · ",connectTermux:"Conectar Termux",connectTermuxBody:"Instala F-Droid, luego Termux desde F-Droid, no Play. Abre Configuración y síguela. Cuando diga Conectado, Configuración pasa al final de Termux.",connectedTermux:"Conectado a Termux",copyLine:"Copiar la línea",reading:"Leyendo…",
 look:"Aspecto",theme:"Tema",themeSystem:"Sistema",themeDark:"Oscuro",themeLight:"Claro",themeOled:"OLED",accent:"Acento",feel:"Tacto",refresh:"Actualización",refreshSaver:"Ahorro 2s",refreshNormal:"Normal 1s",refreshLive:"En vivo 250ms",consoleFont:"Fuente de consola",keepAwake:"Mantener despierto mientras corre un trabajo",haptics:"Hápticos",on:"Sí",off:"No",motion:"Movimiento",motionSystem:"Sistema",motionOff:"No",motionOn:"Sí",motionTestOn:"El movimiento está activo: esta barra acaba de aparecer.",motionTestOff:"El movimiento está apagado: sin fundido ni giro del globo.",language:"Idioma",shortcuts:"Atajos de teclado",
 aboutBlurb:"Un panel para este teléfono, unido a Termux.",aboutReadings:"Las lecturas vienen del dispositivo. Los comandos corren en Termux en este teléfono. No hay cuenta ni servidor. Una clave, si la guardas, se queda aquí y solo se envía al pulsar Plan.",shareReport:"Compartir informe de hardware",copyright:"Copyright 2026",
@@ -925,11 +931,11 @@ shortcutsTitle:"Atajos",shortcutsBody:"Funciona desde cualquier página. Escribi
 back:"Atrás",carrierUnknown:"—",mainNav:"Principal"
 },
 fr: {
-navHome:"Tableau",navHardware:"Matériel",navSystem:"Système",navBattery:"Batterie",navBuild:"Construire",navPlan:"Plan",navKeys:"Plateformes API",navTermux:"Termux",
+navHome:"Tableau",navHardware:"Matériel",navSystem:"Système",navBattery:"Batterie",navSecurity:"Sécurité",navBuild:"Construire",navPlan:"Plan",navKeys:"Plateformes API",navTermux:"Termux",
 connect:"Connecter",disconnect:"Déconnecter",connected:"Connecté",allowTermux:"Autoriser Termux",noTermux:"Pas de Termux",notConnected:"Non connecté",
 settingsAria:"Réglages",commandPh:"Commande",run:"Exécuter",
 work:"Travail",machine:"Machine",library:"Bibliothèque",files:"Fichiers",console:"Console",tweaks:"Réglages",doctor:"Docteur",commands:"Commandes",links:"Liens",setup:"Installation",meridian:"Meridian",linuxPc:"PC Linux",
-titleFinder:"Fichiers",titleConsole:"Console",titleSetup:"Installation",titleHardware:"Matériel",titleSystem:"Système",titleBattery:"Batterie",titleBuild:"Construire",titlePlan:"Plan",titleKeys:"Plateformes API",titleSettings:"Réglages",titleDoctor:"Docteur",titleTweaks:"Réglages",titleCommands:"Commandes",titleLinks:"Liens",titleAbout:"À propos",titleSupport:"Support",titleTermux:"Termux",titleHome:"Tableau",titleLinux:"PC Linux",
+titleFinder:"Fichiers",titleConsole:"Console",titleSetup:"Installation",titleHardware:"Matériel",titleSystem:"Système",titleBattery:"Batterie",titleSecurity:"Sécurité",titleBuild:"Construire",titlePlan:"Plan",titleKeys:"Plateformes API",titleSettings:"Réglages",titleDoctor:"Docteur",titleTweaks:"Réglages",titleCommands:"Commandes",titleLinks:"Liens",titleAbout:"À propos",titleSupport:"Support",titleTermux:"Termux",titleHome:"Tableau",titleLinux:"PC Linux",
 thisPhone:"Ce téléphone",hardwareFromDevice:"Matériel de cet appareil",systemStrained:"Système sollicité",systemOptimal:"Système optimal",cpu:"CPU",gpu:"GPU",ram:"RAM",battery:"Batterie",heat:"Temp. bat.",voltage:"Tension",ramFree:"RAM libre",memory:"Mémoire",virtual:"Virtuel",deviceCare:"Entretien de l’appareil",settings:"Réglages",about:"À propos",liveClocks:"Horloges en direct",hold:"Pause",live:"Direct",quietCool:"Calme et frais",heatOrRam:"La chaleur ou la RAM est élevée",storage:"Stockage",network:"Réseau",testSpeed:"Tester la vitesse réseau",testing:"Test…",noRamPlus:"Pas de RAM Plus",usedOf:" utilisé · ",connectTermux:"Connecter Termux",connectTermuxBody:"Installez F-Droid, puis Termux depuis F-Droid, pas Play. Ouvrez Installation et suivez. Quand il est écrit Connecté, Installation passe à la fin de Termux.",connectedTermux:"Connecté à Termux",copyLine:"Copier la ligne",reading:"Lecture…",
 look:"Apparence",theme:"Thème",themeSystem:"Système",themeDark:"Sombre",themeLight:"Clair",themeOled:"OLED",accent:"Accent",feel:"Sensation",refresh:"Rafraîchissement",refreshSaver:"Économie 2s",refreshNormal:"Normal 1s",refreshLive:"Direct 250ms",consoleFont:"Police console",keepAwake:"Rester éveillé pendant un travail",haptics:"Haptique",on:"Oui",off:"Non",motion:"Mouvement",motionSystem:"Système",motionOff:"Non",motionOn:"Oui",motionTestOn:"Le mouvement est activé — cette barre vient d’apparaître.",motionTestOff:"Le mouvement est coupé — pas de fondu ni de rotation du globe.",language:"Langue",shortcuts:"Raccourcis clavier",
 aboutBlurb:"Un tableau de bord pour ce téléphone, lié à Termux.",aboutReadings:"Les relevés viennent de l’appareil. Les commandes s’exécutent dans Termux sur ce téléphone. Pas de compte, pas de serveur. Une clé, si vous l’enregistrez, reste ici et n’est envoyée que lorsque vous appuyez sur Plan.",shareReport:"Partager le rapport matériel",copyright:"Copyright 2026",
