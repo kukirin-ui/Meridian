@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- Battery screen: a live battery graphic in its own window on the right. Five stacked bars fill with the real charge level (the top lit bar can be partial), a dashed ring turns slowly while the phone is charging and stays still otherwise, and the colours move to amber below 20% and red below 10%. The ring stays still when Motion is off or the system asks for reduced motion.
+
+### Changed
+- Battery screen: charge level, state, and temperature sit in a left column next to the new graphic, and the state label now updates live with the other readings.
+
+### Removed
+- The `>_` mark in the Battery window title bar. Other screens keep it.
+
 ## [2.3.29-oss] - 2026-10-13
 
 ### Changed
