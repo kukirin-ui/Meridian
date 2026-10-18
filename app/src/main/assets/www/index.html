@@ -274,9 +274,9 @@
   .batwin.low { --bat-hi: #ffd166; --bat-lo: #c97a0a; --bat-glow: rgba(255, 190, 70, .35); }
   .batwin.crit { --bat-hi: #ff6b6b; --bat-lo: #a51d2d; --bat-glow: rgba(255, 80, 80, .4); }
   .batwin .bat-l { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; pointer-events: none; }
-  .batwin .bat-ring { background-image: url(img/battery/ring-green.png); background-image: -webkit-image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); background-image: image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); }
-  .batwin.low .bat-ring { background-image: url(img/battery/ring-amber.png); background-image: -webkit-image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); background-image: image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); }
-  .batwin.crit .bat-ring { background-image: url(img/battery/ring-red.png); background-image: -webkit-image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); background-image: image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); }
+  /* The dashed ring is inline SVG so it follows the theme accent. The battery itself stays the PNG artwork. */
+  .batwin .bat-ring { width: 100%; height: 100%; color: var(--accent); filter: drop-shadow(0 0 2px var(--accent-glow)); overflow: visible; }
+  .batwin .bat-ring line { stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; }
   .batwin .bat-body { background-image: url(img/battery/body-green.png); background-image: -webkit-image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); background-image: image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); }
   .batwin.low .bat-body { background-image: url(img/battery/body-amber.png); background-image: -webkit-image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); background-image: image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); }
   .batwin.crit .bat-body { background-image: url(img/battery/body-red.png); background-image: -webkit-image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); background-image: image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); }
@@ -324,13 +324,32 @@
   .bend + .sec::before,
   .deskbar + .sec::before { display: none; }
   .kv span { color: var(--muted); flex: none; }
-  .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: ui-monospace, "Roboto Mono", "Fira Code", monospace; overflow-wrap: anywhere; word-break: break-word; }
+  .kv b { min-width: 0; flex: 1; font-weight: 400; text-align: right; font-size: 13px; line-height: 1.5; font-family: inherit; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; word-break: break-word; }
   .stack { display: flex; flex-direction: column; gap: 10px; }
   h2, .wintop > b { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: 0.04em; color: var(--accent); -webkit-text-fill-color: var(--accent); text-shadow: 0 0 16px var(--accent-glow); }
   .muted { color: var(--muted); }
   .plate p, .muted { overflow-wrap: anywhere; }
   pre { margin: 0; white-space: pre; overflow: auto; word-break: normal; overflow-wrap: normal; font: 400 13px/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; background: var(--field); color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 16px; }
   .term { max-height: 62vh; overflow: auto; background: var(--termbg); color: var(--termfg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 16px; font: 400 var(--term-size)/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; }
+  .win pre { font-size: var(--term-size); }
+  .page.zoomed { zoom: var(--page-zoom, 1); }
+  .linkrow b { font-family: inherit; display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .linkdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .linkdot.on { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, .6); }
+  .linkdot.warm { background: #eab308; box-shadow: 0 0 6px rgba(234, 179, 8, .5); }
+  .linkdot.off { background: var(--bad); box-shadow: 0 0 6px rgba(239, 68, 68, .5); }
+  .kv b.plain { font-family: inherit; }
+  .jobrow { align-items: center; }
+  .jobrow .jobinfo { flex: 1; min-width: 0; }
+  .jobrow .jobinfo b { display: inline; text-align: left; font-size: 0.875rem; font-weight: 600; }
+  .jobrow .jobinfo .muted { font-size: 0.75rem; }
+  .fitrow .fitname { flex: 1; min-width: 0; color: var(--fg); overflow-wrap: anywhere; }
+  .fitrow b { flex: none; display: inline-flex; align-items: center; gap: 8px; }
+  .fitbadge { font-style: normal; font-size: 0.6875rem; font-weight: 700; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+  .fitbadge.fits { color: #22c55e; }
+  .fitbadge.tight { color: #eab308; }
+  .fitbadge.big { color: var(--bad); }
+  .ghost.mini { min-height: 0; padding: 4px 12px; font-size: 0.75rem; }
   .term .line, .term .out { white-space: pre; width: max-content; min-width: 100%; font: inherit; }
   .term.wrap .line, .term.wrap .out { white-space: pre-wrap; overflow-wrap: anywhere; width: auto; }
   .term .line { margin: 0 0 2px; }
@@ -472,7 +491,7 @@
   .accordion[aria-expanded="true"] .chev { transform: none; }
   .accordion[aria-expanded="true"] .chev::before { transform: rotate(225deg); top: 6px; }
   .accordion-body { padding: 8px 0 16px; }
-  .hwmono { margin: 0 0 8px; font: 400 13px/1.5 ui-monospace, "Roboto Mono", "Fira Code", monospace; color: var(--fg); }
+  .hwmono { margin: 0 0 8px; font-weight: 400; font-size: 13px; line-height: 1.5; font-family: inherit; font-variant-numeric: tabular-nums; color: var(--fg); }
   .about-screen { flex: 1; display: flex; flex-direction: column; min-height: 100%; }
   .copyrule { display: block; border: 0; height: 1px; width: calc(100% + 32px); margin: 18px -16px 0; padding: 0; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); animation: latpulse 2.8s var(--ease) infinite; }
   .copyfoot { margin: 20px auto 4px; max-width: 36em; padding: 0 8px 18px; text-align: center; color: var(--muted); font-size: 12.5px; font-weight: 500; line-height: 1.5; }
@@ -901,6 +920,8 @@ back:"Retour",carrierUnknown:"—",mainNav:"Principal"
 };
 const EXTRA = {
 en:{
+termuxInstalled:"Termux installed",termuxVersion:"Termux version",termuxConnection:"Connection",yes:"Yes",no:"No",fixShort:"Fix",
+termuxLinkTitle:"Termux connection",termuxLinkOk:"Connected",termuxLinkOff:"Not connected",termuxLinkChecking:"Checking",termuxLinkUnknown:"Not checked yet",termuxWhyOk:"Meridian can send commands to Termux.",termuxWhyExternal:"Termux does not accept commands from other apps yet. Tap Fix Termux connection, then in Termux long-press, tap Paste and press Enter.",termuxWhyPermission:"Android has not allowed Meridian to run Termux commands. Tap Allow Termux commands.",termuxWhyAsleep:"Termux is closed, so Android did not deliver the check. Open Termux once, then come back.",termuxWhyTimeout:"Termux did not answer. Tap Fix Termux connection, then come back here.",termuxWhyMissing:"Termux is not installed. Get it from F-Droid, not Play.",termuxWhyRefused:"Termux refused the command. Tap Fix Termux connection, then come back here.",fixTermux:"Fix Termux connection",allowTermuxPerm:"Allow Termux commands",checkAgain:"Check again",getTermux:"Get Termux",fixTermuxToast:"Command copied. In Termux, long-press the screen, tap Paste, then press Enter.",deskIntro:"Desk runs a task for you on its own, every hour or every day, even when the app is closed. Pick what to run and how often, then tap Schedule.",schedTitle:"Automatic tasks",schedWhat:"What to run",schedHow:"How often",schedule:"Schedule",showCommand:"Show command",hideCommand:"Hide command",activeJobs:"Active tasks",noJobs:"No tasks are scheduled yet.",stopJob:"Stop",refreshJobs:"Refresh",lastRun:"Last run",neverRun:"Not run yet",schedWorking:"Working on it",schedOk:"Scheduled. It now runs on its own.",schedStopped:"Stopped. It will not run again.",schedFail:"It could not be scheduled. Tap Show command to see the details.",schedBusy:"Another command is running. Try again in a moment.",schedNeedApi:"Automatic tasks need the Termux:API add-on in Termux.",installApi:"Install Termux:API",installingApi:"Installing Termux:API",schedNeedApiApp:"Automatic tasks also need the Termux:API app. Install it from F-Droid, then tap Schedule again.",getApiApp:"Get the Termux:API app",rcpCheck:"Check for updates",rcpCheckD:"Looks for newer versions of your Termux tools. Installs nothing.",rcpUpgrade:"Update tools",rcpUpgradeD:"Installs newer versions of the tools you already have.",rcpClean:"Clean up",rcpCleanD:"Deletes leftover installer files to free space. Your tools stay.",rcpBattery:"Battery log",rcpBatteryD:"Writes the battery level and temperature to meridian-logs/battery.log.",rcpStorage:"Storage log",rcpStorageD:"Writes how full the storage is to meridian-logs/storage.log.",rcpRepair:"Repair installs",rcpRepairD:"Finishes any install that was cut off halfway.",
 
 
 
@@ -948,6 +969,8 @@ agentHint:"Pro runs one step when you press Run. Premium can run the list in ord
 every15:"Every 15 min",everyHour:"Every hour",every6:"Every 6 hours",everyDay:"Every day"
 },
 hr:{
+termuxInstalled:"Termux instaliran",termuxVersion:"Verzija Termuxa",termuxConnection:"Veza",yes:"Da",no:"Ne",fixShort:"Popravi",
+termuxLinkTitle:"Veza s Termuxom",termuxLinkOk:"Povezano",termuxLinkOff:"Nije povezano",termuxLinkChecking:"Provjeravam",termuxLinkUnknown:"Još nije provjereno",termuxWhyOk:"Meridian može slati naredbe Termuxu.",termuxWhyExternal:"Termux još ne prima naredbe iz drugih aplikacija. Dodirnite Popravi vezu s Termuxom, zatim u Termuxu dugo pritisnite, dodirnite Paste i pritisnite Enter.",termuxWhyPermission:"Android još nije dopustio Meridianu da pokreće naredbe u Termuxu. Dodirnite Dopusti Termux naredbe.",termuxWhyAsleep:"Termux je zatvoren pa Android nije isporučio provjeru. Jednom otvorite Termux, pa se vratite.",termuxWhyTimeout:"Termux nije odgovorio. Dodirnite Popravi vezu s Termuxom, pa se vratite ovamo.",termuxWhyMissing:"Termux nije instaliran. Preuzmite ga s F-Droida, ne s Playa.",termuxWhyRefused:"Termux je odbio naredbu. Dodirnite Popravi vezu s Termuxom, pa se vratite ovamo.",fixTermux:"Popravi vezu s Termuxom",allowTermuxPerm:"Dopusti Termux naredbe",checkAgain:"Provjeri ponovno",getTermux:"Preuzmi Termux",fixTermuxToast:"Naredba je kopirana. U Termuxu dugo pritisnite ekran, dodirnite Paste, zatim pritisnite Enter.",deskIntro:"Desk sam pokreće zadatak umjesto vas, svaki sat ili svaki dan, čak i kad je aplikacija zatvorena. Odaberite što i koliko često, zatim dodirnite Zakaži.",schedTitle:"Automatski zadaci",schedWhat:"Što pokrenuti",schedHow:"Koliko često",schedule:"Zakaži",showCommand:"Prikaži naredbu",hideCommand:"Sakrij naredbu",activeJobs:"Aktivni zadaci",noJobs:"Još nema zakazanih zadataka.",stopJob:"Zaustavi",refreshJobs:"Osvježi",lastRun:"Zadnje pokretanje",neverRun:"Još nije pokrenuto",schedWorking:"Radim na tome",schedOk:"Zakazano. Sad se pokreće samo.",schedStopped:"Zaustavljeno. Više se neće pokretati.",schedFail:"Zakazivanje nije uspjelo. Dodirnite Prikaži naredbu za detalje.",schedBusy:"Druga naredba je u tijeku. Pokušajte za trenutak.",schedNeedApi:"Automatski zadaci trebaju dodatak Termux:API u Termuxu.",installApi:"Instaliraj Termux:API",installingApi:"Instaliram Termux:API",schedNeedApiApp:"Automatski zadaci trebaju i aplikaciju Termux:API. Instalirajte je s F-Droida, zatim ponovno dodirnite Zakaži.",getApiApp:"Preuzmi aplikaciju Termux:API",rcpCheck:"Provjeri ažuriranja",rcpCheckD:"Traži novije verzije vaših Termux alata. Ništa ne instalira.",rcpUpgrade:"Ažuriraj alate",rcpUpgradeD:"Instalira novije verzije alata koje već imate.",rcpClean:"Očisti",rcpCleanD:"Briše preostale instalacijske datoteke i oslobađa prostor. Alati ostaju.",rcpBattery:"Dnevnik baterije",rcpBatteryD:"Zapisuje razinu i temperaturu baterije u meridian-logs/battery.log.",rcpStorage:"Dnevnik prostora",rcpStorageD:"Zapisuje koliko je pohrana puna u meridian-logs/storage.log.",rcpRepair:"Popravi instalacije",rcpRepairD:"Dovršava instalaciju koja je prekinuta na pola.",
 
 
 motionTestOn:"Pokret je uključen — kursor trepće.",
@@ -970,6 +993,8 @@ agentHint:"Pro pokreće jedan korak kad pritisnete Pokreni. Premium može pokren
 every15:"Svakih 15 min",everyHour:"Svaki sat",every6:"Svakih 6 sati",everyDay:"Svaki dan"
 },
 de:{
+termuxInstalled:"Termux installiert",termuxVersion:"Termux-Version",termuxConnection:"Verbindung",yes:"Ja",no:"Nein",fixShort:"Reparieren",
+termuxLinkTitle:"Termux-Verbindung",termuxLinkOk:"Verbunden",termuxLinkOff:"Nicht verbunden",termuxLinkChecking:"Wird geprüft",termuxLinkUnknown:"Noch nicht geprüft",termuxWhyOk:"Meridian kann Befehle an Termux senden.",termuxWhyExternal:"Termux nimmt noch keine Befehle von anderen Apps an. Tippe auf Termux-Verbindung reparieren, dann in Termux lange drücken, Paste tippen und Enter drücken.",termuxWhyPermission:"Android hat Meridian noch nicht erlaubt, Termux-Befehle auszuführen. Tippe auf Termux-Befehle erlauben.",termuxWhyAsleep:"Termux ist geschlossen, daher hat Android die Prüfung nicht zugestellt. Öffne Termux einmal und komm zurück.",termuxWhyTimeout:"Termux hat nicht geantwortet. Tippe auf Termux-Verbindung reparieren und komm dann zurück.",termuxWhyMissing:"Termux ist nicht installiert. Hole es von F-Droid, nicht aus Play.",termuxWhyRefused:"Termux hat den Befehl abgelehnt. Tippe auf Termux-Verbindung reparieren und komm dann zurück.",fixTermux:"Termux-Verbindung reparieren",allowTermuxPerm:"Termux-Befehle erlauben",checkAgain:"Erneut prüfen",getTermux:"Termux holen",fixTermuxToast:"Befehl kopiert. In Termux lange auf den Bildschirm drücken, Paste tippen, dann Enter drücken.",deskIntro:"Desk führt eine Aufgabe von selbst für dich aus, jede Stunde oder jeden Tag, auch wenn die App geschlossen ist. Wähle, was und wie oft, dann tippe auf Planen.",schedTitle:"Automatische Aufgaben",schedWhat:"Was ausführen",schedHow:"Wie oft",schedule:"Planen",showCommand:"Befehl zeigen",hideCommand:"Befehl ausblenden",activeJobs:"Aktive Aufgaben",noJobs:"Noch keine Aufgaben geplant.",stopJob:"Stopp",refreshJobs:"Aktualisieren",lastRun:"Zuletzt",neverRun:"Noch nicht gelaufen",schedWorking:"Wird erledigt",schedOk:"Geplant. Läuft jetzt von selbst.",schedStopped:"Gestoppt. Läuft nicht mehr.",schedFail:"Planen hat nicht geklappt. Tippe auf Befehl zeigen für Details.",schedBusy:"Ein anderer Befehl läuft. Versuche es gleich noch einmal.",schedNeedApi:"Automatische Aufgaben brauchen das Termux:API-Paket in Termux.",installApi:"Termux:API installieren",installingApi:"Termux:API wird installiert",schedNeedApiApp:"Automatische Aufgaben brauchen auch die Termux:API-App. Installiere sie von F-Droid und tippe dann erneut auf Planen.",getApiApp:"Termux:API-App holen",rcpCheck:"Nach Updates suchen",rcpCheckD:"Sucht neuere Versionen deiner Termux-Tools. Installiert nichts.",rcpUpgrade:"Tools aktualisieren",rcpUpgradeD:"Installiert neuere Versionen der Tools, die du schon hast.",rcpClean:"Aufräumen",rcpCleanD:"Löscht übrige Installationsdateien und schafft Platz. Deine Tools bleiben.",rcpBattery:"Akku-Protokoll",rcpBatteryD:"Schreibt Akkustand und Temperatur in meridian-logs/battery.log.",rcpStorage:"Speicher-Protokoll",rcpStorageD:"Schreibt, wie voll der Speicher ist, in meridian-logs/storage.log.",rcpRepair:"Installationen reparieren",rcpRepairD:"Schließt eine halb abgebrochene Installation ab.",
 
 
 motionTestOn:"Bewegung ist an — der Cursor blinkt.",
@@ -992,6 +1017,8 @@ agentHint:"Pro startet einen Schritt, wenn du Ausführen drückst. Premium kann 
 every15:"Alle 15 Min",everyHour:"Jede Stunde",every6:"Alle 6 Stunden",everyDay:"Jeden Tag"
 },
 ja:{
+termuxInstalled:"Termux インストール済み",termuxVersion:"Termux バージョン",termuxConnection:"接続",yes:"はい",no:"いいえ",fixShort:"修正",
+termuxLinkTitle:"Termux 接続",termuxLinkOk:"接続済み",termuxLinkOff:"未接続",termuxLinkChecking:"確認中",termuxLinkUnknown:"未確認",termuxWhyOk:"Meridian は Termux にコマンドを送れます。",termuxWhyExternal:"Termux はまだ他のアプリからのコマンドを受け付けません。「Termux 接続を修正」をタップし、Termux で長押しして Paste をタップし、Enter を押してください。",termuxWhyPermission:"Android が Meridian に Termux コマンドの実行を許可していません。「Termux コマンドを許可」をタップしてください。",termuxWhyAsleep:"Termux が閉じているため、確認が届きませんでした。Termux を一度開いてから戻ってください。",termuxWhyTimeout:"Termux が応答しませんでした。「Termux 接続を修正」をタップしてから戻ってください。",termuxWhyMissing:"Termux がインストールされていません。Play ではなく F-Droid から入手してください。",termuxWhyRefused:"Termux がコマンドを拒否しました。「Termux 接続を修正」をタップしてから戻ってください。",fixTermux:"Termux 接続を修正",allowTermuxPerm:"Termux コマンドを許可",checkAgain:"再確認",getTermux:"Termux を入手",fixTermuxToast:"コマンドをコピーしました。Termux で画面を長押しし、Paste をタップして Enter を押してください。",deskIntro:"Desk は、アプリを閉じていても、1時間ごとや毎日など自動でタスクを実行します。実行する内容と頻度を選び、「予約」をタップしてください。",schedTitle:"自動タスク",schedWhat:"実行する内容",schedHow:"頻度",schedule:"予約",showCommand:"コマンドを表示",hideCommand:"コマンドを隠す",activeJobs:"有効なタスク",noJobs:"予約されたタスクはまだありません。",stopJob:"停止",refreshJobs:"更新",lastRun:"前回の実行",neverRun:"未実行",schedWorking:"処理中",schedOk:"予約しました。今後は自動で実行されます。",schedStopped:"停止しました。今後は実行されません。",schedFail:"予約できませんでした。詳細は「コマンドを表示」で確認できます。",schedBusy:"別のコマンドが実行中です。少し待ってから再度お試しください。",schedNeedApi:"自動タスクには Termux の Termux:API パッケージが必要です。",installApi:"Termux:API をインストール",installingApi:"Termux:API をインストール中",schedNeedApiApp:"自動タスクには Termux:API アプリも必要です。F-Droid からインストールして、もう一度「予約」をタップしてください。",getApiApp:"Termux:API アプリを入手",rcpCheck:"更新を確認",rcpCheckD:"Termux ツールの新しいバージョンを探します。何もインストールしません。",rcpUpgrade:"ツールを更新",rcpUpgradeD:"すでにあるツールの新しいバージョンをインストールします。",rcpClean:"お掃除",rcpCleanD:"残ったインストール用ファイルを削除して空き容量を作ります。ツールは残ります。",rcpBattery:"電池ログ",rcpBatteryD:"電池残量と温度を meridian-logs/battery.log に記録します。",rcpStorage:"ストレージログ",rcpStorageD:"ストレージの使用状況を meridian-logs/storage.log に記録します。",rcpRepair:"インストールを修復",rcpRepairD:"途中で止まったインストールを完了させます。",
 
 
 motionTestOn:"モーションはオン — キャレットが点滅します。",
@@ -1014,6 +1041,8 @@ agentHint:"Pro は実行を押した手順だけ動きます。Premium は一覧
 every15:"15分ごと",everyHour:"1時間ごと",every6:"6時間ごと",everyDay:"毎日"
 },
 hi:{
+termuxInstalled:"Termux इंस्टॉल है",termuxVersion:"Termux वर्शन",termuxConnection:"कनेक्शन",yes:"हाँ",no:"नहीं",fixShort:"ठीक करें",
+termuxLinkTitle:"Termux कनेक्शन",termuxLinkOk:"कनेक्टेड",termuxLinkOff:"कनेक्ट नहीं",termuxLinkChecking:"जाँच हो रही है",termuxLinkUnknown:"अभी जाँचा नहीं",termuxWhyOk:"Meridian, Termux को कमांड भेज सकता है।",termuxWhyExternal:"Termux अभी दूसरे ऐप्स से कमांड नहीं लेता। Termux कनेक्शन ठीक करें पर टैप करें, फिर Termux में देर तक दबाएँ, Paste टैप करें और Enter दबाएँ।",termuxWhyPermission:"Android ने Meridian को Termux कमांड चलाने की अनुमति नहीं दी है। Termux कमांड की अनुमति दें पर टैप करें।",termuxWhyAsleep:"Termux बंद है, इसलिए Android ने जाँच नहीं पहुँचाई। Termux एक बार खोलें, फिर वापस आएँ।",termuxWhyTimeout:"Termux ने जवाब नहीं दिया। Termux कनेक्शन ठीक करें पर टैप करें, फिर यहाँ वापस आएँ।",termuxWhyMissing:"Termux इंस्टॉल नहीं है। इसे Play से नहीं, F-Droid से लें।",termuxWhyRefused:"Termux ने कमांड मना कर दी। Termux कनेक्शन ठीक करें पर टैप करें, फिर यहाँ वापस आएँ।",fixTermux:"Termux कनेक्शन ठीक करें",allowTermuxPerm:"Termux कमांड की अनुमति दें",checkAgain:"फिर से जाँचें",getTermux:"Termux पाएँ",fixTermuxToast:"कमांड कॉपी हो गई। Termux में स्क्रीन को देर तक दबाएँ, Paste टैप करें, फिर Enter दबाएँ।",deskIntro:"Desk आपके लिए अपने आप काम चलाता है, हर घंटे या हर दिन, ऐप बंद होने पर भी। क्या और कितनी बार चलाना है चुनें, फिर शेड्यूल करें पर टैप करें।",schedTitle:"अपने आप चलने वाले काम",schedWhat:"क्या चलाएँ",schedHow:"कितनी बार",schedule:"शेड्यूल करें",showCommand:"कमांड दिखाएँ",hideCommand:"कमांड छिपाएँ",activeJobs:"चालू काम",noJobs:"अभी कोई काम शेड्यूल नहीं है।",stopJob:"रोकें",refreshJobs:"रीफ़्रेश",lastRun:"पिछली बार",neverRun:"अभी नहीं चला",schedWorking:"काम हो रहा है",schedOk:"शेड्यूल हो गया। अब यह अपने आप चलेगा।",schedStopped:"रोक दिया। अब यह नहीं चलेगा।",schedFail:"शेड्यूल नहीं हो सका। विवरण के लिए कमांड दिखाएँ पर टैप करें।",schedBusy:"दूसरी कमांड चल रही है। थोड़ी देर में फिर कोशिश करें।",schedNeedApi:"अपने आप चलने वाले कामों के लिए Termux में Termux:API पैकेज चाहिए।",installApi:"Termux:API इंस्टॉल करें",installingApi:"Termux:API इंस्टॉल हो रहा है",schedNeedApiApp:"इसके लिए Termux:API ऐप भी चाहिए। इसे F-Droid से इंस्टॉल करें, फिर दोबारा शेड्यूल करें पर टैप करें।",getApiApp:"Termux:API ऐप पाएँ",rcpCheck:"अपडेट जाँचें",rcpCheckD:"आपके Termux टूल्स के नए वर्शन खोजता है। कुछ इंस्टॉल नहीं करता।",rcpUpgrade:"टूल्स अपडेट करें",rcpUpgradeD:"आपके मौजूदा टूल्स के नए वर्शन इंस्टॉल करता है।",rcpClean:"सफ़ाई",rcpCleanD:"बची हुई इंस्टॉलर फ़ाइलें हटाकर जगह खाली करता है। टूल्स बने रहते हैं।",rcpBattery:"बैटरी लॉग",rcpBatteryD:"बैटरी स्तर और तापमान meridian-logs/battery.log में लिखता है।",rcpStorage:"स्टोरेज लॉग",rcpStorageD:"स्टोरेज कितना भरा है, meridian-logs/storage.log में लिखता है।",rcpRepair:"इंस्टॉल ठीक करें",rcpRepairD:"बीच में रुका इंस्टॉल पूरा करता है।",
 
 
 motionTestOn:"मोशन चालू है — कर्सर झपकता है।",
@@ -1036,6 +1065,8 @@ agentHint:"Pro एक कदम चलाता है जब आप चला�
 every15:"हर 15 मिनट",everyHour:"हर घंटे",every6:"हर 6 घंटे",everyDay:"हर दिन"
 },
 es:{
+termuxInstalled:"Termux instalado",termuxVersion:"Versión de Termux",termuxConnection:"Conexión",yes:"Sí",no:"No",fixShort:"Arreglar",
+termuxLinkTitle:"Conexión con Termux",termuxLinkOk:"Conectado",termuxLinkOff:"Sin conexión",termuxLinkChecking:"Comprobando",termuxLinkUnknown:"Sin comprobar",termuxWhyOk:"Meridian puede enviar comandos a Termux.",termuxWhyExternal:"Termux todavía no acepta comandos de otras apps. Toca Arreglar conexión con Termux y, en Termux, mantén pulsado, toca Paste y pulsa Enter.",termuxWhyPermission:"Android aún no permite a Meridian ejecutar comandos de Termux. Toca Permitir comandos de Termux.",termuxWhyAsleep:"Termux está cerrado, así que Android no entregó la comprobación. Abre Termux una vez y vuelve.",termuxWhyTimeout:"Termux no respondió. Toca Arreglar conexión con Termux y vuelve aquí.",termuxWhyMissing:"Termux no está instalado. Descárgalo de F-Droid, no de Play.",termuxWhyRefused:"Termux rechazó el comando. Toca Arreglar conexión con Termux y vuelve aquí.",fixTermux:"Arreglar conexión con Termux",allowTermuxPerm:"Permitir comandos de Termux",checkAgain:"Comprobar de nuevo",getTermux:"Obtener Termux",fixTermuxToast:"Comando copiado. En Termux, mantén pulsada la pantalla, toca Paste y pulsa Enter.",deskIntro:"Desk ejecuta una tarea por ti, cada hora o cada día, incluso con la app cerrada. Elige qué ejecutar y cada cuánto, y toca Programar.",schedTitle:"Tareas automáticas",schedWhat:"Qué ejecutar",schedHow:"Cada cuánto",schedule:"Programar",showCommand:"Ver comando",hideCommand:"Ocultar comando",activeJobs:"Tareas activas",noJobs:"Aún no hay tareas programadas.",stopJob:"Detener",refreshJobs:"Actualizar",lastRun:"Última vez",neverRun:"Aún no se ejecutó",schedWorking:"Trabajando",schedOk:"Programada. Ahora se ejecuta sola.",schedStopped:"Detenida. No volverá a ejecutarse.",schedFail:"No se pudo programar. Toca Ver comando para ver los detalles.",schedBusy:"Hay otro comando en marcha. Inténtalo en un momento.",schedNeedApi:"Las tareas automáticas necesitan el paquete Termux:API en Termux.",installApi:"Instalar Termux:API",installingApi:"Instalando Termux:API",schedNeedApiApp:"Las tareas automáticas también necesitan la app Termux:API. Instálala desde F-Droid y vuelve a tocar Programar.",getApiApp:"Obtener la app Termux:API",rcpCheck:"Buscar actualizaciones",rcpCheckD:"Busca versiones nuevas de tus herramientas de Termux. No instala nada.",rcpUpgrade:"Actualizar herramientas",rcpUpgradeD:"Instala versiones nuevas de las herramientas que ya tienes.",rcpClean:"Limpiar",rcpCleanD:"Borra archivos de instalación sobrantes para liberar espacio. Tus herramientas se quedan.",rcpBattery:"Registro de batería",rcpBatteryD:"Guarda el nivel y la temperatura de la batería en meridian-logs/battery.log.",rcpStorage:"Registro de almacenamiento",rcpStorageD:"Guarda lo lleno que está el almacenamiento en meridian-logs/storage.log.",rcpRepair:"Reparar instalaciones",rcpRepairD:"Termina una instalación que se cortó a medias.",
 
 
 motionTestOn:"El movimiento está activo — el cursor parpadea.",
@@ -1058,6 +1089,8 @@ agentHint:"Pro ejecuta un paso cuando pulsas Ejecutar. Premium puede recorrer la
 every15:"Cada 15 min",everyHour:"Cada hora",every6:"Cada 6 horas",everyDay:"Cada día"
 },
 fr:{
+termuxInstalled:"Termux installé",termuxVersion:"Version de Termux",termuxConnection:"Connexion",yes:"Oui",no:"Non",fixShort:"Réparer",
+termuxLinkTitle:"Connexion à Termux",termuxLinkOk:"Connecté",termuxLinkOff:"Non connecté",termuxLinkChecking:"Vérification",termuxLinkUnknown:"Pas encore vérifié",termuxWhyOk:"Meridian peut envoyer des commandes à Termux.",termuxWhyExternal:"Termux n’accepte pas encore les commandes des autres apps. Touchez Réparer la connexion Termux, puis dans Termux faites un appui long, touchez Paste et appuyez sur Entrée.",termuxWhyPermission:"Android n’autorise pas encore Meridian à lancer des commandes Termux. Touchez Autoriser les commandes Termux.",termuxWhyAsleep:"Termux est fermé, Android n’a donc pas transmis la vérification. Ouvrez Termux une fois, puis revenez.",termuxWhyTimeout:"Termux n’a pas répondu. Touchez Réparer la connexion Termux, puis revenez ici.",termuxWhyMissing:"Termux n’est pas installé. Prenez-le sur F-Droid, pas sur Play.",termuxWhyRefused:"Termux a refusé la commande. Touchez Réparer la connexion Termux, puis revenez ici.",fixTermux:"Réparer la connexion Termux",allowTermuxPerm:"Autoriser les commandes Termux",checkAgain:"Vérifier à nouveau",getTermux:"Obtenir Termux",fixTermuxToast:"Commande copiée. Dans Termux, appui long sur l’écran, touchez Paste, puis appuyez sur Entrée.",deskIntro:"Desk lance une tâche pour vous, toutes les heures ou tous les jours, même quand l’app est fermée. Choisissez quoi lancer et à quelle fréquence, puis touchez Planifier.",schedTitle:"Tâches automatiques",schedWhat:"Quoi lancer",schedHow:"À quelle fréquence",schedule:"Planifier",showCommand:"Voir la commande",hideCommand:"Masquer la commande",activeJobs:"Tâches actives",noJobs:"Aucune tâche planifiée pour l’instant.",stopJob:"Arrêter",refreshJobs:"Actualiser",lastRun:"Dernière fois",neverRun:"Pas encore lancée",schedWorking:"En cours",schedOk:"Planifiée. Elle tourne maintenant toute seule.",schedStopped:"Arrêtée. Elle ne se relancera plus.",schedFail:"La planification a échoué. Touchez Voir la commande pour les détails.",schedBusy:"Une autre commande est en cours. Réessayez dans un instant.",schedNeedApi:"Les tâches automatiques ont besoin du paquet Termux:API dans Termux.",installApi:"Installer Termux:API",installingApi:"Installation de Termux:API",schedNeedApiApp:"Les tâches automatiques ont aussi besoin de l’app Termux:API. Installez-la depuis F-Droid, puis touchez à nouveau Planifier.",getApiApp:"Obtenir l’app Termux:API",rcpCheck:"Chercher des mises à jour",rcpCheckD:"Cherche de nouvelles versions de vos outils Termux. N’installe rien.",rcpUpgrade:"Mettre à jour les outils",rcpUpgradeD:"Installe les nouvelles versions des outils que vous avez déjà.",rcpClean:"Nettoyer",rcpCleanD:"Supprime les fichiers d’installation restants pour libérer de la place. Vos outils restent.",rcpBattery:"Journal batterie",rcpBatteryD:"Écrit le niveau et la température de la batterie dans meridian-logs/battery.log.",rcpStorage:"Journal stockage",rcpStorageD:"Écrit le remplissage du stockage dans meridian-logs/storage.log.",rcpRepair:"Réparer les installations",rcpRepairD:"Termine une installation coupée en cours de route.",
 
 
 motionTestOn:"Le mouvement est activé — le curseur clignote.",
@@ -1298,7 +1331,7 @@ let editing = false;
 let statusCache = {};
 let probeCache = {};
 let probeAt = 0;
-const BOND_LINE = "mkdir -p ~/.termux && grep -q '^allow-external-apps=true' ~/.termux/termux.properties 2>/dev/null || echo 'allow-external-apps=true' >> ~/.termux/termux.properties";
+const BOND_LINE = "mkdir -p ~/.termux && grep -q '^allow-external-apps' ~/.termux/termux.properties 2>/dev/null && sed -i 's/^allow-external-apps.*/allow-external-apps=true/' ~/.termux/termux.properties || echo 'allow-external-apps=true' >> ~/.termux/termux.properties; termux-reload-settings";
 const ICM_HEAL_GZ_B64 = "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";
 const SWITCH_SET = "# Switch the active Meridian mesh set. Offline. Does not sign.\n# Mesh set seed and atomic switch. Sourced by the healer and by Switch set.\n# Offline. Does not sign. Thermal policy stays pause-69-resume-49.\nwrite_index() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if [ -s \"$dest\" ] && grep -q 'Set B' \"$dest\" && grep -q 'pause-69-resume-49' \"$dest\"; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_INDEX'\n# Mesh sets\n\nOne sandbox. Two sets. `sets/active` names the set that is on.\n\n- Set A (`sets/set-a/`): two Qwen 2.5 0.5B files for Scout and Scribe, Qwen 2.5 3B for Mid, Qwen 2.5 7B for Lead. Models in ~/models. Context 1024, 1024, 2048, 2048.\n- Set B (`sets/set-b/`): `qwen2.5-0.5b-instruct-q4_k_m.gguf` for Scout and Scribe (context 2048), `microsoft_Phi-4-mini-instruct-Q4_K_M.gguf` for Mid (context 2048), `Qwen3-4B-Q4_K_M.gguf` for Lead (context 4096). Models in ~/models2.\n\nSet B pipeline: Scout extract, then Scribe recipe, then Mid E-E-A-T verify. A score under 7 goes back to Scribe once. Then Lead writes the plan.\n\nEach set has `mesh.json`, `roster.env`, `task-template.txt`, and `queue.txt`. Switch set (A/B) swaps the roster, `mesh.json`, the task template pointer, and the queue pointer together. Thermal policy stays pause-69-resume-49.\nEND_INDEX\n}\nwrite_a_mesh() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if set_a_mesh_ok \"$dest\"; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_A_MESH'\n{\n  \"set\": \"set-a\",\n  \"name\": \"Set A\",\n  \"models_dir\": \"$HOME/models\",\n  \"task_template\": \"sets/set-a/task-template.txt\",\n  \"queue\": \"sets/set-a/queue.txt\",\n  \"agent_name\": \"Meridian\",\n  \"active_tier\": \"mesh\",\n  \"execution_mode\": \"scout-scribe-mid-lead\",\n  \"custom_model_path\": \"$HOME/models/cpu_scout_0b5.gguf\",\n  \"scribe_model_path\": \"$HOME/models/cpu_scribe_0b5.gguf\",\n  \"mid_model_path\": \"$HOME/models/mid_3b.gguf\",\n  \"lead_model_path\": \"$HOME/models/gpu_lead_7B.gguf\",\n  \"links\": [\n    \"Scout facts -> Scribe stubs\",\n    \"Scribe stubs -> Mid sort\",\n    \"Mid hard file -> Lead\"\n  ],\n  \"mesh\": {\n    \"roster\": \"qwen\",\n    \"chain\": \"0.5B x2, then 3B, then 7B on a hard file\",\n    \"pipeline\": \"Scout facts, Scribe stubs, Mid sort, Lead on a hard file\",\n    \"scout\": {\"role\": \"Scout\", \"device\": \"cpu\", \"file\": \"cpu_scout_0b5.gguf\", \"context\": 1024},\n    \"scribe\": {\"role\": \"Scribe\", \"device\": \"cpu\", \"file\": \"cpu_scribe_0b5.gguf\", \"context\": 1024},\n    \"mid\": {\"role\": \"Mid\", \"device\": \"cpu\", \"file\": \"mid_3b.gguf\", \"context\": 2048},\n    \"lead\": {\"role\": \"Lead\", \"device\": \"gpu\", \"file\": \"gpu_lead_7B.gguf\", \"context\": 2048},\n    \"thermal\": {\"policy\": \"pause-69-resume-49\", \"pause_c\": 69, \"resume_c\": 49, \"downshift_threads\": 2}\n  }\n}\nEND_A_MESH\n}\nwrite_a_roster() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if roster_ok \"$dest\" set-a; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_A_ROSTER'\nMESH_SET=set-a\nMODELS_DIR=$HOME/models\nSCOUT_FILE=cpu_scout_0b5.gguf\nSCRIBE_FILE=cpu_scribe_0b5.gguf\nMID_FILE=mid_3b.gguf\nLEAD_FILE=gpu_lead_7B.gguf\nSCOUT_CTX=1024\nSCRIBE_CTX=1024\nMID_CTX=2048\nLEAD_CTX=2048\nEND_A_ROSTER\n}\nwrite_a_task() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if [ -s \"$dest\" ] && grep -q 'Scout fetches facts' \"$dest\"; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_A_TASK'\nSet A. Scout fetches facts. Scribe writes stubs and is the speech face. Mid sorts and routes. Lead runs only for a hard file, then unloads. Thermal policy pause-69-resume-49.\nEND_A_TASK\n}\nwrite_a_queue() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if [ -s \"$dest\" ]; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_A_QUEUE'\n# Set A queue. One task per line.\nEND_A_QUEUE\n}\nwrite_b_mesh() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if set_b_mesh_ok \"$dest\"; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_B_MESH'\n{\n  \"set\": \"set-b\",\n  \"name\": \"Set B\",\n  \"models_dir\": \"$HOME/models2\",\n  \"task_template\": \"sets/set-b/task-template.txt\",\n  \"queue\": \"sets/set-b/queue.txt\",\n  \"agent_name\": \"Meridian\",\n  \"active_tier\": \"mesh\",\n  \"execution_mode\": \"scout-scribe-mid-lead\",\n  \"custom_model_path\": \"$HOME/models2/qwen2.5-0.5b-instruct-q4_k_m.gguf\",\n  \"scribe_model_path\": \"$HOME/models2/qwen2.5-0.5b-instruct-q4_k_m.gguf\",\n  \"mid_model_path\": \"$HOME/models2/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf\",\n  \"lead_model_path\": \"$HOME/models2/Qwen3-4B-Q4_K_M.gguf\",\n  \"links\": [\n    \"Scout extract -> Scribe recipe\",\n    \"Scribe recipe -> Mid E-E-A-T verify\",\n    \"Mid score under 7 -> Scribe\",\n    \"Then Lead plan\"\n  ],\n  \"mesh\": {\n    \"roster\": \"set-b\",\n    \"chain\": \"Scout extract, Scribe recipe, Mid E-E-A-T, Lead plan\",\n    \"pipeline\": \"Scout extract, Scribe recipe, Mid E-E-A-T verify, score under 7 back to Scribe, Lead plan\",\n    \"scout\": {\"role\": \"Scout\", \"device\": \"cpu\", \"file\": \"qwen2.5-0.5b-instruct-q4_k_m.gguf\", \"context\": 2048, \"job\": \"extract\"},\n    \"scribe\": {\"role\": \"Scribe\", \"device\": \"cpu\", \"file\": \"qwen2.5-0.5b-instruct-q4_k_m.gguf\", \"context\": 2048, \"job\": \"recipe\"},\n    \"mid\": {\"role\": \"Mid\", \"device\": \"cpu\", \"file\": \"microsoft_Phi-4-mini-instruct-Q4_K_M.gguf\", \"context\": 2048, \"job\": \"E-E-A-T verify\"},\n    \"lead\": {\"role\": \"Lead\", \"device\": \"cpu\", \"file\": \"Qwen3-4B-Q4_K_M.gguf\", \"context\": 4096, \"job\": \"plan\"},\n    \"thermal\": {\"policy\": \"pause-69-resume-49\", \"pause_c\": 69, \"resume_c\": 49, \"downshift_threads\": 2}\n  }\n}\nEND_B_MESH\n}\nwrite_b_roster() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if roster_ok \"$dest\" set-b; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_B_ROSTER'\nMESH_SET=set-b\nMODELS_DIR=$HOME/models2\nSCOUT_FILE=qwen2.5-0.5b-instruct-q4_k_m.gguf\nSCRIBE_FILE=qwen2.5-0.5b-instruct-q4_k_m.gguf\nMID_FILE=microsoft_Phi-4-mini-instruct-Q4_K_M.gguf\nLEAD_FILE=Qwen3-4B-Q4_K_M.gguf\nSCOUT_CTX=2048\nSCRIBE_CTX=2048\nMID_CTX=2048\nLEAD_CTX=4096\nEND_B_ROSTER\n}\nwrite_b_task() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if [ -s \"$dest\" ] && grep -q 'E-E-A-T' \"$dest\"; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_B_TASK'\nSet B. Scout extracts. Scribe writes the recipe. Mid verifies E-E-A-T and prints SCORE: N. If N is under 7, the recipe goes back to Scribe once. Then Lead writes the plan. Models are in ~/models2. Thermal policy pause-69-resume-49.\nEND_B_TASK\n}\nwrite_b_queue() {\n  local dest=\"$1\"\n  if [ -L \"$dest\" ]; then\n    echo \"Left symlink $dest.\"\n    return 0\n  fi\n  if [ -s \"$dest\" ]; then\n    return 0\n  fi\n  mkdir -p -- \"$(dirname -- \"$dest\")\" || return 0\n  cat > \"$dest\" <<'END_B_QUEUE'\n# Set B queue. One task per line.\nEND_B_QUEUE\n}\n\nmesh_sets_init() {\n  box=\"${box:-${HOME}/meridian-sandbox}\"\n  live=\"${live:-$box/mesh}\"\n  root=\"$box/sets\"\n  mkdir -p -- \"$live\" \"$root\" || return 1\n}\n\ngguf_list() {\n  grep -o -E '[A-Za-z0-9_.+-]+\\.gguf' \"$1\" 2>/dev/null || true\n}\n\nset_a_mesh_ok() {\n  local f=\"$1\" token scout=0 scribe=0 mid=0 lead=0\n  [ -f \"$f\" ] && [ ! -L \"$f\" ] || return 1\n  grep -q '\"mesh\"' \"$f\" || return 1\n  grep -q 'pause-69-resume-49' \"$f\" || return 1\n  case \"$(cat -- \"$f\")\" in\n    *..*) return 1 ;;\n  esac\n  while IFS= read -r token; do\n    [ -n \"$token\" ] || continue\n    case \"$token\" in\n      cpu_scout_0b5.gguf) scout=1 ;;\n      cpu_scribe_0b5.gguf) scribe=1 ;;\n      mid_3b.gguf|cpu_mid_3b.gguf) mid=1 ;;\n      gpu_lead_7B.gguf) lead=1 ;;\n      Qwen2.5-0.5B-Instruct-Q4_K_M.gguf|Qwen2.5-0.6B-Instruct-Q4_K_M.gguf|Qwen2.5-0.5B-Instruct-Q5_K_M.gguf|Qwen2.5-0.6B-Instruct-Q5_K_M.gguf) ;;\n      Qwen2.5-3B-Instruct-Q4_K_M.gguf|Qwen2.5-3B-Instruct-Q4_0.gguf) mid=1 ;;\n      Qwen2.5-7B-Instruct-Q4_K_M.gguf) lead=1 ;;\n      *.gguf) return 1 ;;\n    esac\n  done <<EOF\n$(gguf_list \"$f\")\nEOF\n  [ \"$scout\" = 1 ] && [ \"$scribe\" = 1 ] && [ \"$mid\" = 1 ] && [ \"$lead\" = 1 ]\n}\n\nset_b_mesh_ok() {\n  local f=\"$1\" token scout=0 mid=0 lead=0\n  [ -f \"$f\" ] && [ ! -L \"$f\" ] || return 1\n  grep -q '\"mesh\"' \"$f\" || return 1\n  grep -q 'pause-69-resume-49' \"$f\" || return 1\n  grep -q 'models2' \"$f\" || return 1\n  grep -q '4096' \"$f\" || return 1\n  case \"$(cat -- \"$f\")\" in\n    *..*) return 1 ;;\n  esac\n  while IFS= read -r token; do\n    [ -n \"$token\" ] || continue\n    case \"$token\" in\n      qwen2.5-0.5b-instruct-q4_k_m.gguf) scout=1 ;;\n      microsoft_Phi-4-mini-instruct-Q4_K_M.gguf) mid=1 ;;\n      Qwen3-4B-Q4_K_M.gguf) lead=1 ;;\n      *.gguf) return 1 ;;\n    esac\n  done <<EOF\n$(gguf_list \"$f\")\nEOF\n  [ \"$scout\" = 1 ] && [ \"$mid\" = 1 ] && [ \"$lead\" = 1 ]\n}\n\nroster_ok() {\n  local f=\"$1\" name=\"$2\"\n  [ -f \"$f\" ] && [ ! -L \"$f\" ] || return 1\n  grep -q \"MESH_SET=$name\" \"$f\" || return 1\n  if [ \"$name\" = \"set-b\" ]; then\n    grep -q 'MODELS_DIR=$HOME/models2' \"$f\" || return 1\n    grep -q 'Qwen3-4B-Q4_K_M.gguf' \"$f\" || return 1\n    grep -q 'LEAD_CTX=4096' \"$f\" || return 1\n    grep -q 'SCOUT_CTX=2048' \"$f\" || return 1\n  else\n    grep -q 'gpu_lead_7B.gguf' \"$f\" || return 1\n    grep -q 'MODELS_DIR=$HOME/models' \"$f\" || return 1\n    grep -q 'models2' \"$f\" && return 1\n  fi\n}\n\nactive_name() {\n  local name=\"set-a\"\n  if [ -f \"$root/active\" ] && [ ! -L \"$root/active\" ]; then\n    name=$(tr -cd 'a-z0-9-' < \"$root/active\")\n  fi\n  case \"$name\" in\n    set-a|set-b) printf '%s\\n' \"$name\" ;;\n    *) printf '%s\\n' set-a ;;\n  esac\n}\n\nlive_matches() {\n  local name=\"$1\"\n  [ -f \"$live/mesh.json\" ] && [ ! -L \"$live/mesh.json\" ] || return 1\n  [ -f \"$live/roster.env\" ] && [ ! -L \"$live/roster.env\" ] || return 1\n  grep -q \"MESH_SET=$name\" \"$live/roster.env\" || return 1\n  if [ \"$name\" = \"set-b\" ]; then\n    set_b_mesh_ok \"$live/mesh.json\" || return 1\n  else\n    set_a_mesh_ok \"$live/mesh.json\" || return 1\n  fi\n}\n\napply_set() {\n  local name=\"$1\" stage\n  mesh_sets_init || return 0\n  case \"$name\" in\n    set-a|set-b) ;;\n    *) return 0 ;;\n  esac\n  stage=\"$root/.stage\"\n  if [ -L \"$stage\" ]; then\n    echo \"Left symlink $stage.\"\n    return 0\n  fi\n  rm -rf -- \"$stage\"\n  mkdir -p -- \"$stage\" \"$live\" || return 0\n  cp -f -- \"$root/$name/mesh.json\" \"$stage/mesh.json\" || return 0\n  cp -f -- \"$root/$name/roster.env\" \"$stage/roster.env\" || return 0\n  printf 'sets/%s/queue.txt\\n' \"$name\" > \"$stage/queue.pointer\"\n  printf 'sets/%s/task-template.txt\\n' \"$name\" > \"$stage/task-template.pointer\"\n  printf '%s\\n' \"$name\" > \"$stage/active\"\n  mv -f -- \"$stage/mesh.json\" \"$live/mesh.json\"\n  cp -f -- \"$live/mesh.json\" \"$box/mesh.json.tmp\" && mv -f -- \"$box/mesh.json.tmp\" \"$box/mesh.json\"\n  mv -f -- \"$stage/roster.env\" \"$live/roster.env\"\n  mv -f -- \"$stage/queue.pointer\" \"$live/queue.pointer\"\n  mv -f -- \"$stage/task-template.pointer\" \"$live/task-template.pointer\"\n  mv -f -- \"$stage/active\" \"$root/active\"\n  rm -rf -- \"$stage\"\n  echo \"Active set is $name.\"\n}\n\nseed_mesh_sets() {\n  mesh_sets_init || return 0\n  mkdir -p -- \"$root/set-a\" \"$root/set-b\" || return 0\n  if [ ! -s \"$root/INDEX.md\" ] || ! grep -q 'Set B' \"$root/INDEX.md\" || ! grep -q 'pause-69-resume-49' \"$root/INDEX.md\"; then\n    write_index \"$root/INDEX.md\"\n  fi\n  if ! set_a_mesh_ok \"$root/set-a/mesh.json\"; then\n    write_a_mesh \"$root/set-a/mesh.json\"\n  fi\n  if ! roster_ok \"$root/set-a/roster.env\" set-a; then\n    write_a_roster \"$root/set-a/roster.env\"\n  fi\n  if [ ! -s \"$root/set-a/task-template.txt\" ] || ! grep -q 'Scout fetches facts' \"$root/set-a/task-template.txt\"; then\n    write_a_task \"$root/set-a/task-template.txt\"\n  fi\n  if [ ! -s \"$root/set-a/queue.txt\" ] || [ -L \"$root/set-a/queue.txt\" ]; then\n    if [ ! -L \"$root/set-a/queue.txt\" ]; then\n      write_a_queue \"$root/set-a/queue.txt\"\n    fi\n  fi\n  if ! set_b_mesh_ok \"$root/set-b/mesh.json\"; then\n    write_b_mesh \"$root/set-b/mesh.json\"\n  fi\n  if ! roster_ok \"$root/set-b/roster.env\" set-b; then\n    write_b_roster \"$root/set-b/roster.env\"\n  fi\n  if [ ! -s \"$root/set-b/task-template.txt\" ] || ! grep -q 'E-E-A-T' \"$root/set-b/task-template.txt\"; then\n    write_b_task \"$root/set-b/task-template.txt\"\n  fi\n  if [ ! -s \"$root/set-b/queue.txt\" ] || [ -L \"$root/set-b/queue.txt\" ]; then\n    if [ ! -L \"$root/set-b/queue.txt\" ]; then\n      write_b_queue \"$root/set-b/queue.txt\"\n    fi\n  fi\n}\n\nsync_active_set() {\n  local name\n  seed_mesh_sets\n  name=$(active_name)\n  if [ ! -f \"$root/active\" ] || [ -L \"$root/active\" ]; then\n    apply_set set-a\n    return 0\n  fi\n  if ! live_matches \"$name\"; then\n    apply_set \"$name\"\n    return 0\n  fi\n  printf 'sets/%s/queue.txt\\n' \"$name\" > \"$live/queue.pointer\"\n  printf 'sets/%s/task-template.txt\\n' \"$name\" > \"$live/task-template.pointer\"\n}\n\nreport_set() {\n  local name=\"$1\" label=\"A\"\n  [ \"$name\" = \"set-b\" ] && label=\"B\"\n  echo \"Active set: $label\"\n  echo MERIDIAN_ACTIVE_SET\n  printf '%s\\n' \"$name\"\n  echo MERIDIAN_ACTIVE_SET_END\n  echo MERIDIAN_MESH_JSON\n  cat -- \"$live/mesh.json\"\n  echo MERIDIAN_MESH_JSON_END\n  echo MERIDIAN_SET_SWITCH\n  echo MERIDIAN_SET_SWITCH_END\n}\n\nswitch_mesh_set() {\n  local cur next\n  seed_mesh_sets\n  cur=$(active_name)\n  if [ \"$cur\" = \"set-b\" ]; then\n    next=set-a\n  else\n    next=set-b\n  fi\n  apply_set \"$next\"\n  report_set \"$next\"\n}\n\nseed_mesh_sets\nswitch_mesh_set\n";
 const MESH_V2_SEED = "# Seed ~/meridian-mesh-v2 from the app. Writes only missing files. Never overwrites RULES.md, my-knowledge, mesh.json or anything in references, output, queue.\nv2=\"$HOME/meridian-mesh-v2\"\nmkdir -p -- \"$v2/references\" \"$v2/output\" \"$v2/queue\" \"$v2/logs\" \"$v2/my-knowledge\"\nseed_v2() { local f=\"$v2/$1\"; if [ -e \"$f\" ] || [ -L \"$f\" ]; then return 0; fi; mkdir -p -- \"$(dirname -- \"$f\")\"; printf %s \"$2\" | base64 -d > \"$f\" && echo \"Wrote $f\"; }\nseed_v2 CONTEXT.md IyBDT05URVhUCk1lcmlkaWFuIG1lc2ggdjIuIEdvYWw6IHR1cm4gbGlua3MgaW50byB2ZXJpZmllZCBzaG9ydCByZWNpcGVzLgpGbG93OiBTY291dCAobGlua3MgLT4gZmFjdHMpIC0+IFNjcmliZSAocmVmZXJlbmNlcy8qLm1kKSAtPiBNaWQgKEUtRS1BLVQgc2NvcmUpIC0+IExlYWQgKHBsYW4sIG91dHB1dC8pLgpSdWxlczogRW5nbGlzaCBvbmx5LiBObyBHZW1tYS4gT25lIHRhc2sgY2h1bmsgYXQgYSB0aW1lIHBlciByb2xlLiBFdmVyeSBmYWN0IGtlZXBzIGl0cyBzb3VyY2UgbGluay4KUmVhZCBST1VURVIubWQgZm9yIHJvbGVzLiBSZWFkIElOREVYLm1kIGZvciB3aGF0IGV4aXN0cy4gTmV2ZXIgbG9hZCB0aGUgd2hvbGUgcmVmZXJlbmNlcy8gZm9sZGVyOyBsb2FkIG9ubHkgZmlsZXMgbmFtZWQgaW4gdGhlIHRhc2suCg==\nseed_v2 INDEX.md IyBJTkRFWCAodGhpbikKT25lIGxpbmUgcGVyIGZpbGU6IHBhdGggfCB0b3BpYyB8IHNjb3JlCnJlZmVyZW5jZXMvIHwgKGVtcHR5KQo=\nseed_v2 INSTRUCTIONS.md IyBJbnN0cnVjdGlvbnMKRm9sZGVyIG9uIHRoZSBwaG9uZTogfi9tZXJpZGlhbi1tZXNoLXYyIChNZXJpZGlhbiB3cml0ZXMgaXQgd2hlbiB5b3Ugc3dpdGNoIHRvIFNldCBCIG9yIHByZXNzIFN0YXJ0IG1lc2g7IGl0IG9ubHkgYWRkcyBtaXNzaW5nIGZpbGVzIGFuZCBuZXZlciBvdmVyd3JpdGVzIHlvdXJzKS4KCiMjIFdoZXJlIHRvIGVkaXQKLSBSVUxFUy5tZDogdGhlIG9uZSBydWxlIGZpbGUuIEV2ZXJ5IHdvcmtlciByZWFkcyBpdCBiZWZvcmUgZXZlcnkgcHJvbXB0LiBFZGl0IGl0IHRvIGNoYW5nZSBob3cgYWxsIHdvcmtlcnMgYmVoYXZlLgotIG15LWtub3dsZWRnZS86IGRyb3AgeW91ciBvd24gLm1kLy50eHQgbm90ZXMgaGVyZS4gV29ya2VycyBhZGQgdGhlIG5vdGVzIHRoYXQgbWF0Y2ggdGhlIHRhc2sgdG8gZXZlcnkgcHJvbXB0LgotIG1lc2guanNvbjogcG9ydHMsIG1vZGVscywgY29udGV4dCwgdGhlcm1hbCAocGF1c2UgNjlDIC8gcmVzdW1lIDQ5QykgYW5kIHRoZSBtaW5pbXVtIE1pZCBzY29yZSAoZWVhdC5taW5fc2NvcmUsIGRlZmF1bHQgNykuCi0gc3RhcnQtbWVzaC5zaDogdGhlIE1PREVMIGxpbmUgcGlja3MgdGhlIC5nZ3VmIGZpbGUgcGVyIHJvbGUgKGtlZXAgaXQgaW4gc3luYyB3aXRoIG1lc2guanNvbikuCi0gUk9VVEVSLm1kOiByb2xlIHByb21wdHMgYW5kIGZpeGVkIHJvbGVzLgoKIyMgUnVuCjEuIE1vZGVscyBnbyBpbiB+L21vZGVsczIgKFF3ZW4yLjUgMC41QiwgUGhpLTQtbWluaSwgUXdlbjMgNEIpLgoyLiBJbiBNZXJpZGlhbjogU3RhcnQgbWVzaCAoc2VydmVycyBvbiA4MDgxLTgwODQgKyB3b3JrZXIucHkpLiBTdG9wIG1lc2ggc3RvcHMgZXZlcnl0aGluZy4KICAgQnkgaGFuZDogYHRlcm11eC13YWtlLWxvY2s7IGJhc2ggc3RhcnQtbWVzaC5zaCAmYCB0aGVuIGBweXRob24gd29ya2VyLnB5ICZgLgozLiBBZGQgd29yazogTWVyaWRpYW4gIkFkZCBsaW5rcyIsIG9yIGBweXRob24gdGFzay5weSBuZXcgbGVhZCAiTWFrZSByZWNpcGVzIGZyb20gaHR0cHM6Ly9hLmNvbSBodHRwczovL2IuY29tImAuCjQuIEZsb3c6IFNjb3V0IGZldGNoZXMgZWFjaCBsaW5rIC0+IFNjcmliZSB3cml0ZXMgcmVmZXJlbmNlcy8qLm1kIC0+IE1pZCBzY29yZXMgMS0xMCAoYmVsb3cgNyBnb2VzIGJhY2sgdG8gU2NyaWJlLCBtYXggMiByZXRyaWVzKSAtPiBMZWFkIHdyaXRlcyBvdXRwdXQvPGlkPi5tZCBhbmQgYWRkcyBvbmUgbGluZSB0byBJTkRFWC5tZC4KNS4gU2VlIHJlc3VsdHM6IE1lcmlkaWFuICJTaG93IGxlYXJuZWQiIChwcmludHMgSU5ERVgubWQpLCBvciBgY2F0IElOREVYLm1kYC4gTG9nczogbG9ncy93b3JrZXIub3V0LCBsb2dzL21lc2gub3V0LCBsb2dzLzxyb2xlPi5sb2cuCjYuIFN0YXR1czogYHB5dGhvbiB0YXNrLnB5IGxpc3RgLiBPcHRpb25hbDogYHBpcCBpbnN0YWxsIHJlcXVlc3RzYCAod29ya2VyIGZhbGxzIGJhY2sgdG8gdXJsbGliIHdpdGhvdXQgaXQpLgo=\nseed_v2 ROUTER.md IyBST1VURVIKUm9sZXMgYXJlIGZpeGVkOyBtb2RlbHMgYXJlIHN3YXBwYWJsZS4gVG8gc3dhcCwgY2hhbmdlIG9ubHkgIm1vZGVsIiBpbiBtZXNoLmpzb24uIFByb21wdHMgYmVsb25nIHRvIHRoZSByb2xlLCBub3QgdGhlIG1vZGVsLgp8IFJvbGUgfCBQb3J0IHwgUHJvbXB0IHwKfC0tLXwtLS18LS0tfAp8IFNjb3V0IHwgODA4MSB8ICJSZWFkIHRoZSBwYWdlIHRleHQuIE91dHB1dCBKU09OOiB7dXJsLCB0aXRsZSwgYXV0aG9yLCBkYXRlLCBmYWN0czpbLi4uXX0uIENvcHkgZmFjdHMsIGRvIG5vdCBpbnZlbnQuIiB8CnwgU2NyaWJlIHwgODA4MiB8ICJXcml0ZSBhIHJlY2lwZSAubWQgdW5kZXIgMzAwIHdvcmRzOiBUaXRsZSwgU291cmNlLCBTdGVwcywgRmFjdHMuIEtlZXAgZXZlcnkgbGluay4iIHwKfCBNaWQgfCA4MDgzIHwgIlNjb3JlIDAtMTAgYWdhaW5zdCB0aGUgRS1FLUEtVCBjaGVja3MgaW4gbWVzaC5qc29uLiBPdXRwdXQge3Njb3JlLCBmYWlsZWRfY2hlY2tzLCBmaXh9LiBCZWxvdyA3ID0gc2VuZCBiYWNrIHRvIFNjcmliZS4iIHwKfCBMZWFkIHwgODA4NCB8ICJSZWFkIElOREVYLm1kIGFuZCB0aGUgdGFzay4gU3BsaXQgaW50byBjaHVua3MgdW5kZXIgMTUwMCB0b2tlbnMgd2l0aCB0YXNrLnB5IHNwbGl0LiBXcml0ZSBmaW5hbCByZXN1bHQgdG8gb3V0cHV0Ly4iIHwKSWYgYSByb2xlJ3Mgc2VydmVyIGlzIGRvd24sIGl0cyB0YXNrcyB3YWl0IGluIHF1ZXVlOyBhbm90aGVyIHJvbGUgbmV2ZXIgdGFrZXMgb3Zlci4K\nseed_v2 RULES.md IyBSVUxFUwpFZGl0IHRoaXMgZmlsZSB0byBjaGFuZ2UgaG93IGFsbCB3b3JrZXJzIGJlaGF2ZS4KRXZlcnkgd29ya2VyIChTY291dCwgU2NyaWJlLCBNaWQsIExlYWQpIHJlYWRzIHRoaXMgZmlsZSBiZWZvcmUgZXZlcnkgcHJvbXB0LgoKMS4gRW5nbGlzaCBvbmx5LgoyLiBDaXRlIHRoZSBzb3VyY2UgVVJMIGZvciBldmVyeSBmYWN0LiBObyBVUkwsIG5vIGZhY3QuCjMuIFdyaXRlIHNob3J0IHJlY2lwZXM6IFByb2JsZW0sIFNvbHV0aW9uLCBDb21tYW5kKHMpLCBTb3VyY2UuCjQuIE9ubHkgdXNlIGNvbW1hbmRzIHRoYXQgYXBwZWFyIGluIHRoZSBzb3VyY2Ugb3IgaW4gbXkta25vd2xlZGdlLy4gTmV2ZXIgaW52ZW50IGNvbW1hbmRzLCBmbGFncywgbnVtYmVycyBvciB2ZXJzaW9ucy4KNS4gSWYgdGhlIHNvdXJjZSBkb2VzIG5vdCBzYXkgaXQsIHdyaXRlICJub3QgaW4gc291cmNlIi4KNi4gTmV2ZXIgdG91Y2gsIHJlYWQgb3V0LCBtb3ZlIG9yIGRlbGV0ZSBhbnl0aGluZyByZWxhdGVkIHRvIFNoaXp1a3UsIHJpc2gsIHBhc3N3b3Jkcywga2V5cyBvciB0b2tlbnMuCjcuIEtlZXAgaXQgc2hvcnQ6IGEgcmVjaXBlIHN0YXlzIHVuZGVyIDMwMCB3b3Jkcy4KOC4gTm8gR2VtbWEgbW9kZWxzLgo=\nseed_v2 mesh.json ewogICJuYW1lIjogIm1lcmlkaWFuLW1lc2gtdjIiLAogICJkZXZpY2UiOiB7InNvYyI6ICJFeHlub3MgMjYwMCIsICJ1c2FibGVfcmFtX2diIjogIjUtNyIsICJydW50aW1lIjogInRlcm11eCBsbGFtYS5jcHAgbGxhbWEtc2VydmVyIn0sCiAgIm1vZGVsc19kaXIiOiAifi9tb2RlbHMyIiwKICAicnVsZXMiOiB7Im5vX2dlbW1hIjogdHJ1ZSwgImljbSI6IFsiQ09OVEVYVC5tZCIsICJyZWZlcmVuY2VzLyIsICJvdXRwdXQvIl0sICJ0cmVlIjogIklOREVYLm1kIHRoaW4gaW5kZXggb25seSJ9LAogICJ0aGVybWFsIjogeyJwYXVzZV9jIjogNjksICJyZXN1bWVfYyI6IDQ5LCAicG9sbF9zIjogMTB9LAogICJyb2xlcyI6IHsKICAgICJzY291dCI6ICB7InBvcnQiOiA4MDgxLCAibW9kZWwiOiAicXdlbjIuNS0wLjViLWluc3RydWN0LXE0X2tfbS5nZ3VmIiwgImN0eCI6IDIwNDgsICJ0aHJlYWRzIjogMiwgImpvYiI6ICJmZXRjaCBsaW5rcywgZXh0cmFjdCBmYWN0cyBhcyBkYXRhIn0sCiAgICAic2NyaWJlIjogeyJwb3J0IjogODA4MiwgIm1vZGVsIjogInF3ZW4yLjUtMC41Yi1pbnN0cnVjdC1xNF9rX20uZ2d1ZiIsICJjdHgiOiAyMDQ4LCAidGhyZWFkcyI6IDIsICJqb2IiOiAid3JpdGUgc2hvcnQgcmVjaXBlIC5tZCBpbnRvIHJlZmVyZW5jZXMvIn0sCiAgICAibWlkIjogICAgeyJwb3J0IjogODA4MywgIm1vZGVsIjogIm1pY3Jvc29mdF9QaGktNC1taW5pLWluc3RydWN0LVE0X0tfTS5nZ3VmIiwgImN0eCI6IDIwNDgsICJ0aHJlYWRzIjogMiwgImpvYiI6ICJ2ZXJpZnkgYW5kIHNjb3JlIGFnYWluc3QgRS1FLUEtVCBydWxlcyJ9LAogICAgImxlYWQiOiAgIHsicG9ydCI6IDgwODQsICJtb2RlbCI6ICJRd2VuMy00Qi1RNF9LX00uZ2d1ZiIsICJjdHgiOiA0MDk2LCAidGhyZWFkcyI6IDIsICJqb2IiOiAicGxhbiwgc3BsaXQgdGFza3MsIGZpbmFsIG91dHB1dC8ifQogIH0sCiAgInBpcGVsaW5lIjogWyJzY291dCIsICJzY3JpYmUiLCAibWlkIiwgImxlYWQiXSwKICAicXVldWUiOiB7ImRpciI6ICJxdWV1ZS8iLCAiY29tbWFuZHMiOiBbIm5ldyIsICJzcGxpdCIsICJjbGFpbSIsICJkb25lIl0sICJjaHVua19tYXhfdG9rZW5zIjogMTUwMH0sCiAgImVlYXQiOiB7Im1pbl9zY29yZSI6IDcsICJjaGVja3MiOiBbInNvdXJjZSBsaW5rIHByZXNlbnQiLCAiYXV0aG9yIG9yIG9yZyBuYW1lZCIsICJkYXRlIHByZXNlbnQiLCAiY2xhaW0gbWF0Y2hlcyBzb3VyY2UiLCAibm8gaW52ZW50ZWQgbnVtYmVycyJdfQp9Cg==\nseed_v2 my-knowledge/README.md IyBteS1rbm93bGVkZ2UKRHJvcCB5b3VyIG93biAubWQvLnR4dCBub3RlcyBoZXJlOyBhbGwgd29ya2VycyByZWFkIHRoZW0uCkVhY2ggd29ya2VyIGdldHMgUlVMRVMubWQgcGx1cyB0aGUgbm90ZXMgaGVyZSB0aGF0IGJlc3QgbWF0Y2ggaXRzIHRhc2sgKGJ5IHNoYXJlZCB3b3JkcyksIHVwIHRvIGEgc2l6ZSBsaW1pdC4K\nseed_v2 start-mesh.sh IyEvdXNyL2Jpbi9lbnYgYmFzaAojIFN0YXJ0IG9uZSBsbGFtYS1zZXJ2ZXIgcGVyIHJvbGUsIHdpdGggdGhlcm1hbCB3YXRjaC4KTT0iJHtNT0RFTFM6LSRIT01FL21vZGVsczJ9IgpCSU49IiR7TExBTUE6LWxsYW1hLXNlcnZlcn0iClBBVVNFPTY5OyBSRVNVTUU9NDkKZGVjbGFyZSAtQSBNT0RFTD0oIFtzY291dF09cXdlbjIuNS0wLjViLWluc3RydWN0LXE0X2tfbS5nZ3VmIFtzY3JpYmVdPXF3ZW4yLjUtMC41Yi1pbnN0cnVjdC1xNF9rX20uZ2d1ZiBbbWlkXT1taWNyb3NvZnRfUGhpLTQtbWluaS1pbnN0cnVjdC1RNF9LX00uZ2d1ZiBbbGVhZF09UXdlbjMtNEItUTRfS19NLmdndWYgKQpkZWNsYXJlIC1BIFBPUlQ9KCBbc2NvdXRdPTgwODEgW3NjcmliZV09ODA4MiBbbWlkXT04MDgzIFtsZWFkXT04MDg0ICkKZGVjbGFyZSAtQSBDVFg9KCBbc2NvdXRdPTIwNDggW3NjcmliZV09MjA0OCBbbWlkXT0yMDQ4IFtsZWFkXT00MDk2ICkKZGVjbGFyZSAtQSBUSFI9KCBbc2NvdXRdPTIgW3NjcmliZV09MiBbbWlkXT0yIFtsZWFkXT0yICkKbWtkaXIgLXAgbG9ncwp0ZW1wKCkgeyBsb2NhbCBtPTAgdjsgZm9yIHogaW4gL3N5cy9jbGFzcy90aGVybWFsL3RoZXJtYWxfem9uZSovdGVtcDsgZG8gdj0kKGNhdCAiJHoiIDI+L2Rldi9udWxsKSB8fCBjb250aW51ZTsgWyAiJHYiIC1ndCAiJG0iIF0gMj4vZGV2L251bGwgJiYgbT0kdjsgZG9uZTsgZWNobyAkKChtPjEwMDAgPyBtLzEwMDAgOiBtKSk7IH0KZm9yIHIgaW4gc2NvdXQgc2NyaWJlIG1pZCBsZWFkOyBkbwogIGY9IiRNLyR7TU9ERUxbJHJdfSI7IFsgLWYgIiRmIiBdIHx8IHsgZWNobyAibWlzc2luZyAkZiI7IGV4aXQgMTsgfQogICIkQklOIiAtbSAiJGYiIC0tcG9ydCAiJHtQT1JUWyRyXX0iIC1jICIke0NUWFskcl19IiAtdCAiJHtUSFJbJHJdfSIgLS1ob3N0IDEyNy4wLjAuMSA+ICJsb2dzLyRyLmxvZyIgMj4mMSAmCiAgZWNobyAkISA+ICJsb2dzLyRyLnBpZCI7IGVjaG8gIiRyIG9uICR7UE9SVFskcl19IHBpZCAkISI7IHNsZWVwIDMKZG9uZQp0cmFwICdmb3IgcCBpbiBsb2dzLyoucGlkOyBkbyBraWxsIC1DT05UICQoY2F0ICRwKSAyPi9kZXYvbnVsbDsga2lsbCAkKGNhdCAkcCkgMj4vZGV2L251bGw7IGRvbmU7IGV4aXQnIElOVCBURVJNCnBhdXNlZD0wCndoaWxlIHRydWU7IGRvCiAgdD0kKHRlbXApCiAgaWYgWyAkcGF1c2VkIC1lcSAwIF0gJiYgWyAiJHQiIC1nZSAkUEFVU0UgXTsgdGhlbiBlY2hvICJob3QgJHt0fUM6IHBhdXNlIjsgZm9yIHAgaW4gbG9ncy8qLnBpZDsgZG8ga2lsbCAtU1RPUCAkKGNhdCAkcCk7IGRvbmU7IHBhdXNlZD0xCiAgZWxpZiBbICRwYXVzZWQgLWVxIDEgXSAmJiBbICIkdCIgLWxlICRSRVNVTUUgXTsgdGhlbiBlY2hvICJjb29sICR7dH1DOiByZXN1bWUiOyBmb3IgcCBpbiBsb2dzLyoucGlkOyBkbyBraWxsIC1DT05UICQoY2F0ICRwKTsgZG9uZTsgcGF1c2VkPTA7IGZpCiAgc2xlZXAgMTAKZG9uZQo=\nseed_v2 task.py IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiJUYXNrIHF1ZXVlOiBuZXcvc3BsaXQvY2xhaW0vZG9uZS9saXN0LiBGaWxlcyBpbiBxdWV1ZS88c3RhdGU+LzxpZD4uanNvbiIiIgppbXBvcnQganNvbiwgc3lzLCBvcywgdGltZSwgZ2xvYgpRID0gb3MucGF0aC5qb2luKG9zLnBhdGguZGlybmFtZShvcy5wYXRoLmFic3BhdGgoX19maWxlX18pKSwgInF1ZXVlIikKZm9yIHMgaW4gKCJ0b2RvIiwgImRvaW5nIiwgImRvbmUiKTogb3MubWFrZWRpcnMoZiJ7UX0ve3N9IiwgZXhpc3Rfb2s9VHJ1ZSkKZGVmIHNhdmUoc3RhdGUsIHQpOiBqc29uLmR1bXAodCwgb3BlbihmIntRfS97c3RhdGV9L3t0WydpZCddfS5qc29uIiwgInciKSwgaW5kZW50PTEpCmRlZiBuZXcocm9sZSwgdGV4dCwgcGFyZW50PU5vbmUpOgogICAgdCA9IHsiaWQiOiBzdHIoaW50KHRpbWUudGltZSgpKjEwMDApKSwgInJvbGUiOiByb2xlLCAidGV4dCI6IHRleHQsICJwYXJlbnQiOiBwYXJlbnR9CiAgICBzYXZlKCJ0b2RvIiwgdCk7IHByaW50KHRbImlkIl0pOyB0aW1lLnNsZWVwKDAuMDAyKQpkZWYgbWFpbihhKToKICAgIGMgPSBhWzBdIGlmIGEgZWxzZSAibGlzdCIKICAgIGlmIGMgPT0gIm5ldyI6IG5ldyhhWzFdLCAiICIuam9pbihhWzI6XSkpCiAgICBlbGlmIGMgPT0gInNwbGl0IjoKICAgICAgICBwID0ganNvbi5sb2FkKG9wZW4oZiJ7UX0vdG9kby97YVsxXX0uanNvbiIpKSBpZiBvcy5wYXRoLmV4aXN0cyhmIntRfS90b2RvL3thWzFdfS5qc29uIikgZWxzZSB7ImlkIjogYVsxXX0KICAgICAgICBmb3IgcGFydCBpbiAiICIuam9pbihhWzM6XSkuc3BsaXQoInwiKToKICAgICAgICAgICAgaWYgcGFydC5zdHJpcCgpOiBuZXcoYVsyXSwgcGFydC5zdHJpcCgpLCBwWyJpZCJdKQogICAgZWxpZiBjID09ICJjbGFpbSI6CiAgICAgICAgZm9yIGYgaW4gc29ydGVkKGdsb2IuZ2xvYihmIntRfS90b2RvLyouanNvbiIpKToKICAgICAgICAgICAgdCA9IGpzb24ubG9hZChvcGVuKGYpKQogICAgICAgICAgICBpZiB0WyJyb2xlIl0gPT0gYVsxXToKICAgICAgICAgICAgICAgIG9zLnJlbmFtZShmLCBmIntRfS9kb2luZy97dFsnaWQnXX0uanNvbiIpOyBwcmludChqc29uLmR1bXBzKHQpKTsgcmV0dXJuCiAgICAgICAgcHJpbnQoIm5vbmUiKQogICAgZWxpZiBjID09ICJkb25lIjoKICAgICAgICBmID0gZiJ7UX0vZG9pbmcve2FbMV19Lmpzb24iOyB0ID0ganNvbi5sb2FkKG9wZW4oZikpCiAgICAgICAgdFsicmVzdWx0Il0gPSAiICIuam9pbihhWzI6XSk7IG9zLnJlbW92ZShmKTsgc2F2ZSgiZG9uZSIsIHQpOyBwcmludCgib2siKQogICAgZWxzZToKICAgICAgICBmb3IgcyBpbiAoInRvZG8iLCAiZG9pbmciLCAiZG9uZSIpOiBwcmludChzLCBsZW4oZ2xvYi5nbG9iKGYie1F9L3tzfS8qLmpzb24iKSkpCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6IG1haW4oc3lzLmFyZ3ZbMTpdKQo=\nseed_v2 worker.py IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiJNZXNoIHYyIHdvcmtlci4gTG9vcHMgdGhlIHF1ZXVlOiBMZWFkIHRhc2sgLT4gU2NvdXQgKGZldGNoIFVSTCkgLT4gU2NyaWJlIChyZWNpcGUgaW4gcmVmZXJlbmNlcy8pCi0+IE1pZCAoc2NvcmUgMS0xMCwgYmVsb3cgbWluIGdvZXMgYmFjayB0byBTY3JpYmUsIG1heCAyIHJldHJpZXMpIC0+IExlYWQgKG91dHB1dC8gKyBvbmUgSU5ERVgubWQgbGluZSkuCkV2ZXJ5IHByb21wdCBzdGFydHMgd2l0aCBSVUxFUy5tZCBhbmQgdGhlIG1hdGNoaW5nIG5vdGVzIGZyb20gbXkta25vd2xlZGdlLy4gVGhlcm1hbCBwYXVzZS9yZXN1bWUgZnJvbSBtZXNoLmpzb24uIiIiCmltcG9ydCBnbG9iLCBodG1sLCBqc29uLCBvcywgcmUsIHN5cywgdGltZSwgdXJsbGliLnJlcXVlc3QKRCA9IG9zLnBhdGguZGlybmFtZShvcy5wYXRoLmFic3BhdGgoX19maWxlX18pKTsgb3MuY2hkaXIoRCkKc3lzLnBhdGguaW5zZXJ0KDAsIEQpOyBpbXBvcnQgdGFzayBhcyBUCkNGRyA9IGpzb24ubG9hZChvcGVuKCJtZXNoLmpzb24iKSkKUk9MRVMgPSBDRkdbInJvbGVzIl07IFRIID0gQ0ZHLmdldCgidGhlcm1hbCIsIHt9KQpQQVVTRSwgUkVTVU1FLCBQT0xMID0gVEguZ2V0KCJwYXVzZV9jIiwgNjkpLCBUSC5nZXQoInJlc3VtZV9jIiwgNDkpLCBUSC5nZXQoInBvbGxfcyIsIDEwKQpNSU4gPSBDRkcuZ2V0KCJlZWF0Iiwge30pLmdldCgibWluX3Njb3JlIiwgNyk7IFJFVFJJRVMgPSAyCkhPU1QgPSBvcy5lbnZpcm9uLmdldCgiTUVTSF9IT1NUIiwgIjEyNy4wLjAuMSIpCmZvciBkIGluICgicmVmZXJlbmNlcyIsICJvdXRwdXQiLCAibXkta25vd2xlZGdlIiwgImxvZ3MiKTogb3MubWFrZWRpcnMoZCwgZXhpc3Rfb2s9VHJ1ZSkKCmRlZiBsb2coKmEpOiBwcmludCh0aW1lLnN0cmZ0aW1lKCIlSDolTTolUyIpLCAqYSwgZmx1c2g9VHJ1ZSkKZGVmIHRlbXAoKToKICAgIG0gPSAwCiAgICBmb3IgeiBpbiBnbG9iLmdsb2IoIi9zeXMvY2xhc3MvdGhlcm1hbC90aGVybWFsX3pvbmUqL3RlbXAiKToKICAgICAgICB0cnk6IHYgPSBpbnQob3Blbih6KS5yZWFkKCkuc3RyaXAoKSk7IG0gPSBtYXgobSwgdiAvLyAxMDAwIGlmIHYgPiAxMDAwIGVsc2UgdikKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOiBwYXNzCiAgICByZXR1cm4gbQpkZWYgdGhlcm1hbCgpOgogICAgdCA9IHRlbXAoKQogICAgaWYgdCA+PSBQQVVTRToKICAgICAgICBsb2coZiJob3Qge3R9QzogcGF1c2UiKQogICAgICAgIHdoaWxlIHRlbXAoKSA+IFJFU1VNRTogdGltZS5zbGVlcChQT0xMKQogICAgICAgIGxvZyhmImNvb2wge3RlbXAoKX1DOiByZXN1bWUiKQpkZWYgd29yZHMocyk6IHJldHVybiBzZXQodyBmb3IgdyBpbiByZS5maW5kYWxsKHIiW2EtejAtOV17NCx9Iiwgcy5sb3dlcigpKSkKZGVmIGtub3dsZWRnZSh0ZXh0LCBsaW1pdCk6CiAgICB0cnk6IHJ1bGVzID0gb3BlbigiUlVMRVMubWQiKS5yZWFkKCkKICAgIGV4Y2VwdCBFeGNlcHRpb246IHJ1bGVzID0gIiIKICAgIHdhbnQgPSB3b3Jkcyh0ZXh0KTsgbm90ZXMgPSBbXQogICAgZm9yIGYgaW4gc29ydGVkKGdsb2IuZ2xvYigibXkta25vd2xlZGdlLyoubWQiKSArIGdsb2IuZ2xvYigibXkta25vd2xlZGdlLyoudHh0IikpOgogICAgICAgIGlmIG9zLnBhdGguYmFzZW5hbWUoZikgPT0gIlJFQURNRS5tZCI6IGNvbnRpbnVlCiAgICAgICAgdHJ5OiBib2R5ID0gb3BlbihmLCBlcnJvcnM9Imlnbm9yZSIpLnJlYWQoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246IGNvbnRpbnVlCiAgICAgICAgc2NvcmUgPSBsZW4od2FudCAmIHdvcmRzKGJvZHkgKyAiICIgKyBvcy5wYXRoLmJhc2VuYW1lKGYpKSkKICAgICAgICBpZiBzY29yZTogbm90ZXMuYXBwZW5kKChzY29yZSwgZiwgYm9keSkpCiAgICBub3Rlcy5zb3J0KGtleT1sYW1iZGEgbjogLW5bMF0pOyBvdXQgPSAiIyMgUlVMRVMubWRcbiIgKyBydWxlcyArICJcbiIKICAgIGZvciBfLCBmLCBib2R5IGluIG5vdGVzOgogICAgICAgIGNodW5rID0gZiIjIyB7Zn1cbntib2R5fVxuIgogICAgICAgIGlmIGxlbihvdXQpICsgbGVuKGNodW5rKSA+IGxpbWl0OiBjaHVuayA9IGNodW5rWzogbWF4KDAsIGxpbWl0IC0gbGVuKG91dCkpXQogICAgICAgIGlmIG5vdCBjaHVuazogYnJlYWsKICAgICAgICBvdXQgKz0gY2h1bmsKICAgIHJldHVybiBvdXQKZGVmIGFzayhyb2xlLCBwcm9tcHQpOgogICAgciA9IFJPTEVTW3JvbGVdOyBidWRnZXQgPSBpbnQoci5nZXQoImN0eCIsIDIwNDgpICogMyAqIDAuOCkgICMgcm91Z2ggY2hhcnMKICAgIHByZSA9IGtub3dsZWRnZShwcm9tcHQsIGJ1ZGdldCAvLyAzKQogICAgZnVsbCA9IChwcmUgKyAiXG4jIyBUQVNLXG4iICsgcHJvbXB0KVs6YnVkZ2V0XQogICAgYm9keSA9IGpzb24uZHVtcHMoeyJtZXNzYWdlcyI6IFt7InJvbGUiOiAidXNlciIsICJjb250ZW50IjogZnVsbH1dLCAidGVtcGVyYXR1cmUiOiAwLjIsICJtYXhfdG9rZW5zIjogNjAwfSkuZW5jb2RlKCkKICAgIGZvciBpIGluIHJhbmdlKDMpOgogICAgICAgIHRoZXJtYWwoKQogICAgICAgIHRyeToKICAgICAgICAgICAgcSA9IHVybGxpYi5yZXF1ZXN0LlJlcXVlc3QoZiJodHRwOi8ve0hPU1R9OntyWydwb3J0J119L3YxL2NoYXQvY29tcGxldGlvbnMiLCBib2R5LCB7IkNvbnRlbnQtVHlwZSI6ICJhcHBsaWNhdGlvbi9qc29uIn0pCiAgICAgICAgICAgIGogPSBqc29uLmxvYWQodXJsbGliLnJlcXVlc3QudXJsb3BlbihxLCB0aW1lb3V0PTYwMCkpCiAgICAgICAgICAgIHR4dCA9IGpbImNob2ljZXMiXVswXVsibWVzc2FnZSJdWyJjb250ZW50Il0KICAgICAgICAgICAgcmV0dXJuIHJlLnN1YihyIjx0aGluaz4uKj88L3RoaW5rPiIsICIiLCB0eHQsIGZsYWdzPXJlLlMpLnN0cmlwKCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIGxvZyhmIntyb2xlfSBwb3J0IHtyWydwb3J0J119IG5vdCByZWFkeSAoe2V9KTsgcmV0cnkiKTsgdGltZS5zbGVlcCgxMCkKICAgIHJhaXNlIFJ1bnRpbWVFcnJvcihmIntyb2xlfSBzZXJ2ZXIgZG93biIpCmRlZiBmZXRjaCh1cmwpOgogICAgdHJ5OgogICAgICAgIGltcG9ydCByZXF1ZXN0cwogICAgICAgIHQgPSByZXF1ZXN0cy5nZXQodXJsLCB0aW1lb3V0PTMwLCBoZWFkZXJzPXsiVXNlci1BZ2VudCI6ICJNb3ppbGxhLzUuMCBtZXJpZGlhbi1tZXNoIn0pLnRleHQKICAgIGV4Y2VwdCBJbXBvcnRFcnJvcjoKICAgICAgICB0ID0gdXJsbGliLnJlcXVlc3QudXJsb3Blbih1cmxsaWIucmVxdWVzdC5SZXF1ZXN0KHVybCwgaGVhZGVycz17IlVzZXItQWdlbnQiOiAiTW96aWxsYS81LjAgbWVyaWRpYW4tbWVzaCJ9KSwgdGltZW91dD0zMCkucmVhZCgpLmRlY29kZSgidXRmLTgiLCAiaWdub3JlIikKICAgIHQgPSByZS5zdWIociIoP2lzKTwoc2NyaXB0fHN0eWxlfG5vc2NyaXB0fHN2ZykuKj88L1wxPiIsICIgIiwgdCkKICAgIHQgPSBodG1sLnVuZXNjYXBlKHJlLnN1YihyIjxbXj5dKz4iLCAiICIsIHQpKQogICAgcmV0dXJuIHJlLnN1YihyIlxzKyIsICIgIiwgdCkuc3RyaXAoKVs6NDAwMF0KZGVmIHNsdWcocyk6IHJldHVybiAocmUuc3ViKHIiW15hLXowLTldKyIsICItIiwgcy5sb3dlcigpKS5zdHJpcCgiLSIpWzo2MF0gb3IgInJlY2lwZSIpCmRlZiBzY29yZV9vZih0eHQpOgogICAgbSA9IHJlLnNlYXJjaChyIlNDT1JFXHMqWzo9XVxzKihcZCspIiwgdHh0LCByZS5JKSBvciByZS5zZWFyY2gociJcYigxMHxbMS05XSlccyovXHMqMTBcYiIsIHR4dCkgb3IgcmUuc2VhcmNoKHIiXGIoMTB8WzEtOV0pXGIiLCB0eHQpCiAgICByZXR1cm4gaW50KG0uZ3JvdXAoMSkpIGlmIG0gZWxzZSAwCmRlZiBjbGFpbShyb2xlKToKICAgIGZvciBmIGluIHNvcnRlZChnbG9iLmdsb2IoZiJ7VC5RfS90b2RvLyouanNvbiIpKToKICAgICAgICB0ID0ganNvbi5sb2FkKG9wZW4oZikpCiAgICAgICAgaWYgdFsicm9sZSJdID09IHJvbGU6CiAgICAgICAgICAgIG9zLnJlbmFtZShmLCBmIntULlF9L2RvaW5nL3t0WydpZCddfS5qc29uIik7IHJldHVybiB0CmRlZiBkb25lKHQsIHJlc3VsdCk6CiAgICBvcy5yZW1vdmUoZiJ7VC5RfS9kb2luZy97dFsnaWQnXX0uanNvbiIpOyB0WyJyZXN1bHQiXSA9IHJlc3VsdDsgVC5zYXZlKCJkb25lIiwgdCkKCmRlZiBkb191cmwodXJsLCBwYXJlbnQpOgogICAgbG9nKCJzY291dCIsIHVybCkKICAgIHRyeTogcGFnZSA9IGZldGNoKHVybCkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZTogbG9nKCJmZXRjaCBmYWlsZWQiLCB1cmwsIGUpOyByZXR1cm4gTm9uZQogICAgZmFjdHMgPSBhc2soInNjb3V0IiwgZiJTb3VyY2UgVVJMOiB7dXJsfVxuUGFnZSB0ZXh0Olxue3BhZ2V9XG5cbk91dHB1dCBKU09OOiB7e3VybCwgdGl0bGUsIGF1dGhvciwgZGF0ZSwgZmFjdHM6Wy4uLl19fS4gQ29weSBmYWN0cywgZG8gbm90IGludmVudC4iKQogICAgbm90ZSA9ICIiOyByZWNpcGUgPSAiIjsgc2MgPSAwCiAgICBmb3IgYXR0ZW1wdCBpbiByYW5nZShSRVRSSUVTICsgMSk6CiAgICAgICAgbG9nKCJzY3JpYmUiLCB1cmwsICJ0cnkiLCBhdHRlbXB0ICsgMSkKICAgICAgICByZWNpcGUgPSBhc2soInNjcmliZSIsIGYiU291cmNlIFVSTDoge3VybH1cbkZhY3RzOlxue2ZhY3RzfVxue25vdGV9XG5Xcml0ZSBhIHJlY2lwZSAubWQgdW5kZXIgMzAwIHdvcmRzOiBUaXRsZSwgUHJvYmxlbSwgU29sdXRpb24sIENvbW1hbmRzLCBTb3VyY2UgKHt1cmx9KS4gS2VlcCBldmVyeSBsaW5rLiIpCiAgICAgICAgdmVyZGljdCA9IGFzaygibWlkIiwgZiJSZWNpcGU6XG57cmVjaXBlfVxuXG5GYWN0cyBmcm9tIHt1cmx9Olxue2ZhY3RzfVxuXG5TY29yZSAxLTEwIGFnYWluc3Q6ICIgKyAiLCAiLmpvaW4oQ0ZHLmdldCgiZWVhdCIsIHt9KS5nZXQoImNoZWNrcyIsIFtdKSkgKyAiLiBGaXJzdCBsaW5lOiBTQ09SRTogTi4gVGhlbiB0aGUgZmFpbGVkIGNoZWNrcyBhbmQgdGhlIGZpeC4iKQogICAgICAgIHNjID0gc2NvcmVfb2YodmVyZGljdCk7IGxvZygibWlkIHNjb3JlIiwgc2MpCiAgICAgICAgaWYgc2MgPj0gTUlOOiBicmVhawogICAgICAgIG5vdGUgPSBmIk1pZCBzY29yZWQgdGhlIGxhc3QgZHJhZnQge3NjfS8xMC4gRml4IHRoaXM6XG57dmVyZGljdH0iCiAgICB0aXRsZSA9IChyZS5zZWFyY2gociJeIypccyooPzpUaXRsZTopP1xzKiguKykkIiwgcmVjaXBlLCByZS5NKSBvciBbTm9uZSwgdXJsXSlbMV0KICAgIHBhdGggPSBmInJlZmVyZW5jZXMve3NsdWcodGl0bGUpfS17aW50KHRpbWUudGltZSgpKX0ubWQiCiAgICBvcGVuKHBhdGgsICJ3Iikud3JpdGUocmVjaXBlLnN0cmlwKCkgKyBmIlxuXG5Tb3VyY2U6IHt1cmx9XG5TY29yZToge3NjfS8xMFxuIikKICAgIHJldHVybiBwYXRoLCB0aXRsZS5zdHJpcCgpWzo4MF0sIHNjCmRlZiBkb19sZWFkKHQpOgogICAgdXJscyA9IHJlLmZpbmRhbGwociJodHRwcz86Ly9bXlxzLHw8PlwiJ10rIiwgdFsidGV4dCJdKQogICAgbG9nKCJsZWFkIHRhc2siLCB0WyJpZCJdLCBsZW4odXJscyksICJsaW5rcyIpCiAgICBtYWRlID0gW3IgZm9yIHIgaW4gKGRvX3VybCh1LCB0WyJpZCJdKSBmb3IgdSBpbiB1cmxzKSBpZiByXQogICAgaWYgbm90IG1hZGU6IGRvbmUodCwgIm5vIHJlY2lwZSIpOyByZXR1cm4KICAgIHN1bW1hcnkgPSBhc2soImxlYWQiLCAiVGFzazogIiArIHRbInRleHQiXSArICJcblJlY2lwZXM6XG4iICsgIlxuIi5qb2luKGYiLSB7cH0gKHtzfS8xMCk6IHtvcGVuKHApLnJlYWQoKVs6NjAwXX0iIGZvciBwLCBfLCBzIGluIG1hZGUpICsgIlxuV3JpdGUgYSBzaG9ydCBwbGFuOiB3aGF0IHdhcyBsZWFybmVkIGFuZCB0aGUgbmV4dCBzdGVwLiIpCiAgICBvdXQgPSBmIm91dHB1dC97dFsnaWQnXX0ubWQiCiAgICBvcGVuKG91dCwgInciKS53cml0ZShmIiMge3RbJ3RleHQnXX1cblxue3N1bW1hcnl9XG5cbiMjIFJlY2lwZXNcbiIgKyAiXG4iLmpvaW4oZiItIHtwfSB8IHtzfS8xMCIgZm9yIHAsIF8sIHMgaW4gbWFkZSkgKyAiXG4iKQogICAgd2l0aCBvcGVuKCJJTkRFWC5tZCIsICJhIikgYXMgZjoKICAgICAgICBmLndyaXRlKGYie291dH0gfCB7bWFkZVswXVsxXX0gKCt7bGVuKG1hZGUpLTF9IG1vcmUpIHwge21heChzIGZvciBfLF8scyBpbiBtYWRlKX1cbiIgaWYgbGVuKG1hZGUpID4gMSBlbHNlIGYie21hZGVbMF1bMF19IHwge21hZGVbMF1bMV19IHwge21hZGVbMF1bMl19XG4iKQogICAgZG9uZSh0LCBvdXQpOyBsb2coImxlYWQgd3JvdGUiLCBvdXQpCgpkZWYgbWFpbigpOgogICAgb25jZSA9ICItLW9uY2UiIGluIHN5cy5hcmd2CiAgICBsb2coIndvcmtlciB1cDsgcnVsZXMgUlVMRVMubWQ7IG5vdGVzIG15LWtub3dsZWRnZS8iKQogICAgd2hpbGUgVHJ1ZToKICAgICAgICB0ID0gY2xhaW0oImxlYWQiKQogICAgICAgIGlmIHQ6CiAgICAgICAgICAgIHRyeTogZG9fbGVhZCh0KQogICAgICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgICAgICBsb2coInRhc2sgZmFpbGVkLCBiYWNrIHRvIHRvZG86IiwgZSkKICAgICAgICAgICAgICAgIG9zLnJlbmFtZShmIntULlF9L2RvaW5nL3t0WydpZCddfS5qc29uIiwgZiJ7VC5RfS90b2RvL3t0WydpZCddfS5qc29uIik7IHRpbWUuc2xlZXAoMzApCiAgICAgICAgZWxpZiBvbmNlOiByZXR1cm4KICAgICAgICBlbHNlOiB0aW1lLnNsZWVwKDUpCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6IG1haW4oKQo=\nchmod +x \"$v2\"/*.sh \"$v2\"/*.py 2>/dev/null\necho \"Mesh v2 is in $v2.\"\n";
@@ -1334,7 +1367,7 @@ function explainOut(cmd, out) {
   let t = String(out || "");
   t = t.replace(/No schema files found: doing nothing\./g, "Glib had no schema files. That is normal here. Nothing failed.");
   if (/mm_stat/.test(String(cmd || "")) && /^\d/.test(t.trim())) {
-    const nums = t.replace(/\n?exit \d+\s*$/, "").trim().split(/\s+/).filter(function (x) { return /^\d+$/.test(x); });
+    const nums = t.replace(/\n?exit -?\d+\s*$/, "").trim().split(/\s+/).filter(function (x) { return /^\d+$/.test(x); });
     if (nums.length >= 3) {
       const lines = ["Uncompressed  " + mbOf(nums[0]), "Compressed    " + mbOf(nums[1]), "Memory used   " + mbOf(nums[2])];
       if (nums.length > 3) lines.push("Limit          " + (nums[3] === "0" ? "none" : mbOf(nums[3])));
@@ -1356,9 +1389,9 @@ function explainOut(cmd, out) {
   if (/Not allowed to start service|app is in background|Termux was asleep/.test(t)) {
     return "Termux was asleep. Android blocked the command because Termux had no running process. Open Termux, leave it open for a second, then run this again.\n\nexit 1";
   }
-  const body = t.replace(/\n?exit \d+\s*$/, "").trim();
+  const body = t.replace(/\n?exit -?\d+\s*$/, "").trim();
   if (!body) {
-    const code = (t.match(/exit \d+/) || ["exit 0"])[0];
+    const code = (t.match(/exit -?\d+/) || ["exit 0"])[0];
     if (/pkg clean|apt-get clean|apt clean/.test(String(cmd || ""))) return "Done. Downloaded package files were removed. Installed tools stayed.\n\n" + code;
     return "Done. The command printed nothing.\n\n" + code;
   }
@@ -1462,7 +1495,20 @@ function batLevel(s) {
   if (!isFinite(n) || n < 0) return -1;
   return Math.min(100, Math.round(n));
 }
-function batTone(n) { return n < 0 ? "" : n < 10 ? " crit" : n < 20 ? " low" : ""; }
+// Fill colour by level: under 15% red, 15% to 49% yellow, 50% and above green.
+function batTone(n) { return n < 0 ? "" : n < 15 ? " crit" : n < 50 ? " low" : ""; }
+let batRingSvg = "";
+function batRing() {
+  if (batRingSvg) return batRingSvg;
+  let ticks = "";
+  for (let i = 0; i < 48; i++) {
+    const a = i * 7.5 * Math.PI / 180;
+    const op = 0.35 + 0.65 * (0.5 + 0.5 * Math.cos(a - Math.PI * 1.75));
+    ticks += '<line x1="' + (80 + 60 * Math.sin(a)).toFixed(2) + '" y1="' + (80 - 60 * Math.cos(a)).toFixed(2) + '" x2="' + (80 + 70 * Math.sin(a)).toFixed(2) + '" y2="' + (80 - 70 * Math.cos(a)).toFixed(2) + '" opacity="' + op.toFixed(2) + '"/>';
+  }
+  batRingSvg = '<svg class="bat-l bat-ring" viewBox="0 0 160 160" aria-hidden="true" focusable="false">' + ticks + '</svg>';
+  return batRingSvg;
+}
 function batCharging(s) { return !!s && s.state === "Charging"; }
 function batBarFill(n, i) {
   if (n < 0) return 0;
@@ -1481,7 +1527,7 @@ function batGraphic(s) {
     bars += '<span class="bat-slot" style="top:' + top.toFixed(3) + '%"><i class="bat-bar" id="batbar' + i + '" style="background-position:0 ' + pos.toFixed(1) + '%;clip-path:' + batBarClip(n, i) + '"></i></span>';
   }
   return '<div class="batwin' + batTone(n) + (batCharging(s) ? " charging" : "") + '" id="batwin" role="img" aria-label="' + esc(batLabel(s, n)) + '">' +
-    '<i class="bat-l bat-ring" aria-hidden="true"></i><i class="bat-l bat-body" aria-hidden="true"></i>' + bars +
+    batRing() + '<i class="bat-l bat-body" aria-hidden="true"></i>' + bars +
     '<i class="bat-l bat-bolt" aria-hidden="true"></i></div>';
 }
 function paintBatGraphic(s) {
@@ -1661,7 +1707,7 @@ function homePage() {
   const dial = netDial(p);
   const bad = sick(p, s);
   let html = '<div class="stack">';
-  if (bond !== "termux") html += '<button class="btn" type="button" data-go="setup">' + esc(t("setup")) + '</button><article class="plate stack"><b>' + esc(t("connectTermux")) + '</b><p class="muted">' + esc(t("connectTermuxBody")) + '</p><pre>' + esc(BOND_LINE) + '</pre><button class="ghost" type="button" id="copybond">' + esc(t("copyLine")) + '</button></article>';
+  if (bond !== "termux") html += '<button class="btn" type="button" data-go="setup">' + esc(t("setup")) + '</button><article class="plate stack"><b>' + esc(t("connectTermux")) + '</b><p class="muted">' + esc(t("connectTermuxBody")) + '</p><button class="ghost" type="button" data-termuxfix="' + (bond === "ask" ? "permission" : "external") + '">' + esc(bond === "ask" ? t("allowTermuxPerm") : t("fixTermux")) + '</button></article>';
   html += '<p class="muted" id="ramout"></p>';
   html += '<article class="hero">';
   html += '<div class="speedometers">';
@@ -1879,10 +1925,67 @@ function systemPage() {
   html += row("Build", p.buildId);
   html += row("Built", p.built);
   html += row("Kernel", shortKernel(p.kernel));
-  const shellLine = (senseText || (bond === "termux" ? "Reading the shell…" : "Connect Termux. This line is uname from that shell."));
-  html += '</article><p class="sec">Termux</p><article class="plate"><p id="senseline">' + esc(shellLine) + '</p></article>';
-  if (p.fingerprint) html += '<article class="plate"><p class="muted">' + esc(p.fingerprint) + '</p></article>';
+  html += row("Fingerprint", p.fingerprint);
+  html += '</article>';
+  html += termuxInfoCard();
   return html + '</div>';
+}
+// Model fit card: real usable RAM, a friendly recommended setup, and the .gguf files Termux really has.
+let modelFiles = { list: null, at: 0, off: false };
+const MODEL_FIT_LIST = "for d in \"$HOME/models\" \"$HOME/models2\"; do [ -d \"$d\" ] || continue; for f in \"$d\"/*.gguf; do [ -f \"$f\" ] || continue; printf 'F|%s|%s\\n' \"$(basename \"$f\")\" \"$(stat -c %s \"$f\" 2>/dev/null || wc -c < \"$f\")\"; done; done; echo END";
+function fitNeed(bytes) { return Number(bytes) * 1.15 + 300 * 1048576; }
+function fitBadge(bytes, usable) {
+  if (!(usable > 0)) return ["", ""];
+  const need = fitNeed(bytes);
+  if (need <= usable * 0.8) return ["fits", "Fits"];
+  if (need <= usable) return ["tight", "Tight"];
+  return ["big", "Too big"];
+}
+function fitPlan(gib) {
+  if (gib > 7.5) return ["Full team: Scout, Scribe, Mid and Lead", "CPU, with Lead on the GPU when a hard task needs it"];
+  if (gib >= 5) return ["Daily: Scout, Scribe and Mid", "CPU only. Lead only now and then"];
+  if (gib >= 3) return ["Light: Scout and Scribe, Mid when you choose", "CPU only"];
+  if (gib > 0) return ["Small: Scout and Scribe only", "CPU only"];
+  return ["", ""];
+}
+function modelFitInner(p) {
+  const usable = Number(p && p.memFree) || 0;
+  const gib = usable / 1073741824;
+  const plan = fitPlan(gib);
+  let html = row("Usable memory for models", usable > 0 ? gb(usable) : "");
+  html += row("Recommended setup", plan[0]);
+  html += row("Runs on", plan[1]);
+  if (modelFiles.list === null) html += '<div class="kv"><span>Model files</span><b class="plain">' + (modelFiles.off ? "Connect Termux in Setup to list them" : "Reading") + '</b></div>';
+  else if (!modelFiles.list.length) html += '<div class="kv"><span>Model files</span><b class="plain">None in ~/models yet</b></div>';
+  else modelFiles.list.forEach(function (f) {
+    const badge = fitBadge(f.size, usable);
+    html += '<div class="kv fitrow"><span class="fitname">' + esc(f.name) + '</span><b class="plain">' + esc(gb(f.size)) + (badge[0] ? ' <em class="fitbadge ' + badge[0] + '">' + esc(badge[1]) + '</em>' : "") + '</b></div>';
+  });
+  return html;
+}
+function modelFitCard(p) {
+  const usable = Number(p && p.memFree) || 0;
+  const u = usable > 0 ? gb(usable) : "2.0 GB";
+  return '<article class="plate" id="modelfit">' + modelFitInner(p) + '</article>'
+    + '<article class="plate stack fithow"><b>How it works</b><p class="muted">A model file (.gguf) is loaded into RAM to run. If the file is bigger than the free RAM, the phone slows down or the app closes. Meridian picks the models that fit automatically.</p>'
+    + '<p class="muted"><b>Example:</b> example.gguf is 1.2 GB and usable RAM is ' + esc(u) + ', so it ' + (usable <= 0 || fitNeed(1.2 * 1073741824) <= usable ? "fits and runs" : "does not fit") + '. A 4 GB file ' + (usable > 0 && fitNeed(4 * 1073741824) <= usable ? "would also fit" : "would not fit") + '.</p></article>';
+}
+function loadModelFiles(force) {
+  if (!force && Date.now() - modelFiles.at < 60000) return;
+  if (bond !== "termux") { modelFiles.off = true; return; }
+  modelFiles.at = Date.now();
+  quietJob(MODEL_FIT_LIST, function (out) {
+    if (!/\bEND\b/.test(out)) { modelFiles.off = true; modelFiles.at = 0; return; }
+    const list = [];
+    String(out).split("\n").forEach(function (l) {
+      const f = l.split("|");
+      if (f[0] === "F" && f[1]) list.push({ name: f[1], size: Number(f[2]) || 0 });
+    });
+    modelFiles.list = list;
+    modelFiles.off = false;
+    const box = document.getElementById("modelfit");
+    if (box) box.innerHTML = modelFitInner(live());
+  });
 }
 function modelFitLine(p) {
   const usable = Number(p && p.memFree) || 0;
@@ -1937,7 +2040,7 @@ function hardwarePage() {
   html += row("Cached", gb(p.memCached));
   html += row("Free", gb(p.memRaw));
   html += row("Virtual", p.swapTotal ? gb(p.swapFree) + " free of " + gb(p.swapTotal) : "");
-  html += '</article><p class="sec">Model fit</p><article class="plate"><p id="modelfit">' + esc(modelFitLine(p)) + '</p></article><p class="sec">Storage</p><article class="plate">';
+  html += '</article><p class="sec">Model fit</p>' + modelFitCard(p) + '<p class="sec">Storage</p><article class="plate">';
   html += row("Size", gb(p.diskTotal));
   html += row("Free", gb(p.diskFree));
   if (p.ufs) html += row("UFS", hw(p.ufs));
@@ -1947,6 +2050,24 @@ function hardwarePage() {
   html += '</article></div>';
   return html;
 }
+let powerPagesCache = null;
+function powerPages() {
+  if (powerPagesCache) return powerPagesCache;
+  try { powerPagesCache = JSON.parse(MeridianPhone.powerPages() || "{}") || {}; } catch (e) { powerPagesCache = {}; }
+  return powerPagesCache;
+}
+// Android thermal status (PowerManager): 0 none, 1 light, 2 moderate, 3 severe and above. Falls back to battery temperature.
+function heatLevel(s) {
+  const st = Number(s && s.thermalStatus);
+  if (st >= 3) return 2;
+  if (st >= 1) return 1;
+  if (st === 0) return 0;
+  const t = Number(s && s.temp) || 0;
+  if (!(s && s.tempKnown)) return -1;
+  return t >= 45 ? 2 : t >= 40 ? 1 : 0;
+}
+function heatLabel(s) { const l = heatLevel(s); return l === 2 ? "Hot" : l === 1 ? "Warm" : l === 0 ? "Normal" : "Not reported"; }
+function heatTone(s) { const l = heatLevel(s); return l === 2 ? "off" : l === 1 ? "warm" : l === 0 ? "on" : ""; }
 function batteryPage() {
   const s = phone();
   const p = live();
@@ -1957,16 +2078,17 @@ function batteryPage() {
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");
+  // Use: only the battery pages this phone really has, opened with generic Android intents.
+  const pages = powerPages();
   html += '</article><p class="sec">Use</p><div class="modes">';
-  html += '<button class="ghost' + (s.power === "saver" ? " on" : "") + '" type="button" data-power="saver">Saver</button>';
-  html += '<button class="ghost' + (s.power === "regular" ? " on" : "") + '" type="button" data-power="regular">Regular</button>';
-  html += '<button class="ghost' + (s.power === "fast" ? " on" : "") + '" type="button" data-power="fast">Performance</button>';
-  html += '</div><p class="muted" id="powernote">Android does not let an app change these without WRITE_SECURE_SETTINGS, so the buttons open the matching Settings page for you. Saver is Settings, Battery, Power saving. Performance is Settings, Battery, Processing speed.</p>';
+  if (pages.saver !== false) html += '<button class="ghost' + (s.power === "saver" ? " on" : "") + '" type="button" data-power="saver">Saver</button>';
+  if (pages.usage !== false) html += '<button class="ghost" type="button" data-power="usage">Battery usage</button>';
+  if (pages.fast) html += '<button class="ghost' + (s.power === "fast" ? " on" : "") + '" type="button" data-power="fast">Performance</button>';
+  html += '</div><p class="muted" id="powernote">Opens your phone\'s battery settings.</p>';
+  // Thermals: plain values from Android only. Model heat limits live with the model settings on the Mesh page.
   html += '<p class="sec">Thermals</p><article class="plate">';
-  html += '<p class="muted">Mesh policy pause-69-resume-49: llama-cli pauses at 69°C and resumes at 49°C. Between those, a new step uses 2 threads.</p>';
-  const zones = p.zones || [];
-  if (!zones.length) html += '<p class="muted">Thermal zone files are closed on this phone. Battery temperature above is from Android.</p>';
-  zones.forEach(function (z) { html += row(z.name, z.c + "°C"); });
+  html += row("Battery temperature", s.tempKnown ? Number(s.temp || 0).toFixed(1) + "°C" : "");
+  html += '<div class="kv linkrow"><span>Status</span><b><i class="linkdot ' + heatTone(s) + '" aria-hidden="true"></i>' + esc(heatLabel(s)) + '</b></div>';
   html += '</article></div>';
   return html;
 }
@@ -1995,11 +2117,14 @@ function termActs(b) {
   const label = kind === "lock" ? "Release the lock" : kind === "configure" ? "Finish the install" : kind === "mirror" ? "Use the main mirror" : kind === "missing" ? "Install the missing tool" : "";
   const asleep = /Termux was asleep|app is in background/.test(b.out);
   const linkish = /CANNOT LINK EXECUTABLE/.test(b.out);
-  if (!label && !asleep && !linkish) return "";
+  const blocked = /Termux blocked Meridian/.test(b.out);
+  const noPerm = blocked && /command permission/.test(b.out);
+  if (!label && !asleep && !linkish && !blocked) return "";
   let html = '<div class="termacts">';
   if (label) html += '<button class="btn" type="button" id="fixerr">' + label + '</button>';
   if (asleep) html += '<button class="btn" type="button" id="wakeTermux">Open Termux</button>';
   if (linkish) html += '<button class="btn" type="button" id="repairvulkan">Repair Vulkan</button>';
+  if (blocked) html += '<button class="btn" type="button" data-termuxfix="' + (noPerm ? "permission" : "external") + '">' + esc(noPerm ? t("allowTermuxPerm") : t("fixTermux")) + '</button>';
   return html + '</div>';
 }
 function failed(out) {
@@ -2109,6 +2234,182 @@ function sheet(title, note, cmd, link) {
   if (link) html += '<button class="ghost" type="button" data-open="' + esc(link) + '">Open link</button>';
   return html + "</article></div>";
 }
+// Termux link: Setup shows it first, the console offers the same fix when a command is refused.
+let termuxLink = { state: "unknown", detail: "", at: 0 };
+function linkBad(state) { return state !== "ok" && state !== "checking" && state !== "unknown"; }
+function termuxLinkCard() {
+  const st = termuxLink.state;
+  const ok = st === "ok";
+  const label = ok ? t("termuxLinkOk") : st === "checking" ? t("termuxLinkChecking") : st === "unknown" ? t("termuxLinkUnknown") : t("termuxLinkOff");
+  const whyKey = { ok: "termuxWhyOk", external: "termuxWhyExternal", permission: "termuxWhyPermission", asleep: "termuxWhyAsleep", timeout: "termuxWhyTimeout", missing: "termuxWhyMissing", refused: "termuxWhyRefused" }[st];
+  let html = '<article class="plate stack" id="termuxlink"><b>1. ' + esc(t("termuxLinkTitle")) + '</b>';
+  html += '<div><span class="healthpill' + (linkBad(st) ? " bad" : "") + '" id="termuxpill" role="status">' + esc(label) + '</span></div>';
+  if (whyKey) html += '<p class="muted" id="termuxwhy">' + esc(t(whyKey)) + '</p>';
+  html += '<div class="tools">';
+  if (st === "missing") html += '<button class="btn" type="button" data-open="https://f-droid.org/packages/com.termux/">' + esc(t("getTermux")) + '</button>';
+  else if (st === "permission") html += '<button class="btn" type="button" data-termuxfix="permission">' + esc(t("allowTermuxPerm")) + '</button>';
+  else if (st === "asleep") html += '<button class="btn" type="button" id="linkopen">' + "Open Termux" + '</button>';
+  else if (!ok) html += '<button class="btn" type="button" data-termuxfix="external">' + esc(t("fixTermux")) + '</button>';
+  html += '<button class="ghost" type="button" id="linkcheck">' + esc(t("checkAgain")) + '</button></div></article>';
+  return html;
+}
+function checkTermuxLink(force) {
+  const now = Date.now();
+  if (!force && termuxLink.state === "checking" && now - termuxLink.at < 9000) return;
+  if (!force && now - termuxLink.at < 2500) return;
+  termuxLink.at = now;
+  let r = "";
+  try { r = String(MeridianPhone.termuxCheck()); } catch (e) { r = ""; }
+  if (!r) return;
+  window.meridianTermux(r, "");
+}
+function paintTermuxLink() {
+  const card = document.getElementById("termuxlink");
+  if (!card) return;
+  const box = document.createElement("div");
+  box.innerHTML = termuxLinkCard();
+  card.replaceWith(box.firstChild);
+  bindTermuxFix(document);
+}
+window.meridianTermux = function (state, detail) {
+  termuxLink.state = String(state || "unknown");
+  termuxLink.detail = String(detail || "");
+  if (termuxLink.state === "ok") bond = "termux";
+  else if (termuxLink.state === "permission") bond = "ask";
+  else if (termuxLink.state === "missing") bond = "missing";
+  paintTermuxLink();
+  paintTermuxInfo();
+};
+function fixTermux(kind) {
+  if (kind === "permission") {
+    try { MeridianPhone.askTermuxPermission(); } catch (e) {}
+    return;
+  }
+  let r = "";
+  try { r = String(MeridianPhone.fixTermux(BOND_LINE, t("fixTermuxToast"))); } catch (e) { r = ""; }
+  if (!r) { try { MeridianPhone.clip(BOND_LINE); } catch (e) {} }
+  toast(t("fixTermuxToast"));
+  termuxLink.state = "unknown";
+}
+function bindTermuxFix(root) {
+  (root || document).querySelectorAll("[data-termuxfix]").forEach(function (b) {
+    b.onclick = function () { fixTermux(b.getAttribute("data-termuxfix")); };
+  });
+  const again = document.getElementById("linkcheck");
+  if (again) again.onclick = function () { checkTermuxLink(true); };
+  const open = document.getElementById("linkopen");
+  if (open) open.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  (root || document).querySelectorAll("#termuxlink [data-open]").forEach(function (b) { b.onclick = function () { try { MeridianPhone.open(b.getAttribute("data-open")); } catch (e) {} }; });
+}
+// Pinch to zoom, like Termux. Over a terminal or command output, two fingers change the font size.
+// Elsewhere inside the window, two fingers zoom the page content. The bottom bar never zooms.
+// Sizes are remembered per screen. One finger still scrolls; nothing happens until a second finger lands.
+const ZOOM_TERM_MIN = 8, ZOOM_TERM_MAX = 32, ZOOM_PAGE_MIN = 0.8, ZOOM_PAGE_MAX = 2;
+function zoomKey() { return view + (more && more !== "menu" ? "/" + more : ""); }
+function zoomRead(kind) {
+  try {
+    const v = Number(localStorage.getItem("m-zoom-" + kind + "-" + zoomKey()));
+    if (kind === "term" && v >= ZOOM_TERM_MIN && v <= ZOOM_TERM_MAX) return v;
+    if (kind === "page" && v >= ZOOM_PAGE_MIN && v <= ZOOM_PAGE_MAX) return v;
+  } catch (e) {}
+  return 0;
+}
+function applyZoom() {
+  const win = document.querySelector(".win");
+  const page = document.querySelector(".winbody > .page");
+  const term = zoomRead("term");
+  if (win) { if (term) win.style.setProperty("--term-size", term + "px"); else win.style.removeProperty("--term-size"); }
+  const pz = zoomRead("page");
+  if (page) {
+    if (pz && pz !== 1) { page.classList.add("zoomed"); page.style.setProperty("--page-zoom", String(pz)); }
+    else { page.classList.remove("zoomed"); page.style.removeProperty("--page-zoom"); }
+  }
+}
+(function pinchZoom() {
+  let g = null;
+  function dist(t) { const dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY; return Math.sqrt(dx * dx + dy * dy) || 1; }
+  function mid(t) { return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 }; }
+  document.addEventListener("touchstart", function (e) {
+    if (e.touches.length !== 2) { if (e.touches.length > 2) g = null; return; }
+    const m = mid(e.touches);
+    const at = document.elementFromPoint(m.x, m.y) || e.target;
+    if (!at || !at.closest || !at.closest(".winbody")) { g = null; return; }
+    const out = at.closest(".term, pre, textarea.cmd, #mesh-log, .meshlog");
+    const win = document.querySelector(".win");
+    if (out && win) {
+      const cur = parseFloat(getComputedStyle(out).fontSize) || prefs.termFont || 13;
+      const box = out.matches("textarea, .term, pre") ? out : (out.closest(".term") || out);
+      g = { kind: "term", start: dist(e.touches), base: cur, now: cur, box: box, win: win, mid: m };
+    } else {
+      const page = document.querySelector(".winbody > .page");
+      if (!page) { g = null; return; }
+      const cur = zoomRead("page") || 1;
+      g = { kind: "page", start: dist(e.touches), base: cur, now: cur, box: document.querySelector(".winbody"), page: page, mid: m };
+    }
+  }, { passive: true });
+  document.addEventListener("touchmove", function (e) {
+    if (!g || e.touches.length !== 2) return;
+    e.preventDefault();
+    const ratio = dist(e.touches) / g.start;
+    const box = g.box;
+    const r = box.getBoundingClientRect();
+    const ax = g.mid.x - r.left, ay = g.mid.y - r.top;
+    const oldTop = box.scrollTop, oldLeft = box.scrollLeft;
+    const prev = g.now;
+    if (g.kind === "term") {
+      g.now = Math.round(Math.max(ZOOM_TERM_MIN, Math.min(ZOOM_TERM_MAX, g.base * ratio)) * 2) / 2;
+      if (g.now === prev) return;
+      g.win.style.setProperty("--term-size", g.now + "px");
+    } else {
+      g.now = Math.round(Math.max(ZOOM_PAGE_MIN, Math.min(ZOOM_PAGE_MAX, g.base * ratio)) * 100) / 100;
+      if (g.now === prev) return;
+      g.page.classList.add("zoomed");
+      g.page.style.setProperty("--page-zoom", String(g.now));
+    }
+    // Keep the text under the fingers where it was.
+    const k = g.now / prev;
+    box.scrollTop = (oldTop + ay) * k - ay;
+    box.scrollLeft = (oldLeft + ax) * k - ax;
+  }, { passive: false });
+  function end(e) {
+    if (!g || (e.touches && e.touches.length >= 2)) return;
+    const kind = g.kind, v = g.now;
+    g = null;
+    try { localStorage.setItem("m-zoom-" + kind + "-" + zoomKey(), String(v)); } catch (err) {}
+  }
+  document.addEventListener("touchend", end, { passive: true });
+  document.addEventListener("touchcancel", end, { passive: true });
+})();
+// Read-only Termux facts for the System screen. Values come from Android's package manager; nothing here runs a command.
+function termuxInfo() {
+  let o = {};
+  try { o = JSON.parse(MeridianPhone.termuxState()) || {}; } catch (e) { o = {}; }
+  return o;
+}
+function termuxInfoCard() {
+  const o = termuxInfo();
+  const installed = o.installed !== false && (o.installed === true || bond !== "missing");
+  if (o.state && o.state !== "unknown" && o.state !== "checking" && termuxLink.state === "unknown") termuxLink.state = o.state;
+  const st = installed ? termuxLink.state : "missing";
+  const ok = st === "ok";
+  const label = ok ? t("termuxLinkOk") : st === "checking" ? t("termuxLinkChecking") : st === "unknown" ? t("termuxLinkUnknown") : t("termuxLinkOff");
+  let html = '<p class="sec">Termux</p><article class="plate" id="termuxinfo">';
+  html += '<div class="kv"><span>' + esc(t("termuxInstalled")) + '</span><b>' + esc(installed ? t("yes") : t("no")) + '</b></div>';
+  if (installed && o.version) html += row(t("termuxVersion"), o.version);
+  html += '<div class="kv"><span>Termux:API</span><b>' + esc(o.api ? t("yes") : t("no")) + '</b></div>';
+  html += '<div class="kv linkrow"><span>' + esc(t("termuxConnection")) + '</span><b><i class="linkdot' + (ok ? " on" : linkBad(st) ? " off" : "") + '" aria-hidden="true"></i>' + esc(label)
+    + (installed && linkBad(st) ? ' <button class="ghost mini" type="button" data-termuxfix="' + (st === "permission" ? "permission" : "external") + '">' + esc(t("fixShort")) + '</button>' : "") + '</b></div>';
+  return html + '</article>';
+}
+function paintTermuxInfo() {
+  const card = document.getElementById("termuxinfo");
+  if (!card) return;
+  const box = document.createElement("div");
+  box.innerHTML = termuxInfoCard();
+  card.previousElementSibling && card.previousElementSibling.classList.contains("sec") && card.previousElementSibling.remove();
+  card.replaceWith.apply(card, Array.prototype.slice.call(box.childNodes));
+  bindTermuxFix(document);
+}
 function setupPage() {
   const steps = [
     ["F-Droid", "Install Termux from F-Droid, not Play.", "https://f-droid.org/packages/com.termux/", ""],
@@ -2131,7 +2432,7 @@ function setupPage() {
     const s = steps[Number(openCmd)];
     if (s) return sheet(s[0], s[1], s[3], s[2]);
   }
-  return guide("Do these in order. F-Droid first, then Termux from F-Droid, not Play. If Android says permission denied, that is the Termux command permission, not a ban. Allow it, then press Connect. Open a step, read it, then press Run.") + bands("Setup", steps, [
+  return guide("Do these in order. F-Droid first, then Termux from F-Droid, not Play. If Android says permission denied, that is the Termux command permission, not a ban. Allow it, then press Connect. Open a step, read it, then press Run.") + termuxLinkCard() + bands("Setup", steps, [
     ["Start", ["F-Droid", "Termux:API", "Update", "Storage", "Reload settings"]],
     ["Awake", ["Wake lock"]],
     ["Build", ["Compilers", "llama.cpp", "Python", "Node", "Git", "GPU"]],
@@ -2749,7 +3050,7 @@ function languagePage() {
 function deskPage() {
   const p = live();
   const s = phone();
-  let html = '<div class="stack"><article class="plate stack"><b>Desk</b><p class="muted">' + esc(t("agentHint")) + '</p></article>';
+  let html = '<div class="stack"><article class="plate stack"><b>Desk</b><p class="muted">' + esc(t("deskIntro")) + '</p></article>';
   html += '<article class="plate">';
   html += row("CPU", (p.cpuPct != null ? p.cpuPct + "%" : ""));
   html += row("RAM free", gb(p.memFree));
@@ -3160,6 +3461,7 @@ function meshPage() {
     + '<label class="muted" for="mesh-lead"><input id="mesh-lead" type="checkbox" aria-label="Allow Lead"' + (meshLeadChecked() ? " checked" : "") + '> Allow Lead</label>'
     + '<label class="muted" for="mesh-force"><input id="mesh-force" type="checkbox" aria-label="Force Lead"' + (meshForce ? " checked" : "") + '> Force Lead</label>'
     + '<p class="muted" id="meshmodelnote">' + esc(meshModelNote()) + '</p>'
+    + heatLimitsBlock()
     + '<button class="btn" type="button" id="meshget">Download model</button>'
     + '<label class="muted" for="mesh-cmd">Command</label>'
     + '<textarea id="mesh-cmd" rows="3" placeholder="Ask, read file ~/notes/a.txt, or fetch https://example.com">' + esc(meshDraft) + '</textarea>'
@@ -3178,6 +3480,47 @@ function meshPage() {
     + '<button class="ghost" type="button" id="meshfire">Fire command</button>'
     + '<pre class="meshlog" id="meshlog">' + esc(meshLines.join("\n")) + '</pre>'
     + '</div>';
+}
+// Advanced: heat limits for running models. Defaults follow this phone: chip sensors readable means the
+// usual 69/49 °C, otherwise only the battery sensor is known, so lower battery-based limits are used.
+function heatDefaults() {
+  const p = live();
+  const chip = (p.zones || []).length > 0;
+  const cores = Number(p.cores) || (p.coresLive || []).length || 8;
+  return { pause: chip ? 69 : 45, resume: chip ? 49 : 38, threads: Math.max(1, Math.min(4, Math.floor(cores / 4))), chip: chip };
+}
+function heatLimits() {
+  const d = heatDefaults();
+  let v = {};
+  try { v = JSON.parse(localStorage.getItem("m-heat") || "{}") || {}; } catch (e) { v = {}; }
+  return { pause: Number(v.pause) || d.pause, resume: Number(v.resume) || d.resume, threads: Number(v.threads) || d.threads, chip: d.chip };
+}
+function heatLimitsBlock() {
+  const h = heatLimits();
+  return '<details class="advanced" id="meshheat"><summary class="muted">Heat limits (advanced)</summary><div class="stack">'
+    + '<p class="muted">Models stop for a while when the phone gets this hot, and start again once it cools down. ' + (h.chip ? "Measured on the chip sensors." : "This phone only reports the battery sensor, so the limits are lower.") + '</p>'
+    + '<label class="muted" for="heat-pause">Pause models at (°C)</label><input id="heat-pause" type="number" inputmode="numeric" min="35" max="90" value="' + h.pause + '" />'
+    + '<label class="muted" for="heat-resume">Start again at (°C)</label><input id="heat-resume" type="number" inputmode="numeric" min="30" max="85" value="' + h.resume + '" />'
+    + '<label class="muted" for="heat-threads">Processor cores to use while warm</label><input id="heat-threads" type="number" inputmode="numeric" min="1" max="16" value="' + h.threads + '" />'
+    + '<div class="tools"><button class="ghost" type="button" id="heatsave">Save heat limits</button><button class="ghost" type="button" id="heatreset">Use phone defaults</button></div>'
+    + '<p class="muted" id="heatnote" role="status"></p></div></details>';
+}
+function saveHeat(reset) {
+  const d = heatDefaults();
+  let pause = reset ? d.pause : Math.round(Number((document.getElementById("heat-pause") || {}).value));
+  let resume = reset ? d.resume : Math.round(Number((document.getElementById("heat-resume") || {}).value));
+  let threads = reset ? d.threads : Math.round(Number((document.getElementById("heat-threads") || {}).value));
+  const note = document.getElementById("heatnote");
+  if (!(pause >= 35 && pause <= 90) || !(resume >= 30 && resume < pause) || !(threads >= 1 && threads <= 16)) {
+    if (note) note.textContent = "Start again must be lower than Pause. Pause is between 35 and 90 °C.";
+    return;
+  }
+  try { if (reset) localStorage.removeItem("m-heat"); else localStorage.setItem("m-heat", JSON.stringify({ pause: pause, resume: resume, threads: threads })); } catch (e) {}
+  ["heat-pause", "heat-resume", "heat-threads"].forEach(function (id, i) { const el = document.getElementById(id); if (el) el.value = [pause, resume, threads][i]; });
+  // The mesh workers read pause_c and resume_c from their mesh.json.
+  const cmd = "for f in \"$HOME/meridian-mesh-v2/mesh.json\" \"$HOME/meridian-sandbox/mesh/mesh.json\"; do [ -f \"$f\" ] || continue; sed -i -E 's/\"pause_c\": *[0-9]+/\"pause_c\": " + pause + "/; s/\"resume_c\": *[0-9]+/\"resume_c\": " + resume + "/' \"$f\"; done; echo saved";
+  const ok = quietJob(cmd, function () { if (note) note.textContent = "Saved."; });
+  if (note) note.textContent = ok ? "Saving" : "Saved on this phone. It reaches Termux the next time it is free.";
 }
 function meshTreePack() {
   return (typeof SKILL_TREES !== "undefined" && SKILL_TREES[meshSkill]) || { name: "Code Master", shape: "", start: [], skills: [] };
@@ -3421,7 +3764,7 @@ function meshShellText(rel, done) {
         done("");
         return;
       }
-      done(text.slice(0, end).replace(/\n?exit \d+\s*$/, ""));
+      done(text.slice(0, end).replace(/\n?exit -?\d+\s*$/, ""));
     });
     if (ok) return;
     tries += 1;
@@ -4228,6 +4571,12 @@ function payPage() {
   html += tierCard("Business", "Premium", "Optional support", "The same features as Pro, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="premiumsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and use Get support for priority help.</p>', "biz");
   return html + '</div>';
 }
+// The prompt cursor in the title bar is only for screens where commands are typed or run.
+// Info screens (Dashboard, Hardware, System, Battery, Security) read as plain widgets.
+function commandScreen() {
+  if (view === "console" || view === "plan" || view === "build") return true;
+  return view === "tools" && (more === "commands" || more === "doctor" || more === "tweaks" || more === "mesh" || more === "pc");
+}
 function render() {
   const main = document.getElementById("main");
   const map = { home: homePage, hardware: hardwarePage, system: systemPage, battery: batteryPage, security: securityPage, build: buildPage, plan: planPage, key: keyPage, apis: apisPage, tools: toolsPage, console: consoleView, files: filesPage, setup: setupPage, pay: payPage, settings: settingsPage };
@@ -4243,7 +4592,7 @@ function render() {
   const focused = document.activeElement && document.activeElement.id === "line";
   const pageBody = (map[view] || homePage)();
   const readings = /<button\b/i.test(pageBody) ? "" : " readings";
-  main.innerHTML = '<section class="win"><div class="wintop">' + (view === "battery" ? "" : '<span class="termbit" aria-hidden="true">&gt;<i></i></span>') + '<b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
+  main.innerHTML = '<section class="win"><div class="wintop">' + (commandScreen() ? '<span class="termbit" aria-hidden="true">&gt;<i></i></span>' : "") + '<b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
   const typingOn = document.body.classList.contains("typing-focus");
   const kbOn = document.body.classList.contains("kbopen");
@@ -4257,6 +4606,7 @@ function render() {
   });
   const line = document.getElementById("bondline");
   line.textContent = bond === "termux" ? t("connected") : bond === "ask" ? t("allowTermux") : bond === "missing" ? t("noTermux") : t("notConnected");
+  applyZoom();
   bind();
   paintChrome();
   function putScroll(topBody, topMain) {
@@ -4272,7 +4622,6 @@ function render() {
   } else {
     putScroll(0, 0);
   }
-  if ((view === "system" || view === "home") && bond === "termux" && !senseAsked) setTimeout(loadSense, 40);
   if (view === "files") {
     loadFiles();
   }
@@ -4732,6 +5081,14 @@ function bind() {
   if (termuxbat) termuxbat.onclick = function () { try { MeridianPhone.termuxBattery(); } catch (e) {} };
   const repairvulkan = document.getElementById("repairvulkan");
   if (repairvulkan) repairvulkan.onclick = function () { exec("Vulkan repair", VULKAN_REPAIR); };
+  const heatsave = document.getElementById("heatsave");
+  if (heatsave) heatsave.onclick = function () { saveHeat(false); };
+  const heatreset = document.getElementById("heatreset");
+  if (heatreset) heatreset.onclick = function () { saveHeat(true); };
+  bindTermuxFix(document);
+  if (view === "setup" && openCmd === "") setTimeout(function () { checkTermuxLink(false); }, 60);
+  if (view === "hardware") setTimeout(function () { loadModelFiles(false); }, 120);
+  if (view === "system" && (termuxLink.state === "unknown" || Date.now() - termuxLink.at > 30000)) setTimeout(function () { checkTermuxLink(false); }, 60);
   ["opentermux", "wakeTermux"].forEach(function (id) {
     const el = document.getElementById(id);
     if (el) el.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
@@ -4767,7 +5124,7 @@ function bind() {
       let r = "open";
       try { r = MeridianPhone.powerMode(mode); } catch (e) {}
       const note = document.getElementById("powernote");
-      if (note) note.textContent = r === "set" ? "Applied." : r === "open" ? (mode === "fast" ? "The Processing speed page is open. Pick Performance there." : "The Power saving page is open. Pick the mode there.") : "This phone blocked it. Open Settings, Battery, and pick the mode there.";
+      if (note) note.textContent = r === "set" ? "Applied." : r === "open" ? "Opened your phone's battery settings." : "This phone has no matching settings page.";
       if (r === "set") render();
     };
   });
@@ -5079,36 +5436,10 @@ function bind() {
   if (openhelp) openhelp.onclick = function () { openSheet("help"); };
   const copymd = document.getElementById("copymd");
   if (copymd) copymd.onclick = function () { copyMarkdownReport(); };
-  paintScheduler();
-  const schedrecipe = document.getElementById("schedrecipe");
-  const schedevery = document.getElementById("schedevery");
-  if (schedrecipe) schedrecipe.onchange = paintScheduler;
-  if (schedevery) schedevery.onchange = paintScheduler;
-  const schedcopy = document.getElementById("schedcopy");
-  if (schedcopy) schedcopy.onclick = function () {
-    const cmd = schedulerCommand();
-    try { MeridianPhone.clip(cmd); } catch (e) {}
-    toast(t("copyCommand"));
-  };
-  const schedrun = document.getElementById("schedrun");
-  if (schedrun) schedrun.onclick = function () {
-    const cmd = schedulerCommand();
-    if (!cmd) return;
-    const kind = schedulerDanger();
-    if (kind && !confirm(t("dangerConfirm").replace("{kind}", kind))) return;
-    exec("Scheduler", cmd, function (code) {
-      const status = code === 0 ? "scheduled" : "exit " + code;
-      try { localStorage.setItem("m-sched-status", status); } catch (e) {}
-    });
-  };
-  const schedcheck = document.getElementById("schedcheck");
-  if (schedcheck) schedcheck.onclick = function () {
-    exec("Scheduler", "termux-job-scheduler --pending || echo 'termux-job-scheduler is not installed. pkg install termux-api'", function (code) {
-      const last = blocks.length ? String(blocks[blocks.length - 1].out || "").replace(/\n?exit \d+\s*$/, "").trim() : "";
-      const status = (last || ("exit " + code)).slice(0, 240);
-      try { localStorage.setItem("m-sched-status", status); } catch (e) {}
-    });
-  };
+  if (document.getElementById("schedcard")) {
+    paintScheduler();
+    if (more === "desk") setTimeout(function () { refreshJobs(false); }, 80);
+  }
   document.querySelectorAll("[data-crumb]").forEach(function (b) {
     b.onclick = function () { cwd = b.getAttribute("data-crumb"); editing = false; render(); };
   });
@@ -5127,7 +5458,7 @@ function bind() {
   }
   function fileResult(raw, okText) {
     const text = String(raw || "");
-    if (/\nexit [1-9]\d*\s*$/.test(text) || /outside the Termux home/.test(text)) { toast(text.replace(/\n?exit \d+\s*$/, "").trim() || "Termux said no."); return false; }
+    if (/\nexit [1-9]\d*\s*$/.test(text) || /outside the Termux home/.test(text)) { toast(text.replace(/\n?exit -?\d+\s*$/, "").trim() || "Termux said no."); return false; }
     if (okText) toast(okText);
     return true;
   }
@@ -5244,7 +5575,7 @@ function loadFiles() {
     }
     // Only exact noise lines are dropped. The old rule hid every file whose name had a space.
     const lines = clean.split("\n").map(function (l) { return l.replace(/\r$/, ""); }).filter(function (l) {
-      if (!l.trim() || /^exit \d+$/.test(l.trim()) || l === "Reading…" || l === "Termux") return false;
+      if (!l.trim() || /^exit -?\d+$/.test(l.trim()) || l === "Reading…" || l === "Termux") return false;
       if (/^Script (started|done) on /.test(l)) return false;
       if (/^\[COMMAND_EXIT/.test(l)) return false;
       if (/^(ls|bash): /.test(l)) return false;
@@ -5284,7 +5615,7 @@ function loadFiles() {
         picked = join(name);
         let text = "";
         try { text = String(MeridianPhone.readFile(picked)); } catch (e) { text = String(e); }
-        fileBody = text.replace(/\n?exit \d+\s*$/, "");
+        fileBody = text.replace(/\n?exit -?\d+\s*$/, "");
         editing = true;
         render();
       }
@@ -5336,7 +5667,7 @@ function loadSense() {
   senseAsked = true;
   setTimeout(function () {
     const ok = quietJob("uname -srm", function (out) {
-      senseText = out.replace(/\n?exit \d+\s*$/, "").trim();
+      senseText = out.replace(/\n?exit -?\d+\s*$/, "").trim();
       if (/Not allowed to start service|Termux was asleep/.test(senseText)) senseText = "";
       const node = document.getElementById("senseline");
       if (node) node.textContent = senseText || (bond === "termux" ? "Reading the shell…" : "Connect Termux. This line is uname from that shell.");
@@ -5619,36 +5950,186 @@ function showSteps(steps) {
   } catch (e) {}
 }
 const SCHED_MS = { "15": 900000, "60": 3600000, "360": 21600000, "1440": 86400000 };
-function schedulerDanger() {
+// Desk scheduler: curated tasks that make sense to repeat. Meridian schedules them through Termux itself.
+const SCHED_RECIPES = [
+  { id: 701, name: "rcpCheck", steps: ["pkg update -y"] },
+  { id: 702, name: "rcpUpgrade", steps: ["export DEBIAN_FRONTEND=noninteractive", "dpkg --configure -a --force-confdef --force-confold || true", "pkg update -y && pkg upgrade -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\""] },
+  { id: 703, name: "rcpClean", steps: ["apt-get clean"] },
+  { id: 704, name: "rcpBattery", steps: ["mkdir -p \"$HOME/meridian-logs\"", "{ date '+%Y-%m-%d %H:%M'; timeout 20 termux-battery-status; } >> \"$HOME/meridian-logs/battery.log\""] },
+  { id: 705, name: "rcpStorage", steps: ["mkdir -p \"$HOME/meridian-logs\"", "{ date '+%Y-%m-%d %H:%M'; df -h /data; } >> \"$HOME/meridian-logs/storage.log\""] },
+  { id: 706, name: "rcpRepair", steps: ["export DEBIAN_FRONTEND=noninteractive", "dpkg --configure -a --force-confdef --force-confold || true", "apt-get install -f -y || true"] }
+];
+const SCHED_EVERY = [["15", "every15"], ["60", "everyHour"], ["360", "every6"], ["1440", "everyDay"]];
+let schedState = { jobs: null, note: "", noteBad: false, need: "", at: 0, showCmd: false, working: false };
+function schedPick() {
   const pick = document.getElementById("schedrecipe");
-  const steps = byName(pick ? pick.value : "");
-  if (!steps) return "";
-  for (let i = 0; i < steps.length; i++) {
-    const kind = dangerKind(steps[i]);
+  const id = Number(pick ? pick.value : SCHED_RECIPES[0].id);
+  for (let i = 0; i < SCHED_RECIPES.length; i++) if (SCHED_RECIPES[i].id === id) return SCHED_RECIPES[i];
+  return SCHED_RECIPES[0];
+}
+function schedRecipeById(id) {
+  for (let i = 0; i < SCHED_RECIPES.length; i++) if (SCHED_RECIPES[i].id === Number(id)) return SCHED_RECIPES[i];
+  return null;
+}
+function schedulerDanger() {
+  const r = schedPick();
+  for (let i = 0; i < r.steps.length; i++) {
+    const kind = dangerKind(r.steps[i]);
     if (kind) return kind;
   }
   return "";
 }
 function schedulerCommand() {
-  const pick = document.getElementById("schedrecipe");
+  const r = schedPick();
   const every = document.getElementById("schedevery");
-  const name = pick ? pick.value : "";
-  const steps = byName(name);
-  if (!steps) return "";
-  const period = SCHED_MS[(every && every.value) || "60"] || 3600000;
-  const script = "#!/data/data/com.termux/files/usr/bin/bash\nset -e\n" + steps.join("\n") + "\n";
+  const mins = (every && every.value) || "60";
+  const period = SCHED_MS[mins] || 3600000;
+  const dir = "$HOME/.meridian/jobs";
+  const script = "#!/data/data/com.termux/files/usr/bin/bash\nd=\"" + dir + "\"; mkdir -p \"$d\"\ndate '+%Y-%m-%d %H:%M' > \"$d/" + r.id + ".last\"\n{\n" + r.steps.join("\n") + "\n} > \"$d/" + r.id + ".log\" 2>&1\n";
   const b64 = btoa(unescape(encodeURIComponent(script)));
-  return "mkdir -p \"$HOME/.meridian\"\nprintf %s '" + b64 + "' | base64 -d > \"$HOME/.meridian/job.sh\"\nchmod +x \"$HOME/.meridian/job.sh\"\ntermux-job-scheduler --job-id 7 --period-ms " + period + " --persisted true --script \"$HOME/.meridian/job.sh\"\nprintf '%s\\n' 'scheduled " + String(name).replace(/'/g, "") + "' > \"$HOME/.meridian/job-status\"\necho scheduled";
+  return "command -v termux-job-scheduler >/dev/null 2>&1 || { echo MERIDIAN_NO_JOBAPI; exit 3; }\n"
+    + "d=\"" + dir + "\"; mkdir -p \"$d\"\n"
+    + "printf %s '" + b64 + "' | base64 -d > \"$d/" + r.id + ".sh\"\nchmod +x \"$d/" + r.id + ".sh\"\n"
+    + "timeout 25 termux-job-scheduler --job-id " + r.id + " --period-ms " + period + " --persisted true --script \"$d/" + r.id + ".sh\"; rc=$?\n"
+    + "if [ \"$rc\" = 124 ]; then echo MERIDIAN_NO_APIAPP; exit 4; fi\n"
+    + "[ \"$rc\" = 0 ] && printf '%s\\n' '" + r.id + "|" + mins + "' > \"$d/" + r.id + ".meta\"\n"
+    + "exit $rc";
+}
+const SCHED_LIST = "d=\"$HOME/.meridian/jobs\"\nif command -v termux-job-scheduler >/dev/null 2>&1; then p=$(timeout 15 termux-job-scheduler --pending 2>/dev/null); echo \"R|$?\"; printf '%s\\n' \"$p\" | sed 's/^/P|/'; else echo 'R|127'; fi\nfor m in \"$d\"/*.meta; do [ -f \"$m\" ] || continue; id=$(basename \"$m\" .meta); echo \"M|$(cat \"$m\")|$(head -n 1 \"$d/$id.last\" 2>/dev/null)\"; done";
+function parseJobs(out) {
+  const lines = String(out || "").split("\n");
+  let rc = 1;
+  const pending = {};
+  const jobs = [];
+  lines.forEach(function (l) {
+    if (l.indexOf("R|") === 0) rc = Number(l.slice(2)) || 0;
+    else if (l.indexOf("P|") === 0) { const m = l.match(/Job (\d+)/); if (m) pending[m[1]] = 1; }
+    else if (l.indexOf("M|") === 0) {
+      const f = l.split("|");
+      if (schedRecipeById(f[1])) jobs.push({ id: Number(f[1]), every: f[2] || "60", last: f[3] || "" });
+    }
+  });
+  return { rc: rc, jobs: rc === 0 ? jobs.filter(function (j) { return pending[String(j.id)]; }) : jobs };
+}
+function schedNeedHtml() {
+  if (schedState.need === "pkg") return '<p class="muted">' + esc(t("schedNeedApi")) + '</p><button class="btn" type="button" id="schedinstall">' + esc(t("installApi")) + '</button>';
+  if (schedState.need === "app") return '<p class="muted">' + esc(t("schedNeedApiApp")) + '</p><button class="btn" type="button" data-open="https://f-droid.org/packages/com.termux.api/">' + esc(t("getApiApp")) + '</button>';
+  return "";
+}
+function schedJobsHtml() {
+  if (schedState.jobs === null) return '<p class="muted">' + esc(t("termuxLinkChecking")) + '</p>';
+  if (!schedState.jobs.length) return '<p class="muted">' + esc(t("noJobs")) + '</p>';
+  return schedState.jobs.map(function (j) {
+    const r = schedRecipeById(j.id);
+    const ev = SCHED_EVERY.filter(function (e) { return e[0] === String(j.every); })[0];
+    return '<div class="kv jobrow"><div class="jobinfo"><b>' + esc(t(r.name)) + '</b><br><span class="muted">' + esc(ev ? t(ev[1]) : "") + ' · ' + esc(t("lastRun")) + ': ' + esc(j.last || t("neverRun")) + '</span></div><button class="ghost danger" type="button" data-stopjob="' + j.id + '">' + esc(t("stopJob")) + '</button></div>';
+  }).join("");
 }
 function paintScheduler() {
+  const r = schedPick();
+  const desc = document.getElementById("scheddesc");
+  if (desc) desc.textContent = t(r.name + "D");
   const pre = document.getElementById("schedcmd");
   if (pre) pre.textContent = schedulerCommand();
+  const note = document.getElementById("schednote");
+  if (note) { note.textContent = schedState.note; note.className = "muted" + (schedState.noteBad ? " bad" : ""); }
+  const need = document.getElementById("schedneed");
+  if (need) need.innerHTML = schedNeedHtml();
+  const list = document.getElementById("schedjobs");
+  if (list) list.innerHTML = schedJobsHtml();
+  bindScheduler();
 }
 function schedulerCard() {
   let options = "";
-  IDEAS.forEach(function (idea) { options += '<option value="' + esc(idea[0]) + '">' + esc(idea[0]) + '</option>'; });
-  const last = localStorage.getItem("m-sched-status") || "—";
-  return '<article class="plate stack" id="schedcard"><b>' + esc(t("scheduler")) + '</b><p class="muted">' + esc(t("schedulerBlurb")) + '</p><label class="muted" for="schedrecipe">' + esc(t("commands")) + '</label><select id="schedrecipe">' + options + '</select><label class="muted" for="schedevery">' + esc(t("interval")) + '</label><select id="schedevery"><option value="15">' + esc(t("every15")) + '</option><option value="60" selected>' + esc(t("everyHour")) + '</option><option value="360">' + esc(t("every6")) + '</option><option value="1440">' + esc(t("everyDay")) + '</option></select><pre id="schedcmd"></pre><div class="tools"><button class="ghost" type="button" id="schedcopy">' + esc(t("copyCommand")) + '</button><button class="ghost" type="button" id="schedrun">' + esc(t("runScheduler")) + '</button><button class="ghost" type="button" id="schedcheck">' + esc(t("checkJobs")) + '</button></div><p class="muted" id="schedstatus">' + esc(t("lastStatus")) + ": " + esc(last) + '</p></article>';
+  SCHED_RECIPES.forEach(function (r) { options += '<option value="' + r.id + '">' + esc(t(r.name)) + '</option>'; });
+  let every = "";
+  SCHED_EVERY.forEach(function (e) { every += '<option value="' + e[0] + '"' + (e[0] === "60" ? " selected" : "") + '>' + esc(t(e[1])) + '</option>'; });
+  return '<article class="plate stack" id="schedcard"><b>' + esc(t("schedTitle")) + '</b>'
+    + '<label class="muted" for="schedrecipe">' + esc(t("schedWhat")) + '</label><select id="schedrecipe">' + options + '</select>'
+    + '<p class="muted" id="scheddesc"></p>'
+    + '<label class="muted" for="schedevery">' + esc(t("schedHow")) + '</label><select id="schedevery">' + every + '</select>'
+    + '<button class="btn" type="button" id="schedrun">' + esc(t("schedule")) + '</button>'
+    + '<p class="muted" id="schednote" role="status"></p><div id="schedneed"></div>'
+    + '<details id="schedmore"' + (schedState.showCmd ? " open" : "") + '><summary class="muted">' + esc(t("showCommand")) + '</summary><pre id="schedcmd"></pre></details>'
+    + '</article>'
+    + '<article class="plate stack" id="schedlist"><div class="tools" style="justify-content:space-between;align-items:center"><b>' + esc(t("activeJobs")) + '</b><button class="ghost" type="button" id="schedrefresh">' + esc(t("refreshJobs")) + '</button></div><div id="schedjobs"></div></article>';
+}
+function schedNote(text, bad) { schedState.note = text; schedState.noteBad = !!bad; paintScheduler(); }
+function refreshJobs(force) {
+  if (!force && Date.now() - schedState.at < 15000) return;
+  schedState.at = Date.now();
+  quietJob(SCHED_LIST, function (out) {
+    const parsed = parseJobs(out);
+    schedState.jobs = parsed.jobs;
+    if (parsed.rc === 127) schedState.need = "pkg";
+    else if (parsed.rc === 124) schedState.need = "app";
+    paintScheduler();
+  });
+}
+function scheduleNow() {
+  const cmd = schedulerCommand();
+  if (!cmd || schedState.working) return;
+  const kind = schedulerDanger();
+  if (kind && !confirm(t("dangerConfirm").replace("{kind}", kind))) return;
+  schedState.working = true;
+  schedNote(t("schedWorking"), false);
+  const ok = quietJob(cmd, function (out) {
+    schedState.working = false;
+    const code = Number((String(out).match(/exit (-?\d+)\s*$/) || [0, 1])[1]);
+    if (/MERIDIAN_NO_JOBAPI/.test(out)) { schedState.need = "pkg"; schedNote(t("schedNeedApi"), true); return; }
+    if (/MERIDIAN_NO_APIAPP/.test(out)) { schedState.need = "app"; schedNote(t("schedNeedApiApp"), true); return; }
+    if (/Termux blocked Meridian/.test(out)) { schedNote(t("termuxWhyTimeout"), true); return; }
+    if (code === 0) {
+      schedState.need = "";
+      try { localStorage.setItem("m-sched-status", "scheduled"); } catch (e) {}
+      schedNote(t("schedOk"), false);
+      refreshJobs(true);
+    } else {
+      const pre = document.getElementById("schedcmd");
+      if (pre) pre.textContent = schedulerCommand() + "\n\n" + String(out).replace(/\n?exit -?\d+\s*$/, "").trim();
+      schedNote(t("schedFail"), true);
+    }
+  });
+  if (!ok) { schedState.working = false; schedNote(t("schedBusy"), true); }
+}
+function stopScheduled(id) {
+  const ok = quietJob("timeout 15 termux-job-scheduler --cancel --job-id " + Number(id) + " >/dev/null 2>&1; rm -f \"$HOME/.meridian/jobs/" + Number(id) + ".meta\"; echo stopped", function () {
+    schedNote(t("schedStopped"), false);
+    refreshJobs(true);
+  });
+  if (!ok) schedNote(t("schedBusy"), true);
+}
+function installJobApi() {
+  schedNote(t("installingApi"), false);
+  const ok = quietJob("export DEBIAN_FRONTEND=noninteractive\npkg install -y termux-api", function (out) {
+    if (/\nexit 0\s*$/.test(out) || /exit 0$/.test(out)) {
+      let api = true;
+      try { api = !!JSON.parse(MeridianPhone.status()).api; } catch (e) {}
+      schedState.need = api ? "" : "app";
+      schedNote(api ? "" : t("schedNeedApiApp"), !api);
+    } else schedNote(t("schedFail"), true);
+  });
+  if (!ok) schedNote(t("schedBusy"), true);
+}
+function bindScheduler() {
+  const schedrecipe = document.getElementById("schedrecipe");
+  const schedevery = document.getElementById("schedevery");
+  if (schedrecipe) schedrecipe.onchange = paintScheduler;
+  if (schedevery) schedevery.onchange = paintScheduler;
+  const run = document.getElementById("schedrun");
+  if (run) run.onclick = scheduleNow;
+  const more = document.getElementById("schedmore");
+  if (more) more.ontoggle = function () {
+    schedState.showCmd = more.open;
+    const sum = more.querySelector("summary");
+    if (sum) sum.textContent = more.open ? t("hideCommand") : t("showCommand");
+  };
+  const refresh = document.getElementById("schedrefresh");
+  if (refresh) refresh.onclick = function () { refreshJobs(true); };
+  const install = document.getElementById("schedinstall");
+  if (install) install.onclick = installJobApi;
+  document.querySelectorAll("#schedcard [data-open]").forEach(function (b) { b.onclick = function () { try { MeridianPhone.open(b.getAttribute("data-open")); } catch (e) {} }; });
+  document.querySelectorAll("[data-stopjob]").forEach(function (b) { b.onclick = function () { stopScheduled(b.getAttribute("data-stopjob")); }; });
 }
 let platforms = { active: { base: "", model: "", key: "" }, items: [] };
 function normalizeBase(base) {
@@ -6034,7 +6515,11 @@ function paintMarks() {
 paintMarks();
 startRefresh();
 document.addEventListener("visibilitychange", function () {
-  if (!document.hidden) { probeAt = 0; paintMeters(); paintGraph(); paintHardware(); paintBattery(); }
+  if (!document.hidden) {
+    probeAt = 0; paintMeters(); paintGraph(); paintHardware(); paintBattery();
+    if ((view === "setup" && openCmd === "") || view === "system") checkTermuxLink(true);
+    if (more === "desk") refreshJobs(false);
+  }
 });
 function signalMark(on) {
   return on ? "currentColor" : "var(--muted)";

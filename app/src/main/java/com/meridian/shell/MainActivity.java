@@ -47,6 +47,7 @@ import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -107,6 +108,18 @@ public class MainActivity extends Activity {
     static volatile java.net.ServerSocket liveSock;
     /** Random per-job secret: a local socket client must send it as its first line or be ignored. */
     static volatile String liveToken = "";
+    /** Termux RUN_COMMAND permission request code. */
+    private static final int RUN_REQUEST = 7;
+    private static final String RUN_PERM = "com.termux.permission.RUN_COMMAND";
+    /** True once the live socket saw this job's token, so Termux really started the script. */
+    static volatile boolean liveHello = false;
+    /** Last known state of the Termux link: unknown, checking, ok, permission, external, asleep, timeout, missing. */
+    static volatile String termuxState = "unknown";
+    static volatile String termuxDetail = "";
+    static volatile int pingGen = 0;
+    private boolean runAsked = false;
+    private boolean runPending = false;
+    static volatile java.lang.ref.WeakReference<MainActivity> current;
 
     private JSONObject cachedProps;
     private String cachedProbe = "";
@@ -174,6 +187,93 @@ public class MainActivity extends Activity {
         watchSignal();
         generateHardwareBoundKey();
         ensureMeshTts();
+        current = new java.lang.ref.WeakReference<MainActivity>(this);
+        if (termuxInstalled()) askRunPerm();
+    }
+
+    private boolean hasRunPerm() {
+        return checkSelfPermission(RUN_PERM) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Asks Android for the Termux command permission when it is missing. Reinstalling Meridian
+     * can reset it, and every Termux command fails without it. When Android no longer shows the
+     * prompt (denied twice), opening this app's settings page is the only way left.
+     */
+    private boolean askRunPerm() {
+        return askRunPerm(false);
+    }
+
+    /** byUser: the person pressed a button, so falling back to the settings page is expected. */
+    private boolean askRunPerm(final boolean byUser) {
+        if (hasRunPerm()) return true;
+        runOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    if (runPending) return;
+                    if (byUser && runAsked && !shouldShowRequestPermissionRationale(RUN_PERM)) {
+                        Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        i.setData(Uri.parse("package:" + getPackageName()));
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        return;
+                    }
+                    runAsked = true;
+                    runPending = true;
+                    requestPermissions(new String[] { RUN_PERM }, RUN_REQUEST);
+                } catch (Exception ignored) {}
+            }
+        });
+        return false;
+    }
+
+    /** Sends a tiny command to Termux and reports the outcome to the page through window.meridianTermux. */
+    private String checkTermux() {
+        if (!termuxInstalled()) { setTermuxState("missing", ""); return "missing"; }
+        if (!hasRunPerm()) { askRunPerm(); setTermuxState("permission", ""); return "permission"; }
+        final int gen = ++pingGen;
+        termuxState = "checking";
+        Intent intent = termuxIntent("echo meridian-link-ok", true);
+        Intent back = new Intent(this, TermuxResult.class);
+        back.setAction("com.meridian.deck.TERMUX_PING");
+        back.putExtra("ping", gen);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= 31) flags |= PendingIntent.FLAG_MUTABLE;
+        PendingIntent pending = PendingIntent.getBroadcast(this, 990, back, flags);
+        intent.putExtra("com.termux.RUN_COMMAND_PENDING_INTENT", pending);
+        if (!sendToTermux(intent)) { setTermuxState("asleep", ""); return "asleep"; }
+        meshHandler.postDelayed(new Runnable() {
+            public void run() {
+                if (gen == pingGen && "checking".equals(termuxState)) setTermuxState("timeout", "");
+            }
+        }, 8000);
+        return "checking";
+    }
+
+    /** Called by TermuxResult for a link check. */
+    static void pingResult(int gen, String state, String detail) {
+        if (gen != pingGen) return;
+        MainActivity a = current == null ? null : current.get();
+        if (a != null) a.setTermuxState(state, detail);
+        else { termuxState = state; termuxDetail = detail == null ? "" : detail; }
+    }
+
+    /** Remembers a failure seen on a real job, so Setup shows it without another check. */
+    static void noteFault(String state, String detail) {
+        MainActivity a = current == null ? null : current.get();
+        if (a != null) a.setTermuxState(state, detail);
+        else { termuxState = state; termuxDetail = detail == null ? "" : detail; }
+    }
+
+    private void setTermuxState(String state, String detail) {
+        termuxState = state;
+        termuxDetail = detail == null ? "" : detail;
+        final String js = "window.meridianTermux&&window.meridianTermux(" + JSONObject.quote(state) + "," + JSONObject.quote(termuxDetail) + ")";
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (web != null) web.evaluateJavascript(js, null);
+            }
+        });
     }
 
     /**
@@ -301,6 +401,11 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RUN_REQUEST) {
+            runPending = false;
+            setTermuxState(hasRunPerm() ? "unknown" : "permission", "");
+            return;
+        }
         if (requestCode != MIC_REQUEST) return;
         if (meshWanted && activityResumed && hasMic()) {
             ensureMeshRecognizer();
@@ -795,6 +900,97 @@ public class MainActivity extends Activity {
         return asked;
     }
 
+    /**
+     * Battery settings pages, generic Android intents first. Performance has no generic intent,
+     * so it is only offered when one of the known vendor pages exists on this phone.
+     */
+    private Intent[] powerIntents(String which) {
+        java.util.ArrayList<Intent> list = new java.util.ArrayList<Intent>();
+        if ("fast".equals(which)) {
+            String[][] parts = new String[][] {
+                { "com.samsung.android.lool", "com.samsung.android.sm.battery.ui.setting.PowerModeSettingsActivity" },
+                { "com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsConfigActivity" },
+                { "com.oplus.battery", "com.oplus.powermanager.fuelgaue.PowerControlActivity" },
+                { "com.coloros.oppoguardelf", "com.coloros.powermanager.fuelgaue.PowerUsageModelActivity" }
+            };
+            for (String[] part : parts) {
+                Intent i = new Intent();
+                i.setComponent(new android.content.ComponentName(part[0], part[1]));
+                list.add(i);
+            }
+        } else if ("usage".equals(which)) {
+            list.add(new Intent(Intent.ACTION_POWER_USAGE_SUMMARY));
+            list.add(new Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS));
+        } else {
+            list.add(new Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS));
+            list.add(new Intent(Intent.ACTION_POWER_USAGE_SUMMARY));
+        }
+        list.add(new Intent(Settings.ACTION_SETTINGS));
+        if ("fast".equals(which)) list.remove(list.size() - 1);
+        return list.toArray(new Intent[list.size()]);
+    }
+
+    private Intent firstResolvable(Intent[] intents) {
+        PackageManager pm = getPackageManager();
+        for (Intent i : intents) {
+            try {
+                if (i.resolveActivity(pm) != null) return i;
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
+    private boolean openPage(Intent[] intents) {
+        for (final Intent i : intents) {
+            try {
+                if (i.resolveActivity(getPackageManager()) == null) continue;
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                return true;
+            } catch (Exception ignored) {}
+        }
+        return false;
+    }
+
+    private long headroomAt = 0;
+    private float headroomVal = -1f;
+
+    /** Android's own thermal status (API 29+) and headroom (API 30+); -1 when the phone does not say. */
+    private void putThermal(JSONObject o) {
+        try {
+            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(POWER_SERVICE);
+            int status = -1;
+            if (pm != null && Build.VERSION.SDK_INT >= 29) status = pm.getCurrentThermalStatus();
+            o.put("thermalStatus", status);
+            long now = android.os.SystemClock.uptimeMillis();
+            if (pm != null && Build.VERSION.SDK_INT >= 30 && now - headroomAt > 2000) {
+                float h = pm.getThermalHeadroom(10);
+                headroomAt = now;
+                headroomVal = Float.isNaN(h) ? -1f : h;
+            }
+            o.put("headroom", headroomVal);
+        } catch (Exception ignored) {}
+    }
+
+    /** versionName straight from Android's package manager, or "" when the app is not installed. */
+    private String packageVersion(String pkg) {
+        try {
+            String v = getPackageManager().getPackageInfo(pkg, 0).versionName;
+            return v == null ? "" : v;
+        } catch (Exception ex) {
+            return "";
+        }
+    }
+
+    private boolean apiInstalled() {
+        try {
+            getPackageManager().getPackageInfo("com.termux.api", 0);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     private boolean termuxInstalled() {
         try {
             getPackageManager().getPackageInfo("com.termux", 0);
@@ -830,6 +1026,11 @@ public class MainActivity extends Activity {
         String script = "mkdir -p \"$HOME/.meridian\"\n"
             + "printf -- %s " + sh(cmd) + " > \"$HOME/.meridian/open.sh\"\n"
             + "bash \"$HOME/.meridian/open.sh\"; echo; echo '[Meridian] Command finished. Press Enter to close.'; read -r _";
+        if (!hasRunPerm()) {
+            askRunPerm();
+            noteFault("permission", "");
+            return false;
+        }
         boolean sent = sendToTermux(termuxIntent(script, false));
         wakeTermux();
         return sent;
@@ -859,6 +1060,9 @@ public class MainActivity extends Activity {
         return sent;
     }
 
+    static final String NO_PERM = "Termux blocked Meridian: the Termux command permission is off. Tap Allow on the prompt, then run this again.";
+    static final String NO_START = "Termux blocked Meridian: the command never started. Tap Fix Termux connection, then run this again.";
+
     private void launch(String cmd) {
         synchronized (GATE) {
             jobGen++;
@@ -866,9 +1070,21 @@ public class MainActivity extends Activity {
             pendingOut = "";
             pendingCode = -1;
         }
-        int gen = jobGen;
+        final int gen = jobGen;
+        if (!hasRunPerm()) {
+            askRunPerm();
+            noteFault("permission", "");
+            synchronized (GATE) {
+                pendingOut = NO_PERM;
+                pendingCode = 1;
+                ready = true;
+                GATE.notifyAll();
+            }
+            return;
+        }
+        liveHello = false;
         liveToken = randomToken();
-        int port = openLive();
+        final int port = openLive();
         Intent intent = termuxIntent(prepare(cmd, port), true);
         Intent back = new Intent(this, TermuxResult.class);
         back.setAction("com.meridian.deck.TERMUX_RESULT");
@@ -877,11 +1093,12 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 31) flags |= PendingIntent.FLAG_MUTABLE;
         PendingIntent pending = PendingIntent.getBroadcast(this, 1000 + (gen % 50), back, flags);
         intent.putExtra("com.termux.RUN_COMMAND_PENDING_INTENT", pending);
-        if (sendToTermux(intent)) return;
+        if (sendToTermux(intent)) { watchStart(gen, port); return; }
         wakeTermux();
         try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
         if (sendToTermux(intent)) {
             returnToUs();
+            watchStart(gen, port);
             return;
         }
         returnToUs();
@@ -891,6 +1108,28 @@ public class MainActivity extends Activity {
             ready = true;
             GATE.notifyAll();
         }
+    }
+
+    /**
+     * The runner greets the live socket before it does anything else. If neither that greeting nor a
+     * Termux result arrives, Termux dropped the command (for example allow-external-apps is off), so
+     * the console gets a clear reason instead of waiting forever.
+     */
+    private void watchStart(final int gen, int port) {
+        if (port <= 0) return;
+        meshHandler.postDelayed(new Runnable() {
+            public void run() {
+                synchronized (GATE) {
+                    if (gen != jobGen || ready || liveHello) return;
+                    pendingOut = NO_START;
+                    pendingCode = 1;
+                    ready = true;
+                    jobGen++;
+                    GATE.notifyAll();
+                }
+                noteFault("timeout", "");
+            }
+        }, 20000);
     }
 
     private boolean sendToTermux(Intent intent) {
@@ -949,6 +1188,8 @@ public class MainActivity extends Activity {
                     String first = reader.readLine();
                     // Any local app can connect to 127.0.0.1; only streams that know this job's token may write to the console.
                     if (first == null || !first.equals(liveToken)) continue;
+                    liveHello = true;
+                    if (!"ok".equals(termuxState)) termuxState = "ok";
                     String line;
                     while ((line = reader.readLine()) != null) {
                         sb.append(line).append('\n');
@@ -1147,8 +1388,10 @@ public class MainActivity extends Activity {
                     o.put("hz", Math.round(display.getRefreshRate()));
                 } catch (Exception ignored) {}
                 o.put("termux", termuxInstalled());
-                o.put("allowed", checkSelfPermission("com.termux.permission.RUN_COMMAND") == PackageManager.PERMISSION_GRANTED);
+                o.put("allowed", hasRunPerm());
+                o.put("api", apiInstalled());
                 o.put("power", powerNow());
+                putThermal(o);
                 return o.toString();
             } catch (Exception ex) {
                 return "{\"error\":\"status\"}";
@@ -1216,12 +1459,8 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String bond() {
             if (!termuxInstalled()) return "missing";
-            if (checkSelfPermission("com.termux.permission.RUN_COMMAND") != PackageManager.PERMISSION_GRANTED) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        requestPermissions(new String[] { "com.termux.permission.RUN_COMMAND" }, 7);
-                    }
-                });
+            if (!hasRunPerm()) {
+                askRunPerm();
                 return "ask";
             }
             return "termux";
@@ -1353,6 +1592,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String powerMode(String mode) {
             String which = mode == null ? "regular" : mode;
+            if ("usage".equals(which)) return openPage(powerIntents("usage")) ? "open" : "none";
             try {
                 android.content.ContentResolver cr = getContentResolver();
                 if ("saver".equals(which)) {
@@ -1375,19 +1615,22 @@ public class MainActivity extends Activity {
 
         private void openPower(final String which) {
             runOnUiThread(new Runnable() {
-                public void run() {
-                    if ("fast".equals(which)) {
-                        if (openPart("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.setting.PowerModeSettingsActivity")) return;
-                        if (openPart("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity")) return;
-                        if (openPart("com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity")) return;
-                    }
-                    try {
-                        Intent i = new Intent(android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS);
-                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                    } catch (Exception ignored) {}
-                }
+                public void run() { openPage(powerIntents(which)); }
             });
+        }
+
+        /** JSON of which battery pages this phone really has, so the page only shows buttons that work. */
+        @JavascriptInterface
+        public String powerPages() {
+            try {
+                JSONObject o = new JSONObject();
+                o.put("saver", firstResolvable(powerIntents("saver")) != null);
+                o.put("usage", firstResolvable(powerIntents("usage")) != null);
+                o.put("fast", firstResolvable(powerIntents("fast")) != null);
+                return o.toString();
+            } catch (Exception ex) {
+                return "{}";
+            }
         }
 
         private boolean openPart(String pkg, String cls) {
@@ -1496,6 +1739,60 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void openTermux() {
             wakeTermux();
+        }
+
+        /** Starts a link check. The answer arrives later through window.meridianTermux(state, detail). */
+        @JavascriptInterface
+        public String termuxCheck() {
+            return checkTermux();
+        }
+
+        @JavascriptInterface
+        public String termuxState() {
+            try {
+                JSONObject o = new JSONObject();
+                o.put("state", termuxState);
+                o.put("detail", termuxDetail);
+                o.put("installed", termuxInstalled());
+                o.put("allowed", hasRunPerm());
+                o.put("api", apiInstalled());
+                o.put("version", packageVersion("com.termux"));
+                o.put("apiVersion", packageVersion("com.termux.api"));
+                return o.toString();
+            } catch (Exception ex) {
+                return "{\"state\":\"unknown\"}";
+            }
+        }
+
+        /** Asks for the Termux command permission, or opens this app's settings when Android stopped asking. */
+        @JavascriptInterface
+        public String askTermuxPermission() {
+            if (!termuxInstalled()) return "missing";
+            return askRunPerm(true) ? "granted" : "asked";
+        }
+
+        /**
+         * One tap fix for allow-external-apps: Meridian cannot write Termux's settings itself, so it
+         * copies the line, opens Termux and tells the user where to paste it.
+         */
+        @JavascriptInterface
+        public String fixTermux(final String line, final String hint) {
+            if (!termuxInstalled()) return "missing";
+            if (line == null || line.length() == 0 || line.length() > 2000) return "refused";
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                        if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("meridian", line));
+                    } catch (Exception ignored) {}
+                    wakeTermux();
+                    if (hint != null && hint.length() > 0 && hint.length() < 400) {
+                        try { Toast.makeText(MainActivity.this, hint, Toast.LENGTH_LONG).show(); } catch (Exception ignored) {}
+                    }
+                }
+            });
+            termuxState = "unknown";
+            return "ok";
         }
 
         @JavascriptInterface

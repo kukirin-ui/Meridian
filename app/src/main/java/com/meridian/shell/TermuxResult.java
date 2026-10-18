@@ -13,13 +13,33 @@ import android.os.Bundle;
 public class TermuxResult extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        Bundle bundle = intent.getBundleExtra("result");
+        if (bundle == null) bundle = intent.getBundleExtra("com.termux.RUN_COMMAND_RESULT_BUNDLE");
+        // Termux sets "err" to something other than -1 when it refused the command before running it
+        // (Pre-Execution failure), for example when allow-external-apps is not true.
+        int err = bundle != null && bundle.containsKey("err") ? bundle.getInt("err", -1) : -1;
+        String errmsg = bundle != null ? bundle.getString("errmsg", "") : "";
+        if (errmsg == null) errmsg = "";
+        String kind = errmsg.contains("allow-external-apps") ? "external" : "refused";
+        int ping = intent.getIntExtra("ping", -1);
+        if (ping >= 0) {
+            if (err != -1) MainActivity.pingResult(ping, kind, errmsg);
+            else {
+                String stdout = bundle == null ? "" : bundle.getString("stdout", "");
+                MainActivity.pingResult(ping, stdout != null && stdout.contains("meridian-link-ok") ? "ok" : "refused", stdout == null ? "" : stdout);
+            }
+            return;
+        }
         int gen = intent.getIntExtra("gen", -1);
         if (gen != MainActivity.jobGen) return;
         String out = "";
         int code = -1;
-        Bundle bundle = intent.getBundleExtra("result");
-        if (bundle == null) bundle = intent.getBundleExtra("com.termux.RUN_COMMAND_RESULT_BUNDLE");
-        if (bundle != null) {
+        if (err != -1) {
+            MainActivity.noteFault(kind, errmsg);
+            out = "Termux blocked Meridian before the command started. Tap Fix Termux connection, then run this again."
+                + (errmsg.length() > 0 ? "\n\n" + errmsg.trim() : "");
+            code = 1;
+        } else if (bundle != null) {
             String stdout = bundle.getString("stdout", "");
             String stderr = bundle.getString("stderr", "");
             out = stdout == null ? "" : stdout;

@@ -5,7 +5,8 @@ Original artwork drawn here as SVG and rasterised with headless Chromium
 app/src/main/assets/www/img/battery/ at 512 px (1x) and 1024 px (2x).
 
 Layers used by the live graphic (bars are drawn live in CSS on top):
-  ring-<tone>.png  dashed ring, turns while charging
+  (the dashed ring is inline SVG in index.html so it follows the theme accent;
+   ring() below is only used for the static icon.png)
   body-<tone>.png  battery shell, cap and empty bar slots
   bolt.png         charging bolt
 Plus a full static icon: icon.png (100%, charging, green).
@@ -61,7 +62,6 @@ def svg(inner, tone="green"):
 
 def jobs():
     for t in TONES:
-        yield f"ring-{t}", svg(ring(), t)
         yield f"body-{t}", svg(body(TONES[t][0]), t)
     yield "bolt", svg(BOLT, "green")
     yield "icon", svg(ring() + body(TONES["green"][0]) + bars() + BOLT, "green")

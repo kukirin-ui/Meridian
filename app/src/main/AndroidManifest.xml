@@ -9,6 +9,17 @@
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
     <queries>
         <package android:name="com.termux" />
+        <package android:name="com.termux.api" />
+        <package android:name="com.samsung.android.lool" />
+        <package android:name="com.miui.powerkeeper" />
+        <package android:name="com.oplus.battery" />
+        <package android:name="com.coloros.oppoguardelf" />
+        <intent>
+            <action android:name="android.intent.action.POWER_USAGE_SUMMARY" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.BATTERY_SAVER_SETTINGS" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
