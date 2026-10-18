@@ -13,7 +13,7 @@ Every feature is available to everyone. There is no licence key, no trial, and n
 
 - **Dashboard** — live CPU, GPU, RAM, battery, thermals, network, and storage readings from the device.
 - **Termux bridge** — commands run in Termux on the same phone through `RunCommandService`. You read a command before it runs.
-- **Recipes** — Setup, Doctor, Build, Tweaks, and a command library (packages, Python, Node, git, llama.cpp, and more).
+- **Recipes** — Setup, Doctor, Build, Advanced tuning, and a command library (packages, Python, Node, git, llama.cpp, and more).
 - **Plan** — describe a goal; an AI model (your own API key or a local model) drafts the shell steps for you to review.
 - **API platforms** — up to 32 OpenAI-compatible providers (Groq, Gemini, OpenRouter, OpenAI, Anthropic, xAI, custom). Keys are encrypted with the Android Keystore and never leave the phone except to the provider you chose.
 - **Local AI mesh (mesh v2)** — llama.cpp GGUF models on the phone, a worker (`worker.py`), task queue, knowledge folder (`my-knowledge/`), and **Add links** to feed public pages into the knowledge base.
