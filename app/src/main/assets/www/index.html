@@ -263,12 +263,32 @@
   .core b::after { content: " MHz"; font-size: 10px; font-weight: 550; color: var(--muted); }
   .bar { display: block; height: 7px; margin-top: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); transition: width 400ms ease-out; }
-  .xtal { display: flex; align-items: center; height: 36px; margin: 8px 0 2px; }
-  .xtal-orb { width: 36px; height: 36px; border-radius: 50%; flex: none; z-index: 2; display: grid; place-items: center; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%), radial-gradient(circle at 50% 60%, #eaff6a 0%, #8dff3c 26%, #1c9a52 56%, rgba(6, 28, 20, .4) 80%); box-shadow: inset 0 0 0 2px rgba(186, 255, 255, .95), inset 0 0 0 4px rgba(0, 190, 230, .28), inset 0 -6px 8px rgba(0, 30, 16, .5), 0 0 10px rgba(0, 230, 255, .4); }
-  .xtal-orb svg { width: 14px; height: 14px; display: block; fill: #0b3a22; }
-  .xtal-track { position: relative; flex: 1; height: 22px; margin-left: -8px; border-radius: 6px 14px 7px 6px; transform: skewX(-18deg); overflow: hidden; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 36%, rgba(0, 16, 32, .55)), repeating-linear-gradient(105deg, rgba(90, 160, 180, .16) 0 8px, rgba(8, 24, 36, .35) 8px 15px); border: 1.5px solid rgba(140, 248, 255, .95); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -6px 8px rgba(0, 50, 80, .5), 0 0 8px rgba(0, 210, 255, .35); }
-  .xtal-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0) 34%, rgba(0, 70, 30, .22)), repeating-linear-gradient(105deg, rgba(210, 255, 60, .2) 0 6px, #f3ff78 6px 11px, rgba(90, 210, 20, .35) 11px 16px); box-shadow: inset 0 0 14px rgba(255,255,255,.3); }
-  .xtal-track::after { content: ""; position: absolute; left: 10px; right: 22px; top: 5px; height: 7px; border-radius: 8px; background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(255,255,255,.08)); pointer-events: none; }
+  /* Battery screen: live battery graphic in its own window on the right. */
+  .bathead { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .batread { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .batread .sec { margin: 0; }
+  .batread .batpct { font-size: 44px; line-height: 1.05; font-weight: 700; letter-spacing: -.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .batread .muted { margin: 0; }
+  /* Transparent PNG layers (tools/battery-icon) with the live bar fill drawn in CSS on top. No panel behind it. */
+  .batwin { --bat-hi: #4dffa6; --bat-lo: #0f8a5f; --bat-glow: rgba(60, 255, 160, .35); position: relative; flex: none; width: 46%; max-width: 190px; aspect-ratio: 1; background: none; border: 0; }
+  .batwin.low { --bat-hi: #ffd166; --bat-lo: #c97a0a; --bat-glow: rgba(255, 190, 70, .35); }
+  .batwin.crit { --bat-hi: #ff6b6b; --bat-lo: #a51d2d; --bat-glow: rgba(255, 80, 80, .4); }
+  .batwin .bat-l { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 100% 100%; pointer-events: none; }
+  .batwin .bat-ring { background-image: url(img/battery/ring-green.png); background-image: -webkit-image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); background-image: image-set(url(img/battery/ring-green.png) 1x, url(img/battery/ring-green@2x.png) 2x); }
+  .batwin.low .bat-ring { background-image: url(img/battery/ring-amber.png); background-image: -webkit-image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); background-image: image-set(url(img/battery/ring-amber.png) 1x, url(img/battery/ring-amber@2x.png) 2x); }
+  .batwin.crit .bat-ring { background-image: url(img/battery/ring-red.png); background-image: -webkit-image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); background-image: image-set(url(img/battery/ring-red.png) 1x, url(img/battery/ring-red@2x.png) 2x); }
+  .batwin .bat-body { background-image: url(img/battery/body-green.png); background-image: -webkit-image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); background-image: image-set(url(img/battery/body-green.png) 1x, url(img/battery/body-green@2x.png) 2x); }
+  .batwin.low .bat-body { background-image: url(img/battery/body-amber.png); background-image: -webkit-image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); background-image: image-set(url(img/battery/body-amber.png) 1x, url(img/battery/body-amber@2x.png) 2x); }
+  .batwin.crit .bat-body { background-image: url(img/battery/body-red.png); background-image: -webkit-image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); background-image: image-set(url(img/battery/body-red.png) 1x, url(img/battery/body-red@2x.png) 2x); }
+  .batwin .bat-bolt { background-image: url(img/battery/bolt.png); background-image: -webkit-image-set(url(img/battery/bolt.png) 1x, url(img/battery/bolt@2x.png) 2x); background-image: image-set(url(img/battery/bolt.png) 1x, url(img/battery/bolt@2x.png) 2x); opacity: 0; transition: opacity 300ms ease-out; }
+  .batwin.charging .bat-bolt { opacity: .95; }
+  .batwin.charging .bat-ring { animation: spin 14s linear infinite; }
+  .batwin .bat-slot { position: absolute; left: 38.75%; width: 22.5%; height: 8.125%; border-radius: 6.9% / 19.2%; overflow: hidden; filter: drop-shadow(0 0 2px var(--bat-glow)); }
+  .batwin .bat-bar { position: absolute; inset: 0; background: linear-gradient(to top, var(--bat-lo), var(--bat-hi)); background-size: 100% 615%; clip-path: inset(100% 0 0 0); transition: clip-path 500ms ease-out; }
+  @media (prefers-reduced-motion: reduce) {
+    html:not([data-motion="full"]) .batwin .bat-ring { animation: none !important; }
+  }
+  html[data-motion="reduce"] .batwin .bat-ring { animation: none !important; }
   .sec { color: var(--accent); font-size: 13px; font-weight: 650; margin: 0 0 8px; letter-spacing: 0.14em; text-transform: uppercase; -webkit-text-stroke: 0; -webkit-text-fill-color: var(--accent); text-shadow: 0 0 12px var(--accent-glow); font-synthesis: none; filter: none; }
   .kv { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 0 -16px; padding: 10px 16px; border-top: 1px solid transparent; }
   .plate > .kv:first-child { border-top: 0; }
@@ -324,10 +344,12 @@
   .runbar .muted { flex: 1; font-size: 0.8125rem; }
   textarea.cmd { display: block; padding: 10px 12px; line-height: 1.45; font: 0.8125rem/1.45 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; resize: vertical; min-height: 72px; }
   select, textarea, input { width: 100%; background: var(--field); color: var(--fg); border: 2px solid var(--accent-strong); border-radius: 12px; padding: 12px; }
+  input[type="checkbox"] { width: 20px; height: 20px; flex: none; margin: 0; padding: 0; accent-color: var(--accent); }
+  label:has(> input[type="checkbox"]) { display: flex; align-items: center; gap: 10px; min-height: 44px; }
   select { min-height: 44px; }
   nav { position: fixed; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 0; background: var(--header); border: 1px solid var(--line); border-radius: 16px; z-index: 5; padding: 0 8px; box-shadow: none; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
   nav::-webkit-scrollbar { display: none; }
-  nav button { position: relative; flex: 1 0 64px; min-width: 48px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
+  nav button { position: relative; flex: 1 0 auto; min-width: 64px; min-height: 48px; border: 0; background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; -webkit-text-stroke: 0; -webkit-text-fill-color: currentColor; text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; filter: none; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0 4px; white-space: nowrap; overflow: visible; scroll-snap-align: start; }
   nav button svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   nav button.on { color: var(--accent); }
   nav button.on::before { content: ""; position: absolute; top: 2px; left: 50%; width: 18px; height: 3px; border-radius: 3px; background: var(--accent); transform: translateX(-50%); }
@@ -383,17 +405,19 @@
   .glyph.dir { background: linear-gradient(var(--icon), var(--icon)) 2px 0 / 18px 6px no-repeat, linear-gradient(var(--icon-soft), var(--icon-soft)) 0 6px / 100% 30px no-repeat; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--icon); }
   .glyph.file { background: transparent; border: 1px solid var(--icon); border-radius: 2px; }
   .glyph.file::after { content: ""; position: absolute; top: -1px; right: -1px; border-width: 0 9px 9px 0; border-style: solid; border-color: var(--paper) var(--accent-strong) transparent transparent; }
-  .ico em { position: relative; z-index: 1; font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--icon); -webkit-text-fill-color: var(--icon); text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; opacity: 1; }
+  .ico em { position: relative; z-index: 1; font-style: normal; font-size: 0.75rem; font-weight: 650; line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; white-space: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-overflow: ellipsis; letter-spacing: 0.02em; -webkit-text-stroke: 0; color: var(--icon); -webkit-text-fill-color: var(--icon); text-shadow: none; font-synthesis: none; text-rendering: optimizeSpeed; transform: none; filter: none; opacity: 1; }
   .ico .mark { position: relative; z-index: 1; opacity: 1; }
   .ico em::before, .ico em::after, .sec::after, .deskbar b::before, .deskbar b::after { content: none !important; }
   textarea.cmd { font: var(--term-size)/1.3 ui-monospace, monospace; padding: 8px; white-space: pre-wrap; overflow: auto; word-break: normal; overflow-wrap: break-word; min-height: 0; }
   .about { align-items: center; text-align: center; }
   .about .osx { margin: 4px auto 0; }
-  .filegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .filegrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
   .filegrid .ico { flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; padding: 8px 10px; min-height: 52px; }
   .filegrid .glyph { width: 34px; height: 26px; flex: none; }
-  .filegrid .ico em { font-size: 0.8125rem; text-align: left; display: block; white-space: normal; word-break: normal; -webkit-line-clamp: unset; -webkit-box-orient: unset; max-height: 2.5em; }
-  .speedrow #devicecare { margin-left: auto; width: auto; flex: none; }
+  .filegrid .ico em { font-size: 0.8125rem; text-align: left; min-width: 0; white-space: normal; word-break: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; max-height: none; }
+  .desk .filegrid { padding: 12px 16px; }
+  @media (min-width: 720px) { .filegrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .speedrow #devicecare { width: auto; flex: 1 1 auto; }
   #ramout:empty { display: none; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .planpage .chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: row; gap: 8px; align-items: stretch; }
@@ -482,6 +506,7 @@
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
   .sheet .tiny { margin-top: auto; color: var(--muted); font-size: 11px; text-align: center; }
   .desk .grid { padding: 16px; }
+  .desk > .deskbar, .desk > .desktools, .desk > .deskfoot { padding-left: 16px; padding-right: 16px; }
   .desk > .plate, .desk > article { margin: 0 16px 16px; }
   .winbody > * { animation: rise 280ms ease-out; }
   @keyframes rise {
@@ -528,8 +553,8 @@
   .cheatcard .row { position: relative; display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid transparent; font-size: 0.875rem; }
   .cheatcard kbd { font: 0.75rem/1 ui-monospace, monospace; color: var(--accent); }
   html[data-theme="oled"] .win { box-shadow: none; }
-  .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-top: 8px; }
-  .speedrow .ghost { width: auto; flex: none; }
+  .speedrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .speedrow .ghost { width: auto; flex: 1 1 auto; }
   #carrierline { margin: 0; min-width: 0; flex: 1; max-width: 100%; color: var(--muted); font-size: 0.6875rem; font-weight: 650; letter-spacing: 0.14em; line-height: 1.15; text-transform: uppercase; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .motionpulse {
     min-height: 40px; border-radius: 12px; background: var(--accent); color: var(--btnfg);
@@ -1426,11 +1451,49 @@ function netView(p) {
   return { big: "—", sub: "interface closed" };
 }
 function bar(pct) { let n = parseInt(pct, 10); if (isNaN(n) || n < 0) n = 0; if (n > 100) n = 100; return '<i class="bar"><i style="width:' + n + '%"></i></i>'; }
-function crystalBat(pct) {
-  let n = parseInt(pct, 10);
-  if (isNaN(n) || n < 0) n = 0;
-  if (n > 100) n = 100;
-  return '<div class="xtal" aria-hidden="true"><span class="xtal-orb"><svg viewBox="0 0 24 24"><path d="M14.2 1.6 6 13.2h5.6L10.2 22.4 18.8 10h-5.8l1.2-8.4z"/></svg></span><span class="xtal-track"><span class="xtal-fill" id="batfill" style="width:' + n + '%"></span></span></div>';
+// Live battery graphic for the Battery screen: five stacked bars inside a dashed ring.
+// Level fills the bars from the bottom (the top lit bar can be partial), the ring turns
+// slowly while charging, and the colours move to amber below 20% and red below 10%.
+const BAT_BAR_H = 13;
+const BAT_BAR_GAP = 3.5;
+const BAT_BAR_BOTTOM = 117;
+function batLevel(s) {
+  let n = Number(s && s.battery);
+  if (!isFinite(n) || n < 0) return -1;
+  return Math.min(100, Math.round(n));
+}
+function batTone(n) { return n < 0 ? "" : n < 10 ? " crit" : n < 20 ? " low" : ""; }
+function batCharging(s) { return !!s && s.state === "Charging"; }
+function batBarFill(n, i) {
+  if (n < 0) return 0;
+  return Math.max(0, Math.min(1, n / 20 - i));
+}
+// Clip from the top so the lit part of each bar grows from its bottom edge.
+function batBarClip(n, i) { return "inset(" + ((1 - batBarFill(n, i)) * 100).toFixed(1) + "% 0 0 0)"; }
+function batLabel(s, n) { return n >= 0 ? "Battery " + n + "%" + (batCharging(s) ? ", charging" : "") : "Battery level unknown"; }
+function batGraphic(s) {
+  const n = batLevel(s);
+  let bars = "";
+  for (let i = 0; i < 5; i++) {
+    // Bar geometry follows the 160x160 artwork in tools/battery-icon/render.py.
+    const top = (BAT_BAR_BOTTOM - i * (BAT_BAR_H + BAT_BAR_GAP) - BAT_BAR_H) / 160 * 100;
+    const pos = (67 - i * (BAT_BAR_H + BAT_BAR_GAP)) / 66.95 * 100;
+    bars += '<span class="bat-slot" style="top:' + top.toFixed(3) + '%"><i class="bat-bar" id="batbar' + i + '" style="background-position:0 ' + pos.toFixed(1) + '%;clip-path:' + batBarClip(n, i) + '"></i></span>';
+  }
+  return '<div class="batwin' + batTone(n) + (batCharging(s) ? " charging" : "") + '" id="batwin" role="img" aria-label="' + esc(batLabel(s, n)) + '">' +
+    '<i class="bat-l bat-ring" aria-hidden="true"></i><i class="bat-l bat-body" aria-hidden="true"></i>' + bars +
+    '<i class="bat-l bat-bolt" aria-hidden="true"></i></div>';
+}
+function paintBatGraphic(s) {
+  const win = document.getElementById("batwin");
+  if (!win) return;
+  const n = batLevel(s);
+  win.className = "batwin" + batTone(n) + (batCharging(s) ? " charging" : "");
+  win.setAttribute("aria-label", batLabel(s, n));
+  for (let i = 0; i < 5; i++) {
+    const r = document.getElementById("batbar" + i);
+    if (r) r.style.clipPath = batBarClip(n, i);
+  }
 }
 function shortKernel(k) { k = String(k || ""); const cut = k.indexOf("("); return (cut > 8 ? k.slice(0, cut) : k).trim(); }
 function shortGl(v) { v = String(v || ""); const d = v.indexOf(" Driver"); return (d > 0 ? v.slice(0, d) : v).trim(); }
@@ -1767,8 +1830,9 @@ function paintBattery() {
     if (s.tempKnown) temp.textContent = Number(s.temp || 0).toFixed(1) + "°C";
     else temp.remove();
   }
-  const fill = document.getElementById("batfill");
-  if (fill) fill.style.width = Math.max(0, Math.min(100, Number(s.battery) || 0)) + "%";
+  const state = document.querySelector("[data-k='BatState']");
+  if (state) state.textContent = s.state || "Battery";
+  paintBatGraphic(s);
 }
 function paintGraph() {
   if (document.hidden || view !== "home") return;
@@ -1886,10 +1950,10 @@ function hardwarePage() {
 function batteryPage() {
   const s = phone();
   const p = live();
-  let html = '<div class="stack"><article class="plate"><p class="sec">' + esc(s.state || "Battery") + '</p>';
-  html += '<b style="font-size:32px;color:var(--accent)" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
+  let html = '<div class="stack"><article class="plate"><div class="bathead"><div class="batread"><p class="sec" data-k="BatState">' + esc(s.state || "Battery") + '</p>';
+  html += '<b class="batpct" data-k="BatPct">' + (s.battery >= 0 ? s.battery + "%" : "—") + '</b>';
   if (s.tempKnown) html += '<p class="muted" data-k="BatTemp">' + Number(s.temp || 0).toFixed(1) + "°C</p>";
-  html += crystalBat(s.battery);
+  html += '</div>' + batGraphic(s) + '</div>';
   html += row("Voltage", s.voltage ? Number(s.voltage).toFixed(3) + " V" : "");
   html += row("Current", s.currentMa ? s.currentMa + " mA" : "");
   html += row("Charge", s.chargeMah ? s.chargeMah + " mAh" : "");
@@ -1934,7 +1998,7 @@ function termActs(b) {
   if (!label && !asleep && !linkish) return "";
   let html = '<div class="termacts">';
   if (label) html += '<button class="btn" type="button" id="fixerr">' + label + '</button>';
-  if (asleep) html += '<button class="btn" type="button" id="opentermux">Open Termux</button>';
+  if (asleep) html += '<button class="btn" type="button" id="wakeTermux">Open Termux</button>';
   if (linkish) html += '<button class="btn" type="button" id="repairvulkan">Repair Vulkan</button>';
   return html + '</div>';
 }
@@ -2337,6 +2401,7 @@ function planPage() {
 function mark(name) {
   const n = String(name || "").toLowerCase();
   if (n === "go") return '<svg class="mark" viewBox="0 0 24 24"><path d="M4 12h14M13 7l5 5-5 5"/></svg>';
+  if (typeof APIS !== "undefined" && APIS.some(function (a) { return a[0].toLowerCase() === n; })) return '<svg class="mark" viewBox="0 0 24 24"><path d="M10 14a4 4 0 1 1 1-1h8v2h-2v2h-2v-2"/></svg>';
   const hit = [
     ["f-droid", '<path d="M12 4v10M8 10l4 4 4-4M6 19h12"/>'],
     ["llama", '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>'],
@@ -4178,7 +4243,7 @@ function render() {
   const focused = document.activeElement && document.activeElement.id === "line";
   const pageBody = (map[view] || homePage)();
   const readings = /<button\b/i.test(pageBody) ? "" : " readings";
-  main.innerHTML = '<section class="win"><div class="wintop"><span class="termbit" aria-hidden="true">&gt;<i></i></span><b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
+  main.innerHTML = '<section class="win"><div class="wintop">' + (view === "battery" ? "" : '<span class="termbit" aria-hidden="true">&gt;<i></i></span>') + '<b id="pagetitle">' + windowTitle() + '</b></div><div class="winbody"><div class="page' + (view === "plan" ? " typing" : "") + readings + '">' + pageBody + '</div></div></section>';
   const imeOn = document.body.classList.contains("ime");
   const typingOn = document.body.classList.contains("typing-focus");
   const kbOn = document.body.classList.contains("kbopen");
@@ -4667,8 +4732,10 @@ function bind() {
   if (termuxbat) termuxbat.onclick = function () { try { MeridianPhone.termuxBattery(); } catch (e) {} };
   const repairvulkan = document.getElementById("repairvulkan");
   if (repairvulkan) repairvulkan.onclick = function () { exec("Vulkan repair", VULKAN_REPAIR); };
-  const opentermux = document.getElementById("opentermux");
-  if (opentermux) opentermux.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  ["opentermux", "wakeTermux"].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  });
   const winlogo = document.getElementById("winlogo");
   if (winlogo) winlogo.onclick = function () {
     logoPressed = !logoPressed;
