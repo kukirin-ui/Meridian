@@ -544,6 +544,11 @@
   .sheet { position: fixed; inset: 0; z-index: 40; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + var(--kb, 0px) + env(safe-area-inset-bottom)); overflow: auto; }
   .sheet[hidden] { display: none !important; }
   .sheet h2 { margin: 8px 0; }
+  .sheet .fcplate { border: 1px solid var(--accent); border-radius: 16px; padding: 14px; gap: 10px; }
+  .sheet .fcplate h2 { margin: 0; }
+  .sheet .fcplate p { margin: 0; }
+  .sheet .fcline summary { cursor: pointer; padding: 6px 0; }
+  .sheet .fcline pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-all; margin: 8px 0 0; font-size: 0.75rem; }
   .sheet p { margin: 0 0 10px; line-height: 1.45; }
   .sheet .tiny { margin-top: auto; color: var(--muted); font-size: 11px; text-align: center; }
   .desk .grid { padding: 16px; }
@@ -2276,6 +2281,114 @@ function sheet(title, note, cmd, link) {
   if (link) html += '<button class="ghost" type="button" data-open="' + esc(link) + '">Open link</button>';
   return html + "</article></div>";
 }
+// First connect: one clean step, nothing is sent to Termux before its setup line has run.
+const LINK_SETUP_LINE = BOND_LINE + "; am start -n com.meridian.shell/.MainActivity --ez meridian_linked true >/dev/null 2>&1";
+const FC_I18N = {"en": {"fcTitle": "Connect Termux", "fcBody": "One step. Meridian copies a setup line, asks Android to let it send commands to Termux, and opens Termux. There, long-press, tap Paste and press Enter. Termux brings you back and Meridian connects by itself.", "fcGo": "Copy and open Termux", "fcShowLine": "Show the setup line", "fcLineWhat": "It turns on allow-external-apps in ~/.termux/termux.properties, reloads the Termux settings and reopens Meridian. Running it again is safe.", "fcWaiting": "Waiting for Termux. Paste the line there and press Enter.", "fcChecking": "Connecting to Termux.", "fcPermission": "Android has not allowed Meridian to send commands to Termux yet.", "fcAllow": "Allow", "fcNoAnswer": "Termux has not answered yet. Open Termux once, then tap Check again.", "fcMissing": "Termux is not installed. Get it from F-Droid, open it once, then come back.", "fcOpenTermux": "Open Termux", "termuxWhySetup": "Termux is not set up for Meridian yet. One step connects it.", "fcDone": "Connected"}, "hr": {"fcTitle": "Poveži Termux", "fcBody": "Jedan korak. Meridian kopira redak za postavljanje, traži od Androida dopuštenje za slanje naredbi Termuxu i otvara Termux. Tamo dugo pritisni, dodirni Zalijepi i pritisni Enter. Termux te vraća ovamo i Meridian se sam poveže.", "fcGo": "Kopiraj i otvori Termux", "fcShowLine": "Prikaži redak za postavljanje", "fcLineWhat": "Uključuje allow-external-apps u ~/.termux/termux.properties, ponovno učitava postavke Termuxa i ponovno otvara Meridian. Ponovno pokretanje je sigurno.", "fcWaiting": "Čekam Termux. Zalijepi redak tamo i pritisni Enter.", "fcChecking": "Povezujem se s Termuxom.", "fcPermission": "Android još nije dopustio Meridianu slanje naredbi Termuxu.", "fcAllow": "Dopusti", "fcNoAnswer": "Termux se još nije javio. Jednom otvori Termux, zatim dodirni Provjeri ponovno.", "fcMissing": "Termux nije instaliran. Preuzmi ga s F-Droida, jednom ga otvori i vrati se.", "fcOpenTermux": "Otvori Termux", "termuxWhySetup": "Termux još nije postavljen za Meridian. Jedan korak ga povezuje.", "fcDone": "Povezano"}, "de": {"fcTitle": "Termux verbinden", "fcBody": "Ein Schritt. Meridian kopiert eine Einrichtungszeile, bittet Android um die Erlaubnis, Befehle an Termux zu senden, und öffnet Termux. Dort lange drücken, Einfügen tippen und Enter drücken. Termux bringt dich zurück und Meridian verbindet sich von selbst.", "fcGo": "Kopieren und Termux öffnen", "fcShowLine": "Einrichtungszeile zeigen", "fcLineWhat": "Sie schaltet allow-external-apps in ~/.termux/termux.properties ein, lädt die Termux-Einstellungen neu und öffnet Meridian wieder. Erneutes Ausführen ist sicher.", "fcWaiting": "Warte auf Termux. Füge die Zeile dort ein und drücke Enter.", "fcChecking": "Verbinde mit Termux.", "fcPermission": "Android erlaubt Meridian noch nicht, Befehle an Termux zu senden.", "fcAllow": "Erlauben", "fcNoAnswer": "Termux hat noch nicht geantwortet. Öffne Termux einmal und tippe dann auf Erneut prüfen.", "fcMissing": "Termux ist nicht installiert. Hol es von F-Droid, öffne es einmal und komm zurück.", "fcOpenTermux": "Termux öffnen", "termuxWhySetup": "Termux ist noch nicht für Meridian eingerichtet. Ein Schritt verbindet es.", "fcDone": "Verbunden"}, "ja": {"fcTitle": "Termux を接続", "fcBody": "1 ステップです。Meridian が設定用の行をコピーし、Termux にコマンドを送る許可を Android に求め、Termux を開きます。Termux で長押しして「貼り付け」をタップし、Enter を押してください。Termux がこの画面に戻し、Meridian が自動で接続します。", "fcGo": "コピーして Termux を開く", "fcShowLine": "設定用の行を表示", "fcLineWhat": "~/.termux/termux.properties の allow-external-apps をオンにし、Termux の設定を再読み込みして Meridian を再び開きます。何度実行しても安全です。", "fcWaiting": "Termux を待っています。そこで行を貼り付けて Enter を押してください。", "fcChecking": "Termux に接続しています。", "fcPermission": "Android はまだ Meridian に Termux へのコマンド送信を許可していません。", "fcAllow": "許可", "fcNoAnswer": "Termux がまだ応答していません。Termux を一度開いてから「再確認」をタップしてください。", "fcMissing": "Termux がインストールされていません。F-Droid から入手し、一度開いてから戻ってください。", "fcOpenTermux": "Termux を開く", "termuxWhySetup": "Termux はまだ Meridian 用に設定されていません。1 ステップで接続できます。", "fcDone": "接続済み"}, "hi": {"fcTitle": "Termux जोड़ें", "fcBody": "एक चरण। Meridian सेटअप लाइन कॉपी करता है, Android से Termux को कमांड भेजने की अनुमति माँगता है और Termux खोलता है। वहाँ देर तक दबाएँ, Paste पर टैप करें और Enter दबाएँ। Termux आपको वापस लाता है और Meridian अपने आप जुड़ जाता है।", "fcGo": "कॉपी करें और Termux खोलें", "fcShowLine": "सेटअप लाइन दिखाएँ", "fcLineWhat": "यह ~/.termux/termux.properties में allow-external-apps चालू करती है, Termux सेटिंग दोबारा लोड करती है और Meridian फिर खोलती है। इसे दोबारा चलाना सुरक्षित है।", "fcWaiting": "Termux का इंतज़ार है। वहाँ लाइन पेस्ट करें और Enter दबाएँ।", "fcChecking": "Termux से जुड़ रहा है।", "fcPermission": "Android ने अभी Meridian को Termux को कमांड भेजने की अनुमति नहीं दी है।", "fcAllow": "अनुमति दें", "fcNoAnswer": "Termux ने अभी जवाब नहीं दिया। Termux एक बार खोलें, फिर दोबारा जाँचें पर टैप करें।", "fcMissing": "Termux इंस्टॉल नहीं है। इसे F-Droid से लें, एक बार खोलें, फिर लौटें।", "fcOpenTermux": "Termux खोलें", "termuxWhySetup": "Termux अभी Meridian के लिए सेट नहीं है। एक चरण में यह जुड़ जाता है।", "fcDone": "जुड़ा"}, "es": {"fcTitle": "Conectar Termux", "fcBody": "Un solo paso. Meridian copia una línea de configuración, pide a Android permiso para enviar comandos a Termux y abre Termux. Allí mantén pulsado, toca Pegar y pulsa Intro. Termux te devuelve aquí y Meridian se conecta solo.", "fcGo": "Copiar y abrir Termux", "fcShowLine": "Mostrar la línea de configuración", "fcLineWhat": "Activa allow-external-apps en ~/.termux/termux.properties, recarga los ajustes de Termux y vuelve a abrir Meridian. Ejecutarla otra vez es seguro.", "fcWaiting": "Esperando a Termux. Pega la línea allí y pulsa Intro.", "fcChecking": "Conectando con Termux.", "fcPermission": "Android aún no permite que Meridian envíe comandos a Termux.", "fcAllow": "Permitir", "fcNoAnswer": "Termux aún no ha respondido. Abre Termux una vez y luego toca Comprobar de nuevo.", "fcMissing": "Termux no está instalado. Consíguelo en F-Droid, ábrelo una vez y vuelve.", "fcOpenTermux": "Abrir Termux", "termuxWhySetup": "Termux aún no está configurado para Meridian. Un paso lo conecta.", "fcDone": "Conectado"}, "fr": {"fcTitle": "Connecter Termux", "fcBody": "Une seule étape. Meridian copie une ligne de configuration, demande à Android l'autorisation d'envoyer des commandes à Termux et ouvre Termux. Là, appuyez longuement, touchez Coller puis Entrée. Termux vous ramène ici et Meridian se connecte tout seul.", "fcGo": "Copier et ouvrir Termux", "fcShowLine": "Afficher la ligne de configuration", "fcLineWhat": "Elle active allow-external-apps dans ~/.termux/termux.properties, recharge les réglages de Termux et rouvre Meridian. La relancer est sans risque.", "fcWaiting": "En attente de Termux. Collez la ligne et appuyez sur Entrée.", "fcChecking": "Connexion à Termux.", "fcPermission": "Android n'autorise pas encore Meridian à envoyer des commandes à Termux.", "fcAllow": "Autoriser", "fcNoAnswer": "Termux n'a pas encore répondu. Ouvrez Termux une fois, puis touchez Vérifier à nouveau.", "fcMissing": "Termux n'est pas installé. Installez-le depuis F-Droid, ouvrez-le une fois, puis revenez.", "fcOpenTermux": "Ouvrir Termux", "termuxWhySetup": "Termux n'est pas encore configuré pour Meridian. Une étape suffit.", "fcDone": "Connecté"}};
+Object.keys(FC_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, FC_I18N[l]); });
+let firstConn = { on: false, step: "", tries: 0, poll: 0 };
+function termuxLinkedNow() {
+  try { return String(MeridianPhone.termuxLinked()) === "1"; } catch (e) { return true; }
+}
+function firstConnectHtml() {
+  const st = firstConn.step;
+  let h = '<button class="ghost" type="button" id="sheetback">' + esc(t("back")) + '</button>';
+  h += '<article class="plate stack fcplate"><h2>' + esc(t("fcTitle")) + '</h2>';
+  if (st === "missing") {
+    h += '<p class="muted">' + esc(t("fcMissing")) + '</p><button class="btn" type="button" data-open="https://f-droid.org/packages/com.termux/">' + esc(t("getTermux")) + '</button>';
+    return h + '</article>';
+  }
+  h += '<p class="muted">' + esc(t("fcBody")) + '</p>';
+  if (st === "permission") h += '<button class="btn" type="button" id="fcallow">' + esc(t("fcAllow")) + '</button>';
+  else h += '<button class="btn" type="button" id="fcgo">' + esc(t("fcGo")) + '</button>';
+  const note = st === "waiting" ? t("fcWaiting") : st === "checking" ? t("fcChecking") : st === "permission" ? t("fcPermission") : st === "noanswer" ? t("fcNoAnswer") : "";
+  h += '<p class="muted fcnote" id="fcnote" role="status"' + (note ? "" : " hidden") + '>' + esc(note) + '</p>';
+  if (st === "waiting" || st === "noanswer") h += '<div class="tools"><button class="ghost" type="button" id="fcopen">' + esc(t("fcOpenTermux")) + '</button>' + (st === "noanswer" ? '<button class="ghost" type="button" id="fcagain">' + esc(t("checkAgain")) + '</button>' : "") + '</div>';
+  h += '<details class="fcline"><summary class="muted">' + esc(t("fcShowLine")) + '</summary><p class="muted">' + esc(t("fcLineWhat")) + '</p><pre>' + esc(LINK_SETUP_LINE) + '</pre></details>';
+  return h + '</article>';
+}
+function paintFirstConnect() {
+  const el = document.getElementById("sheet");
+  if (!el || !firstConn.on) return;
+  const keepLine = !!(el.querySelector("details.fcline") || {}).open;
+  el.innerHTML = firstConnectHtml();
+  el.hidden = false;
+  if (keepLine) { const d = el.querySelector("details.fcline"); if (d) d.open = true; }
+  const back = document.getElementById("sheetback");
+  if (back) back.onclick = closeFirstConnect;
+  const go = document.getElementById("fcgo");
+  if (go) go.onclick = function () {
+    let r = "";
+    try { r = String(MeridianPhone.firstConnect(LINK_SETUP_LINE, t("fixTermuxToast"))); } catch (e) { r = ""; }
+    if (r === "missing") { firstConn.step = "missing"; paintFirstConnect(); return; }
+    if (!r) { try { MeridianPhone.clip(LINK_SETUP_LINE); } catch (e) {} try { MeridianPhone.openTermux(); } catch (e) {} }
+    firstConn.step = "waiting";
+    paintFirstConnect();
+    firstConnectPoll();
+  };
+  const allow = document.getElementById("fcallow");
+  if (allow) allow.onclick = function () { try { MeridianPhone.askTermuxPermission(); } catch (e) {} };
+  const open = document.getElementById("fcopen");
+  if (open) open.onclick = function () { try { MeridianPhone.openTermux(); } catch (e) {} };
+  const again = document.getElementById("fcagain");
+  if (again) again.onclick = function () { if (termuxLinkedNow()) firstConnectLinked(); else { firstConn.step = "waiting"; paintFirstConnect(); firstConnectPoll(); } };
+  el.querySelectorAll("[data-open]").forEach(function (b) { b.onclick = function () { try { MeridianPhone.open(b.getAttribute("data-open")); } catch (e) {} }; });
+}
+function openFirstConnect() {
+  let installed = true;
+  try { installed = String(MeridianPhone.bond()) !== "missing"; } catch (e) {}
+  firstConn = { on: true, step: installed ? "" : "missing", tries: 0, poll: 0 };
+  paintFirstConnect();
+}
+function closeFirstConnect() {
+  firstConn.on = false;
+  if (firstConn.poll) { clearInterval(firstConn.poll); firstConn.poll = 0; }
+  const el = document.getElementById("sheet");
+  if (el) el.hidden = true;
+}
+// Silent: reads a local flag only. No command goes to Termux and nothing runs in the background.
+function firstConnectPoll() {
+  if (firstConn.poll) return;
+  let n = 0;
+  firstConn.poll = setInterval(function () {
+    n++;
+    if (!firstConn.on || n > 300) { clearInterval(firstConn.poll); firstConn.poll = 0; return; }
+    if (firstConn.step === "waiting" && termuxLinkedNow()) firstConnectLinked();
+  }, 1000);
+}
+function firstConnectLinked() {
+  if (!firstConn.on) return;
+  if (firstConn.poll) { clearInterval(firstConn.poll); firstConn.poll = 0; }
+  firstConn.step = "checking";
+  paintFirstConnect();
+  let b = "";
+  try { b = String(MeridianPhone.bond()); } catch (e) { b = ""; }
+  if (b === "ask") { firstConn.step = "permission"; paintFirstConnect(); return; }
+  checkTermuxLink(true);
+}
+function firstConnectState(state) {
+  if (!firstConn.on || firstConn.step === "" || firstConn.step === "waiting" || firstConn.step === "missing") return;
+  if (state === "ok") {
+    closeFirstConnect();
+    userOff = false;
+    bond = "termux";
+    probeAt = 0;
+    goNav({ view: "home", more: "menu", openCmd: "", editing: false });
+    toast(t("fcDone"));
+    return;
+  }
+  if (state === "unknown" && firstConn.step === "permission") { firstConnectLinked(); return; }
+  if (state === "checking" || state === "unknown") return;
+  if (state === "permission") { firstConn.step = "permission"; paintFirstConnect(); return; }
+  if (state === "setup") { firstConn.step = "waiting"; paintFirstConnect(); firstConnectPoll(); return; }
+  if (state === "missing") { firstConn.step = "missing"; paintFirstConnect(); return; }
+  if (++firstConn.tries <= 3) { setTimeout(function () { if (firstConn.on) checkTermuxLink(true); }, 2500); return; }
+  firstConn.step = "noanswer";
+  paintFirstConnect();
+}
+window.meridianLinked = function () {
+  if (firstConn.on) firstConnectLinked();
+  else if (!userOff && bond !== "termux") { try { bond = MeridianPhone.bond(); } catch (e) {} render(); }
+};
 // Termux link: Setup shows it first, the console offers the same fix when a command is refused.
 let termuxLink = { state: "unknown", detail: "", at: 0 };
 function linkBad(state) { return state !== "ok" && state !== "checking" && state !== "unknown"; }
@@ -2283,7 +2396,7 @@ function termuxLinkCard() {
   const st = termuxLink.state;
   const ok = st === "ok";
   const label = ok ? t("termuxLinkOk") : st === "checking" ? t("termuxLinkChecking") : st === "unknown" ? t("termuxLinkUnknown") : t("termuxLinkOff");
-  const whyKey = { ok: "termuxWhyOk", external: "termuxWhyExternal", permission: "termuxWhyPermission", asleep: "termuxWhyAsleep", timeout: "termuxWhyTimeout", missing: "termuxWhyMissing", refused: "termuxWhyRefused" }[st];
+  const whyKey = { ok: "termuxWhyOk", external: "termuxWhyExternal", permission: "termuxWhyPermission", asleep: "termuxWhyAsleep", timeout: "termuxWhyTimeout", missing: "termuxWhyMissing", refused: "termuxWhyRefused", setup: "termuxWhySetup" }[st];
   let html = '<article class="plate stack" id="termuxlink"><b>1. ' + esc(t("termuxLinkTitle")) + '</b>';
   html += '<div><span class="healthpill' + (linkBad(st) ? " bad" : "") + '" id="termuxpill" role="status">' + esc(label) + '</span></div>';
   if (whyKey) html += '<p class="muted" id="termuxwhy">' + esc(t(whyKey)) + '</p>';
@@ -2319,19 +2432,17 @@ window.meridianTermux = function (state, detail) {
   if (termuxLink.state === "ok") bond = "termux";
   else if (termuxLink.state === "permission") bond = "ask";
   else if (termuxLink.state === "missing") bond = "missing";
+  else if (termuxLink.state === "setup") bond = "setup";
   paintTermuxLink();
   paintTermuxInfo();
+  firstConnectState(termuxLink.state);
 };
 function fixTermux(kind) {
   if (kind === "permission") {
     try { MeridianPhone.askTermuxPermission(); } catch (e) {}
     return;
   }
-  let r = "";
-  try { r = String(MeridianPhone.fixTermux(BOND_LINE, t("fixTermuxToast"))); } catch (e) { r = ""; }
-  if (!r) { try { MeridianPhone.clip(BOND_LINE); } catch (e) {} }
-  toast(t("fixTermuxToast"));
-  termuxLink.state = "unknown";
+  openFirstConnect();
 }
 function bindTermuxFix(root) {
   (root || document).querySelectorAll("[data-termuxfix]").forEach(function (b) {
@@ -3720,6 +3831,8 @@ function meshPullLocalConfig(done) {
   }
   let tries = 0;
   function attempt() {
+    // Read only when Termux is connected; before first connect nothing may reach Termux.
+    if (bond !== "termux") { if (done) done(null); return; }
     const ok = quietJob(cmd, function (out) {
       const config = meshConfigFromText(out);
       meshRememberWww(out);
@@ -4976,7 +5089,7 @@ function render() {
     b.setAttribute("aria-current", name === tab ? "page" : "false");
   });
   const line = document.getElementById("bondline");
-  line.textContent = bond === "termux" ? t("connected") : bond === "ask" ? t("allowTermux") : bond === "missing" ? t("noTermux") : t("notConnected");
+  line.textContent = bond === "termux" ? t("connected") : bond === "ask" ? t("allowTermux") : bond === "setup" ? t("notConnected") : bond === "missing" ? t("noTermux") : t("notConnected");
   applyZoom();
   bind();
   paintChrome();
@@ -5073,6 +5186,7 @@ function closeSetMenu() {
   if (btn) btn.setAttribute("aria-expanded", "false");
 }
 window.meridianBack = function () {
+  if (firstConn.on) { closeFirstConnect(); return "true"; }
   const menu = document.getElementById("setmenu");
   if (menu && !menu.hidden) { closeSetMenu(); return "true"; }
   const cheat = document.getElementById("cheat");
@@ -5674,6 +5788,7 @@ function bind() {
       senseAsked = false;
       probeAt = 0;
       render();
+      if (bond === "setup" || bond === "missing") openFirstConnect();
     };
   }
   const copybond = document.getElementById("copybond");
@@ -6021,6 +6136,7 @@ function loadFiles() {
 // Runs a command without showing it in any session. Uses the same async job channel as exec(),
 // so it never blocks the UI thread the way the synchronous MeridianPhone.run() did.
 function quietJob(cmd, done) {
+  if (bond === "setup" || bond === "missing") return false;
   if (busy || quiet) return false;
   let r = "ok";
   try { r = String(MeridianPhone.startJob(cmd)); } catch (e) { return false; }
@@ -6769,6 +6885,13 @@ sessions.forEach(function (s) {
   // A session saved mid-command cannot be resumed after the WebView was torn down.
   if (s.length && /^Connecting to Termux/.test(s[s.length - 1].out || "")) s[s.length - 1].out = "The app was closed while this ran. Termux may still have finished it.\nexit 0";
 });
+(function keepEarlierLink() {
+  if (termuxLinkedNow()) return;
+  const ran = sessions.some(function (s) { return (s || []).some(function (b) { const o = String((b && b.out) || ""); return /(^|\n)exit 0\s*$/.test(o) && !/^Not connected/.test(o) && !/^Connecting to Termux/.test(o); }); });
+  if (!ran) return;
+  try { MeridianPhone.markLinked(); } catch (e) {}
+  try { if (!userOff && !introOpen()) bond = MeridianPhone.bond(); } catch (e) {}
+})();
 readPrefs();
 bootPlatforms();
 applySkin();
@@ -6889,6 +7012,7 @@ paintMarks();
 startRefresh();
 document.addEventListener("visibilitychange", function () {
   if (!document.hidden) {
+    if (firstConn.on && firstConn.step === "waiting" && termuxLinkedNow()) firstConnectLinked();
     probeAt = 0; paintMeters(); paintGraph(); paintHardware(); paintBattery();
     if ((view === "setup" && openCmd === "") || view === "system") checkTermuxLink(true);
     if (more === "desk") refreshJobs(false);

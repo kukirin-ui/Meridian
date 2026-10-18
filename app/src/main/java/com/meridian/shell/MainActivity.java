@@ -188,7 +188,43 @@ public class MainActivity extends Activity {
         generateHardwareBoundKey();
         ensureMeshTts();
         current = new java.lang.ref.WeakReference<MainActivity>(this);
-        if (termuxInstalled()) askRunPerm();
+        if (termuxInstalled() && isLinked()) askRunPerm();
+        takeLinkIntent(getIntent());
+    }
+
+    /**
+     * First connect: Termux refuses every command (and shows a Pre-Execution failure) until
+     * allow-external-apps is on. Meridian cannot read Termux's settings, so it sends nothing until
+     * the setup line has run in Termux. That line ends by opening Meridian with meridian_linked,
+     * and a successful link check also counts. A later "allow-external-apps" refusal clears it.
+     */
+    private static final String LINK_PREFS = "meridian_link";
+    private boolean pendingTermuxOpen = false;
+
+    private boolean isLinked() {
+        try { return getSharedPreferences(LINK_PREFS, MODE_PRIVATE).getBoolean("linked", false); } catch (Exception e) { return false; }
+    }
+
+    private void setLinked(boolean on) {
+        try { getSharedPreferences(LINK_PREFS, MODE_PRIVATE).edit().putBoolean("linked", on).apply(); } catch (Exception ignored) {}
+    }
+
+    private void takeLinkIntent(Intent intent) {
+        if (intent == null || !intent.getBooleanExtra("meridian_linked", false)) return;
+        intent.removeExtra("meridian_linked");
+        setLinked(true);
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (web != null) web.evaluateJavascript("window.meridianLinked&&window.meridianLinked()", null);
+            }
+        });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        takeLinkIntent(intent);
     }
 
     private boolean hasRunPerm() {
@@ -230,7 +266,8 @@ public class MainActivity extends Activity {
     /** Sends a tiny command to Termux and reports the outcome to the page through window.meridianTermux. */
     private String checkTermux() {
         if (!termuxInstalled()) { setTermuxState("missing", ""); return "missing"; }
-        if (!hasRunPerm()) { askRunPerm(); setTermuxState("permission", ""); return "permission"; }
+        if (!isLinked()) { setTermuxState("setup", ""); return "setup"; }
+        if (!hasRunPerm()) { setTermuxState("permission", ""); return "permission"; }
         final int gen = ++pingGen;
         termuxState = "checking";
         Intent intent = termuxIntent("echo meridian-link-ok", true);
@@ -254,6 +291,8 @@ public class MainActivity extends Activity {
     static void pingResult(int gen, String state, String detail) {
         if (gen != pingGen) return;
         MainActivity a = current == null ? null : current.get();
+        if (a != null && "ok".equals(state)) a.setLinked(true);
+        if (a != null && "external".equals(state)) { a.setLinked(false); state = "setup"; }
         if (a != null) a.setTermuxState(state, detail);
         else { termuxState = state; termuxDetail = detail == null ? "" : detail; }
     }
@@ -403,6 +442,11 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RUN_REQUEST) {
             runPending = false;
+            if (pendingTermuxOpen) {
+                pendingTermuxOpen = false;
+                wakeTermux();
+                return;
+            }
             setTermuxState(hasRunPerm() ? "unknown" : "permission", "");
             return;
         }
@@ -1133,6 +1177,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean sendToTermux(Intent intent) {
+        if (!isLinked()) return false;
         try {
             startService(intent);
             return true;
@@ -1459,6 +1504,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String bond() {
             if (!termuxInstalled()) return "missing";
+            if (!isLinked()) return "setup";
             if (!hasRunPerm()) {
                 askRunPerm();
                 return "ask";
@@ -1716,6 +1762,7 @@ public class MainActivity extends Activity {
                 }
                 return "missing";
             }
+            if (!isLinked()) return "setup";
             if (jobLive) return "busy";
             jobLive = true;
             launch(cmd);
@@ -1762,6 +1809,43 @@ public class MainActivity extends Activity {
             } catch (Exception ex) {
                 return "{\"state\":\"unknown\"}";
             }
+        }
+
+        /** "1" once the first-connect setup line has run in Termux (see isLinked). */
+        @JavascriptInterface
+        public String termuxLinked() {
+            return MainActivity.this.isLinked() ? "1" : "0";
+        }
+
+        /** Set from the page only when an earlier Meridian run already got output back from Termux. */
+        @JavascriptInterface
+        public void markLinked() {
+            setLinked(true);
+        }
+
+        /**
+         * The single first-connect step: copy the setup line, ask Android for the Termux command
+         * permission when it is missing, then open Termux so the line can be pasted. Sends nothing.
+         */
+        @JavascriptInterface
+        public String firstConnect(final String line, final String hint) {
+            if (!termuxInstalled()) return "missing";
+            if (line == null || line.length() == 0 || line.length() > 2000) return "refused";
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                        if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("meridian", line));
+                    } catch (Exception ignored) {}
+                    if (hint != null && hint.length() > 0 && hint.length() < 400) {
+                        try { Toast.makeText(MainActivity.this, hint, Toast.LENGTH_LONG).show(); } catch (Exception ignored) {}
+                    }
+                    if (hasRunPerm()) { wakeTermux(); return; }
+                    pendingTermuxOpen = true;
+                    if (askRunPerm(true)) { pendingTermuxOpen = false; wakeTermux(); }
+                }
+            });
+            return hasRunPerm() ? "open" : "asked";
         }
 
         /** Asks for the Termux command permission, or opens this app's settings when Android stopped asking. */
