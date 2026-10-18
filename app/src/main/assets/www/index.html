@@ -4842,28 +4842,24 @@ function toolsPage() {
     if (openCmd !== "") return inner;
     return '<div class="stack"><button class="ghost" type="button" id="moreback">' + esc(t("back")) + '</button>' + inner + '</div>';
   }
-  const linked = bond === "termux";
+  // Order: Work, Machine, Desk, Library. Library holds exactly Commands, Links and Setup.
   const setup = '<button class="ico" type="button" data-go="setup">' + mark("Setup") + '<em>' + esc(t("setup")) + '</em></button>';
   let html = '<div class="desk">'
     + '<p class="sec work">' + esc(t("work")) + '</p><div class="grid">'
-    + (linked ? "" : setup)
     + '<button class="ico" type="button" data-go="files">' + mark("Files") + '<em>' + esc(t("files")) + '</em></button>'
     + '<button class="ico" type="button" data-go="console">' + mark("Console") + '<em>' + esc(t("console")) + '</em></button>'
     + '</div><div class="bend"></div><p class="sec mach">' + esc(t("machine")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-more="tuning">' + mark("Tweaks") + '<em>' + esc(t("titleTuning")) + '</em>' + "" + '</button>'
     + '<button class="ico" type="button" data-more="doctor">' + mark("Doctor") + '<em>' + esc(t("doctor")) + '</em></button>'
     + '<button class="ico" type="button" data-more="pc">' + mark("Debian") + '<em>' + esc(t("linuxPc")) + '</em>' + "" + '</button>'
+    + '</div><div class="bend"></div><p class="sec">Desk</p><div class="grid">'
+    + '<button class="ico" type="button" data-more="desk">' + mark("readout") + '<em>Desk</em></button>'
+    + '<button class="ico" type="button" data-more="mesh">' + mark("wake") + '<em>Mesh</em></button>'
     + '</div><div class="bend"></div><p class="sec lib">' + esc(t("library")) + '</p><div class="grid">'
     + '<button class="ico" type="button" data-more="commands">' + mark("Commands") + '<em>' + esc(t("commands")) + '</em></button>'
     + '<button class="ico" type="button" data-more="links">' + mark("Links") + '<em>' + esc(t("links")) + '</em></button>'
-    + '<button class="ico" type="button" data-more="mesh">' + mark("wake") + '<em>Mesh</em></button>'
-    + (linked ? setup : "")
+    + setup
     + '</div>';
-  {
-    html += '<div class="bend"></div><p class="sec">Desk</p><div class="grid">'
-      + '<button class="ico" type="button" data-more="desk">' + mark("readout") + '<em>Desk</em></button>'
-      + '</div>';
-  }
   const count = (html.match(/class="ico"/g) || []).length;
   return html + '<div class="deskfoot">' + count + ' items</div></div>';
 }
