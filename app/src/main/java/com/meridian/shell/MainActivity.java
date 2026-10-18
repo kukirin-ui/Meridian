@@ -78,10 +78,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
-    /** Optional donation / Premium support link. Donating does not unlock Pro. */
+    /** Optional donation / business support link. Donating does not unlock Premium. */
     private static final String PAY_URL = "https://checkout.revolut.com/pay/044a268e-4869-4708-9b0f-8e302cc28c37";
-    /** Meridian Pro checkout (4.99 EUR). The license check is not wired yet; see verifyLicense() in index.html. */
-    private static final String PRO_URL = "https://checkout.revolut.com/pay/a8de4ee8-551d-4f34-b8e7-4ec8aabca2e9";
+    /** Meridian Premium checkout (4.99 EUR). The license check is not wired yet; see verifyLicense() in index.html. */
+    private static final String PREMIUM_URL = "https://checkout.revolut.com/pay/a8de4ee8-551d-4f34-b8e7-4ec8aabca2e9";
     private WebView web;
     /** Hardware key used only to sign a high-risk Mesh line on this phone. */
     private static final String KEY_ALIAS = "meridian_tee_key";
@@ -2102,13 +2102,13 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
-        public void buyPro(String url) {
-            // Only the one Pro checkout link can be opened from here.
-            if (!PRO_URL.equals(url)) return;
+        public void buyPremium(String url) {
+            // Only the one Premium checkout link can be opened from here.
+            if (!PREMIUM_URL.equals(url)) return;
             runOnUiThread(new Runnable() {
                 public void run() {
                     try {
-                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(PRO_URL));
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(PREMIUM_URL));
                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);
                     } catch (Exception ignored) {}

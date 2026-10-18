@@ -438,19 +438,19 @@
   .ico { position: relative; border: 1px solid var(--accent); border-radius: 16px; min-height: 48px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--icon); background: transparent; box-shadow: none; animation: tileglow 2.8s var(--ease) infinite; }
   .lockbadge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--accent); pointer-events: none; }
   .lockbadge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  html[data-pro="1"] .lockbadge { display: none; }
+  html[data-premium="1"] .lockbadge { display: none; }
   .ico > .lockbadge { position: absolute; top: 6px; right: 6px; z-index: 2; }
   nav button > .lockbadge { position: absolute; top: 4px; right: 6px; width: 12px; height: 12px; }
   nav button > .lockbadge svg { width: 10px; height: 10px; }
-  .prosheet { border: 1px solid var(--accent); border-radius: 16px; background: var(--win); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: none; }
-  .prosheet h2 { margin: 0; display: flex; align-items: center; gap: 8px; }
-  .prosheet .checks { margin: 0; }
-  .prosheet .btn { width: 100%; }
-  .prosheet label { font-size: 0.875rem; color: var(--muted); }
-  .prosheet input { font: 0.875rem/1.3 ui-monospace, monospace; text-transform: uppercase; }
-  .prosheet .promsg { min-height: 1.4em; margin: 0; font-size: 0.875rem; }
-  .prosheet .promsg.bad { color: var(--bad); }
-  .prosheet .promsg.ok { color: var(--accent); }
+  .premiumsheet { border: 1px solid var(--accent); border-radius: 16px; background: var(--win); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: none; }
+  .premiumsheet h2 { margin: 0; display: flex; align-items: center; gap: 8px; }
+  .premiumsheet .checks { margin: 0; }
+  .premiumsheet .btn { width: 100%; }
+  .premiumsheet label { font-size: 0.875rem; color: var(--muted); }
+  .premiumsheet input { font: 0.875rem/1.3 ui-monospace, monospace; text-transform: uppercase; }
+  .premiumsheet .premiummsg { min-height: 1.4em; margin: 0; font-size: 0.875rem; }
+  .premiumsheet .premiummsg.bad { color: var(--bad); }
+  .premiumsheet .premiummsg.ok { color: var(--accent); }
   .ico > .probadge { position: absolute; top: 4px; right: 4px; margin: 0; z-index: 2; pointer-events: none; }
   .ico .mark { width: 28px; height: 28px; stroke: var(--icon); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .grid.big .ico .mark { width: 36px; height: 36px; }
@@ -809,7 +809,7 @@
       <button class="btn" type="button" id="getstarted">Get Started</button>
       <p class="muted">Install Termux from F-Droid, not Play, then press Connect. If Android says permission denied, it is asking for the Termux command permission. That is not a ban and not a broken phone. Allow it. Get Started opens that setup.</p>
       <button class="rowline" type="button" id="introplan"><span>Support &amp; Plans</span></button>
-      <p class="muted">Meridian is open source. The readings are free. Pro unlocks tuning, files, Build, Plan and command runs. See Support &amp; Plans.</p>
+      <p class="muted">Meridian is open source. The readings are free. Premium unlocks tuning, files, Build, Plan and command runs. See Support &amp; Plans.</p>
       <button class="rowline" type="button" id="introprefs"><span>Preferences</span></button>
       <div class="introtoggles">
         <button class="ghost" type="button" id="intronotices">Notices on</button>
@@ -1171,71 +1171,71 @@ agentHint:"Pro lance une étape quand vous appuyez sur Exécuter. Premium peut e
 every15:"Toutes les 15 min",everyHour:"Toutes les heures",every6:"Toutes les 6 heures",everyDay:"Chaque jour"
 }
 };
-// Meridian Pro. Info screens (Dashboard, Hardware, System, Battery, Security) stay free.
-// Pro locks Advanced tuning, Termux files, Build, Plan and every place that runs or changes things.
-const PRO_URL = "https://checkout.revolut.com/pay/a8de4ee8-551d-4f34-b8e7-4ec8aabca2e9";
-const PRO_BUY_LABEL = "Get Pro, 4.99 EUR";
+// Meridian Premium. Info screens (Dashboard, Hardware, System, Battery, Security) stay free.
+// Premium locks Advanced tuning, Termux files, Build, Plan and every place that runs or changes things.
+const PREMIUM_URL = "https://checkout.revolut.com/pay/a8de4ee8-551d-4f34-b8e7-4ec8aabca2e9";
+const PREMIUM_BUY_LABEL = "Get Premium, 4.99 EUR";
 const LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
-const PRO_I18N = {
-en:{proLead:"System, Hardware, Battery and the other readings stay free. Pro unlocks the parts that change or run things on this phone.",proItems:"Advanced tuning for CPU, GPU, thermal and memory|Termux files and folders|Build and Plan|Console and command runs|Desk and the scheduler|Commands, Mesh and Linux PC",proNote:"Opens the Revolut checkout page in your browser. Your license key comes after payment.",proKeyLabel:"Enter license key",proActivate:"Activate",proEmpty:"Paste your license key first.",proBad:"This key was not accepted. Check that you copied all of it.",proOk:"Pro is active on this phone.",proActive:"Pro active",proFree:"Free version",proSee:"See Pro",proLockedAria:"Pro feature"},
-hr:{proLead:"Sustav, Hardver, Baterija i ostala očitanja ostaju besplatni. Pro otključava dijelove koji mijenjaju ili pokreću stvari na ovom mobitelu.",proItems:"Napredno podešavanje za CPU, GPU, toplinu i memoriju|Termux datoteke i mape|Gradnja i Plan|Konzola i pokretanje naredbi|Desk i raspored|Naredbe, Mesh i Linux PC",proNote:"Otvara Revolut stranicu za plaćanje u pregledniku. Licencni ključ dobivaš nakon plaćanja.",proKeyLabel:"Unesi licencni ključ",proActivate:"Aktiviraj",proEmpty:"Prvo zalijepi licencni ključ.",proBad:"Ovaj ključ nije prihvaćen. Provjeri jesi li kopirao cijeli ključ.",proOk:"Pro je aktivan na ovom mobitelu.",proActive:"Pro aktivan",proFree:"Besplatna verzija",proSee:"Pogledaj Pro",proLockedAria:"Pro značajka"},
-de:{proLead:"System, Hardware, Akku und die anderen Werte bleiben kostenlos. Pro schaltet die Teile frei, die auf diesem Telefon etwas ändern oder ausführen.",proItems:"Erweitertes Tuning für CPU, GPU, Temperatur und Speicher|Termux-Dateien und Ordner|Bauen und Plan|Konsole und Befehle ausführen|Desk und der Zeitplaner|Befehle, Mesh und Linux-PC",proNote:"Öffnet die Revolut-Bezahlseite im Browser. Den Lizenzschlüssel bekommst du nach der Zahlung.",proKeyLabel:"Lizenzschlüssel eingeben",proActivate:"Aktivieren",proEmpty:"Füge zuerst deinen Lizenzschlüssel ein.",proBad:"Dieser Schlüssel wurde nicht angenommen. Prüfe, ob du ihn vollständig kopiert hast.",proOk:"Pro ist auf diesem Telefon aktiv.",proActive:"Pro aktiv",proFree:"Kostenlose Version",proSee:"Pro ansehen",proLockedAria:"Pro-Funktion"},
-ja:{proLead:"システム、ハードウェア、電池などの表示は無料のままです。Pro では、このスマホで設定を変えたりコマンドを実行したりする機能が使えます。",proItems:"CPU、GPU、温度、メモリの詳細チューニング|Termux のファイルとフォルダ|ビルドとプラン|コンソールとコマンド実行|Desk とスケジューラ|コマンド、Mesh、Linux PC",proNote:"ブラウザで Revolut の支払いページを開きます。ライセンスキーは支払い後に届きます。",proKeyLabel:"ライセンスキーを入力",proActivate:"有効化",proEmpty:"先にライセンスキーを貼り付けてください。",proBad:"このキーは受け付けられませんでした。すべてコピーされているか確認してください。",proOk:"このスマホで Pro が有効になりました。",proActive:"Pro 有効",proFree:"無料版",proSee:"Pro を見る",proLockedAria:"Pro 機能"},
-hi:{proLead:"सिस्टम, हार्डवेयर, बैटरी और बाकी रीडिंग मुफ़्त रहती हैं। Pro वे हिस्से खोलता है जो इस फ़ोन पर कुछ बदलते या चलाते हैं।",proItems:"CPU, GPU, तापमान और मेमोरी के लिए उन्नत ट्यूनिंग|Termux फ़ाइलें और फ़ोल्डर|बिल्ड और योजना|कंसोल और कमांड चलाना|Desk और शेड्यूलर|कमांड, Mesh और Linux PC",proNote:"यह आपके ब्राउज़र में Revolut भुगतान पेज खोलता है। भुगतान के बाद आपको लाइसेंस कुंजी मिलेगी।",proKeyLabel:"लाइसेंस कुंजी डालें",proActivate:"सक्रिय करें",proEmpty:"पहले अपनी लाइसेंस कुंजी पेस्ट करें।",proBad:"यह कुंजी स्वीकार नहीं हुई। देखें कि पूरी कुंजी कॉपी हुई है।",proOk:"इस फ़ोन पर Pro सक्रिय है।",proActive:"Pro सक्रिय",proFree:"मुफ़्त संस्करण",proSee:"Pro देखें",proLockedAria:"Pro सुविधा"},
-es:{proLead:"Sistema, Hardware, Batería y las demás lecturas siguen gratis. Pro desbloquea las partes que cambian o ejecutan cosas en este teléfono.",proItems:"Ajuste avanzado de CPU, GPU, temperatura y memoria|Archivos y carpetas de Termux|Construir y Plan|Consola y ejecución de comandos|Desk y el programador|Comandos, Mesh y PC Linux",proNote:"Abre la página de pago de Revolut en el navegador. La clave de licencia llega después del pago.",proKeyLabel:"Introduce la clave de licencia",proActivate:"Activar",proEmpty:"Pega primero tu clave de licencia.",proBad:"Esta clave no se aceptó. Comprueba que la copiaste completa.",proOk:"Pro está activo en este teléfono.",proActive:"Pro activo",proFree:"Versión gratuita",proSee:"Ver Pro",proLockedAria:"Función Pro"},
-fr:{proLead:"Système, Matériel, Batterie et les autres mesures restent gratuits. Pro débloque les parties qui modifient ou lancent des choses sur ce téléphone.",proItems:"Réglage avancé du CPU, du GPU, de la température et de la mémoire|Fichiers et dossiers Termux|Construire et Plan|Console et lancement de commandes|Desk et le planificateur|Commandes, Mesh et PC Linux",proNote:"Ouvre la page de paiement Revolut dans le navigateur. La clé de licence arrive après le paiement.",proKeyLabel:"Saisir la clé de licence",proActivate:"Activer",proEmpty:"Colle d’abord ta clé de licence.",proBad:"Cette clé n’a pas été acceptée. Vérifie que tu l’as copiée en entier.",proOk:"Pro est actif sur ce téléphone.",proActive:"Pro actif",proFree:"Version gratuite",proSee:"Voir Pro",proLockedAria:"Fonction Pro"}
+const PREMIUM_I18N = {
+en:{premiumLead:"System, Hardware, Battery and the other readings stay free. Premium unlocks the parts that change or run things on this phone.",premiumItems:"Advanced tuning for CPU, GPU, thermal and memory|Termux files and folders|Build and Plan|Console and command runs|Desk and the scheduler|Commands, Mesh and Linux PC",premiumNote:"Opens the Revolut checkout page in your browser. Your license key comes after payment.",premiumKeyLabel:"Enter license key",premiumActivate:"Activate",premiumEmpty:"Paste your license key first.",premiumBad:"This key was not accepted. Check that you copied all of it.",premiumOk:"Premium is active on this phone.",premiumActive:"Premium active",premiumFree:"Free version",premiumSee:"See Premium",premiumLockedAria:"Premium feature"},
+hr:{premiumLead:"Sustav, Hardver, Baterija i ostala očitanja ostaju besplatni. Premium otključava dijelove koji mijenjaju ili pokreću stvari na ovom mobitelu.",premiumItems:"Napredno podešavanje za CPU, GPU, toplinu i memoriju|Termux datoteke i mape|Gradnja i Plan|Konzola i pokretanje naredbi|Desk i raspored|Naredbe, Mesh i Linux PC",premiumNote:"Otvara Revolut stranicu za plaćanje u pregledniku. Licencni ključ dobivaš nakon plaćanja.",premiumKeyLabel:"Unesi licencni ključ",premiumActivate:"Aktiviraj",premiumEmpty:"Prvo zalijepi licencni ključ.",premiumBad:"Ovaj ključ nije prihvaćen. Provjeri jesi li kopirao cijeli ključ.",premiumOk:"Premium je aktivan na ovom mobitelu.",premiumActive:"Premium aktivan",premiumFree:"Besplatna verzija",premiumSee:"Pogledaj Premium",premiumLockedAria:"Premium značajka"},
+de:{premiumLead:"System, Hardware, Akku und die anderen Werte bleiben kostenlos. Premium schaltet die Teile frei, die auf diesem Telefon etwas ändern oder ausführen.",premiumItems:"Erweitertes Tuning für CPU, GPU, Temperatur und Speicher|Termux-Dateien und Ordner|Bauen und Plan|Konsole und Befehle ausführen|Desk und der Zeitplaner|Befehle, Mesh und Linux-PC",premiumNote:"Öffnet die Revolut-Bezahlseite im Browser. Den Lizenzschlüssel bekommst du nach der Zahlung.",premiumKeyLabel:"Lizenzschlüssel eingeben",premiumActivate:"Aktivieren",premiumEmpty:"Füge zuerst deinen Lizenzschlüssel ein.",premiumBad:"Dieser Schlüssel wurde nicht angenommen. Prüfe, ob du ihn vollständig kopiert hast.",premiumOk:"Premium ist auf diesem Telefon aktiv.",premiumActive:"Premium aktiv",premiumFree:"Kostenlose Version",premiumSee:"Premium ansehen",premiumLockedAria:"Premium-Funktion"},
+ja:{premiumLead:"システム、ハードウェア、電池などの表示は無料のままです。Premium では、このスマホで設定を変えたりコマンドを実行したりする機能が使えます。",premiumItems:"CPU、GPU、温度、メモリの詳細チューニング|Termux のファイルとフォルダ|ビルドとプラン|コンソールとコマンド実行|Desk とスケジューラ|コマンド、Mesh、Linux PC",premiumNote:"ブラウザで Revolut の支払いページを開きます。ライセンスキーは支払い後に届きます。",premiumKeyLabel:"ライセンスキーを入力",premiumActivate:"有効化",premiumEmpty:"先にライセンスキーを貼り付けてください。",premiumBad:"このキーは受け付けられませんでした。すべてコピーされているか確認してください。",premiumOk:"このスマホで Premium が有効になりました。",premiumActive:"Premium 有効",premiumFree:"無料版",premiumSee:"Premium を見る",premiumLockedAria:"Premium 機能"},
+hi:{premiumLead:"सिस्टम, हार्डवेयर, बैटरी और बाकी रीडिंग मुफ़्त रहती हैं। Premium वे हिस्से खोलता है जो इस फ़ोन पर कुछ बदलते या चलाते हैं।",premiumItems:"CPU, GPU, तापमान और मेमोरी के लिए उन्नत ट्यूनिंग|Termux फ़ाइलें और फ़ोल्डर|बिल्ड और योजना|कंसोल और कमांड चलाना|Desk और शेड्यूलर|कमांड, Mesh और Linux PC",premiumNote:"यह आपके ब्राउज़र में Revolut भुगतान पेज खोलता है। भुगतान के बाद आपको लाइसेंस कुंजी मिलेगी।",premiumKeyLabel:"लाइसेंस कुंजी डालें",premiumActivate:"सक्रिय करें",premiumEmpty:"पहले अपनी लाइसेंस कुंजी पेस्ट करें।",premiumBad:"यह कुंजी स्वीकार नहीं हुई। देखें कि पूरी कुंजी कॉपी हुई है।",premiumOk:"इस फ़ोन पर Premium सक्रिय है।",premiumActive:"Premium सक्रिय",premiumFree:"मुफ़्त संस्करण",premiumSee:"Premium देखें",premiumLockedAria:"Premium सुविधा"},
+es:{premiumLead:"Sistema, Hardware, Batería y las demás lecturas siguen gratis. Premium desbloquea las partes que cambian o ejecutan cosas en este teléfono.",premiumItems:"Ajuste avanzado de CPU, GPU, temperatura y memoria|Archivos y carpetas de Termux|Construir y Plan|Consola y ejecución de comandos|Desk y el programador|Comandos, Mesh y PC Linux",premiumNote:"Abre la página de pago de Revolut en el navegador. La clave de licencia llega después del pago.",premiumKeyLabel:"Introduce la clave de licencia",premiumActivate:"Activar",premiumEmpty:"Pega primero tu clave de licencia.",premiumBad:"Esta clave no se aceptó. Comprueba que la copiaste completa.",premiumOk:"Premium está activo en este teléfono.",premiumActive:"Premium activo",premiumFree:"Versión gratuita",premiumSee:"Ver Premium",premiumLockedAria:"Función Premium"},
+fr:{premiumLead:"Système, Matériel, Batterie et les autres mesures restent gratuits. Premium débloque les parties qui modifient ou lancent des choses sur ce téléphone.",premiumItems:"Réglage avancé du CPU, du GPU, de la température et de la mémoire|Fichiers et dossiers Termux|Construire et Plan|Console et lancement de commandes|Desk et le planificateur|Commandes, Mesh et PC Linux",premiumNote:"Ouvre la page de paiement Revolut dans le navigateur. La clé de licence arrive après le paiement.",premiumKeyLabel:"Saisir la clé de licence",premiumActivate:"Activer",premiumEmpty:"Colle d’abord ta clé de licence.",premiumBad:"Cette clé n’a pas été acceptée. Vérifie que tu l’as copiée en entier.",premiumOk:"Premium est actif sur ce téléphone.",premiumActive:"Premium actif",premiumFree:"Version gratuite",premiumSee:"Voir Premium",premiumLockedAria:"Fonction Premium"}
 };
-Object.keys(PRO_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, PRO_I18N[l]); });
+Object.keys(PREMIUM_I18N).forEach(function (l) { EXTRA[l] = Object.assign(EXTRA[l] || {}, PREMIUM_I18N[l]); });
 // TODO(Abc): the encrypted license key check goes here. Until it is written, no key is accepted.
-// Return true only for a key that passes that check. Nothing else in the app decides Pro.
+// Return true only for a key that passes that check. Nothing else in the app decides Premium.
 function verifyLicense(key) {
   return false;
 }
-function isProUnlocked() {
+function isPremiumUnlocked() {
   let key = "";
-  try { key = localStorage.getItem("m-pro-key") || ""; } catch (e) {}
+  try { key = localStorage.getItem("m-premium-key") || ""; } catch (e) {}
   return key !== "" && verifyLicense(key) === true;
 }
-function proNeeded(v, m) {
+function premiumNeeded(v, m) {
   if (v === "build" || v === "plan" || v === "console" || v === "files") return true;
   return v === "tools" && ["tuning", "pc", "commands", "mesh", "desk"].indexOf(m) >= 0;
 }
 function lockB() {
-  return '<i class="lockbadge" aria-label="' + esc(t("proLockedAria")) + '">' + LOCK_SVG + '</i>';
+  return '<i class="lockbadge" aria-label="' + esc(t("premiumLockedAria")) + '">' + LOCK_SVG + '</i>';
 }
-function paintPro() {
-  document.documentElement.setAttribute("data-pro", isProUnlocked() ? "1" : "0");
+function paintPremium() {
+  document.documentElement.setAttribute("data-premium", isPremiumUnlocked() ? "1" : "0");
 }
 function activateLicense(raw) {
   const key = String(raw || "").trim();
-  if (!key) return { ok: false, msg: t("proEmpty") };
-  if (verifyLicense(key) !== true) return { ok: false, msg: t("proBad") };
-  try { localStorage.setItem("m-pro-key", key); } catch (e) {}
-  paintPro();
-  return { ok: true, msg: t("proOk") };
+  if (!key) return { ok: false, msg: t("premiumEmpty") };
+  if (verifyLicense(key) !== true) return { ok: false, msg: t("premiumBad") };
+  try { localStorage.setItem("m-premium-key", key); } catch (e) {}
+  paintPremium();
+  return { ok: true, msg: t("premiumOk") };
 }
-function buyPro() {
-  try { MeridianPhone.buyPro(PRO_URL); } catch (e) {}
+function buyPremium() {
+  try { MeridianPhone.buyPremium(PREMIUM_URL); } catch (e) {}
 }
-function proSheetBody() {
-  const items = t("proItems").split("|").map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
-  let html = '<article class="prosheet" id="prosheet"><h2>' + (isProUnlocked() ? "" : '<i class="lockbadge" aria-hidden="true">' + LOCK_SVG + '</i>') + 'Meridian Pro</h2>';
-  html += '<p class="muted">' + esc(t("proLead")) + '</p><ul class="checks">' + items + '</ul>';
-  if (isProUnlocked()) return html + '<p class="promsg ok">' + esc(t("proActive")) + '</p></article>';
-  html += '<button class="btn" type="button" id="getpro">' + esc(PRO_BUY_LABEL) + '</button><p class="muted">' + esc(t("proNote")) + '</p>';
-  html += '<label for="prokey">' + esc(t("proKeyLabel")) + '</label><input id="prokey" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="' + esc(t("proKeyLabel")) + '" />';
-  html += '<button class="ghost" type="button" id="proactivate">' + esc(t("proActivate")) + '</button><p class="promsg" id="promsg" role="status" aria-live="polite"></p></article>';
+function premiumSheetBody() {
+  const items = t("premiumItems").split("|").map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
+  let html = '<article class="premiumsheet" id="premiumsheet"><h2>' + (isPremiumUnlocked() ? "" : '<i class="lockbadge" aria-hidden="true">' + LOCK_SVG + '</i>') + 'Meridian Premium</h2>';
+  html += '<p class="muted">' + esc(t("premiumLead")) + '</p><ul class="checks">' + items + '</ul>';
+  if (isPremiumUnlocked()) return html + '<p class="premiummsg ok">' + esc(t("premiumActive")) + '</p></article>';
+  html += '<button class="btn" type="button" id="getpremium">' + esc(PREMIUM_BUY_LABEL) + '</button><p class="muted">' + esc(t("premiumNote")) + '</p>';
+  html += '<label for="premiumkey">' + esc(t("premiumKeyLabel")) + '</label><input id="premiumkey" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="' + esc(t("premiumKeyLabel")) + '" />';
+  html += '<button class="ghost" type="button" id="premiumactivate">' + esc(t("premiumActivate")) + '</button><p class="premiummsg" id="premiummsg" role="status" aria-live="polite"></p></article>';
   return html;
 }
-function bindProSheet(after) {
-  const get = document.getElementById("getpro");
-  if (get) get.onclick = function () { buyPro(); };
-  const act = document.getElementById("proactivate");
+function bindPremiumSheet(after) {
+  const get = document.getElementById("getpremium");
+  if (get) get.onclick = function () { buyPremium(); };
+  const act = document.getElementById("premiumactivate");
   if (act) act.onclick = function () {
-    const field = document.getElementById("prokey");
-    const msg = document.getElementById("promsg");
+    const field = document.getElementById("premiumkey");
+    const msg = document.getElementById("premiummsg");
     const res = activateLicense(field ? field.value : "");
-    if (msg) { msg.textContent = res.msg; msg.className = "promsg " + (res.ok ? "ok" : "bad"); }
+    if (msg) { msg.textContent = res.msg; msg.className = "premiummsg " + (res.ok ? "ok" : "bad"); }
     if (res.ok && after) after();
   };
 }
@@ -1756,7 +1756,7 @@ function goNav(patch, opts) {
     openCmd: Object.prototype.hasOwnProperty.call(patch, "openCmd") ? patch.openCmd : openCmd,
     editing: Object.prototype.hasOwnProperty.call(patch, "editing") ? patch.editing : editing
   };
-  if (proNeeded(next.view, next.more) && !isProUnlocked()) { openSheet("pro"); return; }
+  if (premiumNeeded(next.view, next.more) && !isPremiumUnlocked()) { openSheet("premium"); return; }
   if (!sameNav(cur, next) && !(opts && opts.replace)) {
     navStack.push(cur);
     if (navStack.length > 48) navStack.shift();
@@ -1785,7 +1785,7 @@ function paintChrome() {
     if (svg) el.appendChild(svg);
     el.appendChild(document.createTextNode(t(key)));
     const nv = el.getAttribute("data-view");
-    if (proNeeded(nv, "menu")) el.insertAdjacentHTML("beforeend", lockB());
+    if (premiumNeeded(nv, "menu")) el.insertAdjacentHTML("beforeend", lockB());
   });
   const nav = document.querySelector("nav");
   if (nav) nav.setAttribute("aria-label", t("mainNav"));
@@ -3528,8 +3528,8 @@ function settingsPage() {
   });
   html += '</div></div>';
   html += '<div class="setrow"><div class="k">' + esc(t("language")) + '</div>' + seg("lang", LANGS) + '</div>';
-  html += '</article><article class="plate stack" id="prorow"><b>Meridian Pro</b>';
-  html += '<div class="setrow"><div class="k" id="prostate">' + esc(isProUnlocked() ? t("proActive") : t("proFree")) + '</div>' + (isProUnlocked() ? "" : '<button class="ghost" type="button" id="opensetpro">' + esc(t("proSee")) + '</button>') + '</div>';
+  html += '</article><article class="plate stack" id="premiumrow"><b>Meridian Premium</b>';
+  html += '<div class="setrow"><div class="k" id="premiumstate">' + esc(isPremiumUnlocked() ? t("premiumActive") : t("premiumFree")) + '</div>' + (isPremiumUnlocked() ? "" : '<button class="ghost" type="button" id="opensetpremium">' + esc(t("premiumSee")) + '</button>') + '</div>';
   html += '</article><article class="plate stack"><b>' + esc(t("feel")) + '</b>';
   html += '<div class="setrow"><div class="k">' + esc(t("refresh")) + '</div>' + seg("refresh", [["saver", t("refreshSaver")], ["normal", t("refreshNormal")], ["live", t("refreshLive")]]) + '</div>';
   html += '<div class="setrow"><div class="k">' + esc(t("consoleFont")) + " " + prefs.termFont + 'px</div><div class="seg"><button class="ghost" type="button" id="fontdown">A−</button><button class="ghost" type="button" id="fontup">A+</button></div></div>';
@@ -4992,8 +4992,8 @@ function windowTitle() {
   return t("titleHome");
 }
 let logoPressed = false;
-// Meridian is open source (MIT). The readings are free; Pro (see PRO_URL) unlocks the rest.
-// Premium is the optional business support tier on top of Pro.
+// Meridian is open source (MIT). The readings are free; Premium (see PREMIUM_URL) unlocks the rest.
+// Business support is an optional tier on top of Premium.
 function payNote() {
   return "";
 }
@@ -5016,18 +5016,18 @@ const REPO_URL = "https://github.com/kukirin-ui/Meridian";
 const SUPPORT_MAIL = "mailto:Pozun.alen96@gmail.com?subject=Meridian%20support";
 function supportCard() {
   let html = '<article class="tiercard support" id="support"><div class="tierhead"><div><p class="priceem">Open source</p><h2>Support Meridian</h2></div><p class="tierprice">MIT</p></div>';
-  html += '<p class="muted">Meridian is open source under the MIT licence. The readings are free with no account. Pro unlocks the rest. A donation also keeps development going.</p>';
+  html += '<p class="muted">Meridian is open source under the MIT licence. The readings are free with no account. Premium unlocks the rest. A donation also keeps development going.</p>';
   html += '<div class="tools supportbtns"><button class="btn pay tierbtn" id="pay" type="button">Donate</button><button class="ghost tierbtn" id="supportbtn" type="button">Get support</button><button class="ghost tierbtn" id="sourcebtn" type="button">Source code</button></div>';
-  html += '<p class="muted">Donate opens the donation checkout page in your browser. It is optional and does not unlock Pro. Get support opens an email to the developer. Bug reports and feature ideas are also welcome on GitHub Issues.</p>';
+  html += '<p class="muted">Donate opens the donation checkout page in your browser. It is optional and does not unlock Premium. Get support opens an email to the developer. Bug reports and feature ideas are also welcome on GitHub Issues.</p>';
   return html + '</article>';
 }
 function payPage() {
   let html = '<div class="stack plans">';
-  html += '<p class="plansub">' + esc(t("proLead")) + '</p>';
+  html += '<p class="plansub">' + esc(t("premiumLead")) + '</p>';
   html += supportCard();
-  const on = isProUnlocked() ? '<button class="ghost tierbtn" type="button" disabled>' + esc(t("proActive")) + '</button>' : '<button class="btn tierbtn" type="button" id="plangetpro">' + esc(PRO_BUY_LABEL) + '</button><button class="ghost tierbtn" type="button" id="planprokey">' + esc(t("proKeyLabel")) + '</button>';
-  html += tierCard("Personal", "Pro", "4.99 EUR", t("proItems").split("|").join(", "), on, "pro");
-  html += tierCard("Business", "Premium", "Optional support", "Everything in Pro, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="premiumsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and use Get support for priority help.</p>', "biz");
+  const on = isPremiumUnlocked() ? '<button class="ghost tierbtn" type="button" disabled>' + esc(t("premiumActive")) + '</button>' : '<button class="btn tierbtn" type="button" id="plangetpremium">' + esc(PREMIUM_BUY_LABEL) + '</button><button class="ghost tierbtn" type="button" id="planpremiumkey">' + esc(t("premiumKeyLabel")) + '</button>';
+  html += tierCard("Personal", "Premium", "4.99 EUR", t("premiumItems").split("|").join(", "), on, "pro");
+  html += tierCard("Business", "Business support", "Optional", "Everything in Premium, Aimed at businesses and teams, Priority help with setup and issues, Backs ongoing open source development.", '<button class="btn tierbtn" type="button" id="bizsupport">Support as a business</button><p class="muted">Uses the same checkout link as Donate. Mention your company in the note and use Get support for priority help.</p>', "biz");
   return html + '</div>';
 }
 // The prompt cursor in the title bar is only for screens where commands are typed or run.
@@ -5038,12 +5038,12 @@ function commandScreen() {
 }
 function render() {
   const main = document.getElementById("main");
-  paintPro();
-  if (proNeeded(view, more) && !isProUnlocked()) {
+  paintPremium();
+  if (premiumNeeded(view, more) && !isPremiumUnlocked()) {
     // Catch-all for paths that set view directly. The first paint stays quiet.
     const fromTools = view === "tools" || view === "console" || view === "files";
     view = fromTools ? "tools" : "home"; more = "menu"; openCmd = ""; editing = false;
-    if (window.__place !== undefined) setTimeout(function () { openSheet("pro"); }, 0);
+    if (window.__place !== undefined) setTimeout(function () { openSheet("premium"); }, 0);
   }
   const map = { home: homePage, hardware: hardwarePage, system: systemPage, battery: batteryPage, security: securityPage, build: buildPage, plan: planPage, key: keyPage, apis: apisPage, tools: toolsPage, console: consoleView, files: filesPage, setup: setupPage, pay: payPage, settings: settingsPage };
   const place = [view, more, openCmd, editing ? "1" : "0", cwd || "", String(sessionIx), selectMode ? "1" : "0"].join(":");
@@ -5894,18 +5894,18 @@ function bind() {
   };
   const pay = document.getElementById("pay");
   if (pay) pay.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
-  const plangetpro = document.getElementById("plangetpro");
-  if (plangetpro) plangetpro.onclick = function () { buyPro(); };
-  const planprokey = document.getElementById("planprokey");
-  if (planprokey) planprokey.onclick = function () { openSheet("pro"); };
-  const premiumsupport = document.getElementById("premiumsupport");
-  if (premiumsupport) premiumsupport.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
+  const plangetpremium = document.getElementById("plangetpremium");
+  if (plangetpremium) plangetpremium.onclick = function () { buyPremium(); };
+  const planpremiumkey = document.getElementById("planpremiumkey");
+  if (planpremiumkey) planpremiumkey.onclick = function () { openSheet("premium"); };
+  const bizsupport = document.getElementById("bizsupport");
+  if (bizsupport) bizsupport.onclick = function () { try { MeridianPhone.pay(); } catch (e) {} };
   const supportbtn = document.getElementById("supportbtn");
   if (supportbtn) supportbtn.onclick = function () { try { MeridianPhone.open(SUPPORT_MAIL); } catch (e) {} };
   const sourcebtn = document.getElementById("sourcebtn");
   if (sourcebtn) sourcebtn.onclick = function () { try { MeridianPhone.open(REPO_URL); } catch (e) {} };
-  const opensetpro = document.getElementById("opensetpro");
-  if (opensetpro) opensetpro.onclick = function () { openSheet("pro"); };
+  const opensetpremium = document.getElementById("opensetpremium");
+  if (opensetpremium) opensetpremium.onclick = function () { openSheet("premium"); };
   const openhelp = document.getElementById("openhelp");
   if (openhelp) openhelp.onclick = function () { openSheet("help"); };
   const copymd = document.getElementById("copymd");
@@ -6797,16 +6797,16 @@ function openSheet(kind) {
   if (!el) return;
   const ver = esc(appVersion());
   let body = '<button class="ghost" type="button" id="sheetback">Back</button>';
-  if (kind === "pro") {
-    body += proSheetBody();
+  if (kind === "premium") {
+    body += premiumSheetBody();
   } else if (kind === "help") {
     body += '<h2>Help</h2><p><b>Where do commands run?</b></p><p>Commands run in Termux on this phone. There is no account and no server.</p><p><b>Permission denied</b></p><p>Android is asking for the Termux command permission. Allow it. That is not a ban.</p><p><b>Network looks stuck</b></p><p>If the phone closes its counters, the gauge shows the link speed instead of a dash.</p><button class="btn" type="button" id="sheetsetup">Open Setup</button><button class="ghost" type="button" id="sheetdoctor">Troubleshooting</button><button class="ghost" type="button" id="sheetmail">Contact Support</button><button class="ghost" type="button" id="sheetintro">Show the intro</button>';
   } else if (kind === "terms") {
-    body += '<h2>Terms</h2><p>Meridian is open source software under the MIT licence. Copyright (c) 2026 Alen Požun (kukirin-ui). You may use, copy, modify, and share it under that licence.</p><p>The readings are free. Pro is a one time 4.99 EUR purchase that unlocks tuning, files, Build, Plan and command runs. Premium is optional support for businesses.</p><p>Commands run in Termux on this phone. You read a command before it runs.</p>';
+    body += '<h2>Terms</h2><p>Meridian is open source software under the MIT licence. Copyright (c) 2026 Alen Požun (kukirin-ui). You may use, copy, modify, and share it under that licence.</p><p>The readings are free. Premium is a one time 4.99 EUR purchase that unlocks tuning, files, Build, Plan and command runs. Business support is optional, for businesses.</p><p>Commands run in Termux on this phone. You read a command before it runs.</p>';
   } else if (kind === "started") {
     body += '<h2>Get Started</h2><p>Install Termux from F-Droid, not Play. Come back to Meridian and press Connect.</p><p>If Android says permission denied, it is asking for the Termux command permission. Allow it. That is not a ban and not a broken phone.</p><p>The line turns into Connected when the bond is there.</p><button class="btn" type="button" id="sheetcontinue">Continue</button>';
   } else if (kind === "plans") {
-    body += '<h2>Plans</h2><p>Meridian is open source. The readings are free.</p><p>Pro unlocks tuning, files, Build, Plan and command runs for 4.99 EUR. Premium is optional support for businesses that want priority help.</p><p>Donations are optional and do not unlock Pro.</p>';
+    body += '<h2>Plans</h2><p>Meridian is open source. The readings are free.</p><p>Premium unlocks tuning, files, Build, Plan and command runs for 4.99 EUR. Business support is optional, for businesses that want priority help.</p><p>Donations are optional and do not unlock Premium.</p>';
   } else if (kind === "prefs") {
     body += '<h2>Preferences</h2><p>Look stays on this handset.</p><div class="setrow"><div class="k">Theme</div><div class="seg">';
     [["oled", "OLED"], ["dark", "Dark"], ["light", "Light"], ["system", "System"]].forEach(function (o) {
@@ -6826,7 +6826,7 @@ function openSheet(kind) {
   el.hidden = false;
   const back = document.getElementById("sheetback");
   if (back) back.onclick = function () { el.hidden = true; };
-  if (kind === "pro") bindProSheet(function () { render(); });
+  if (kind === "premium") bindPremiumSheet(function () { render(); });
   const setup = document.getElementById("sheetsetup");
   if (setup) setup.onclick = function () {
     if (introUp()) { openSheet("started"); return; }
